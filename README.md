@@ -12,3 +12,31 @@ It provides GUI with following features:
 * Saving and loading
 * Changing colors of new objects or all current lines on some position
 * Output list of objects on some points
+
+
+## How to run
+
+First, make sure you have Python 3 installed.
+```
+python3 --version
+```
+
+Create a virtual environment via `venv` (2nd *venv* is name of the folder with virtual environment):
+```
+python3 -m venv venv
+```
+
+Activate your virtual environment:
+```
+source venv/bin/activate
+```
+
+Upgrade pip to latest version and install all dependencies:
+```
+pip install --upgrade pip && pip install -r requirements.txt
+```
+
+Run the app:
+```
+bin/run.py
+```
