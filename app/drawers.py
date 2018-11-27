@@ -10,26 +10,41 @@ from app.shapes import Shape, Dot, Line, Rectangle, Circle
 class Drawer:
     def __init__(self, shapes: List[Shape]):
         super().__init__()
-        self._shapes = shapes or []
+        self.shapes = shapes or []
 
     def add_shape(self, shape: Shape):
-        self._shapes.append(shape)
+        self.shapes.append(shape)
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
             self.add_shape(shape)
 
+    def remove_last_shape(self):
+        self.shapes.pop()
+
+    def remove_shape(self, shape: Shape):
+        try:
+            self.shapes.remove(shape)
+        except ValueError:
+            pass
+
     def draw_dot(self, dot: Dot):
-        pass
+        raise NotImplementedError
 
     def draw_line(self, line: Line):
-        pass
+        raise NotImplementedError
 
     def draw_rectangle(self, rect: Rectangle):
-        pass
+        raise NotImplementedError
 
     def draw_circle(self, circle: Circle):
-        pass
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.shapes == other.shapes
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 class Canvas(Drawer, QtWidgets.QWidget):
@@ -42,7 +57,7 @@ class Canvas(Drawer, QtWidgets.QWidget):
         return painter
 
     def paintEvent(self, event: QEvent):
-        for obj in self._shapes:
+        for obj in self.shapes:
             obj.draw(self)
 
     def draw_dot(self, dot: Dot):

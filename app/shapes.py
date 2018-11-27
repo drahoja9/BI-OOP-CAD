@@ -9,10 +9,26 @@ class Shape:
         self.color = color
 
     def draw(self, drawer):
-        pass
+        raise NotImplementedError
 
     def get_props(self):
-        pass
+        raise NotImplementedError
+
+    def __repr__(self):
+        return (
+            'Abstract shape at ' +
+            str(self.start)
+        )
+
+    def __eq__(self, other):
+        return (
+            self.__class__ == other.__class__ and
+            self.start == other.start and
+            self.color == other.color
+        )
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 class Dot(Shape):
@@ -25,6 +41,12 @@ class Dot(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y
 
+    def __repr__(self):
+        return (
+            'Dot at ' +
+            str(self.start)
+        )
+
 
 class Line(Shape):
     def __init__(self, start: Point, end: Point, color: QColor):
@@ -36,6 +58,20 @@ class Line(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.end.x, self.end.y
+
+    def __repr__(self):
+        return (
+            'Line from ' +
+            str(self.start) +
+            ' to ' +
+            str(self.end)
+        )
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.end == other.end
+        )
 
 
 class Rectangle(Shape):
@@ -50,6 +86,22 @@ class Rectangle(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.width, self.height
 
+    def __repr__(self):
+        return (
+            str(self.width) +
+            'x' +
+            str(self.height) +
+            ' rectangle with top-left corner at ' +
+            str(self.start)
+        )
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.width == other.width and
+            self.height == other.height
+        )
+
 
 class Circle(Shape):
     def __init__(self, middle: Point, radius: int, color: QColor):
@@ -61,3 +113,17 @@ class Circle(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.radius
+
+    def __repr__(self):
+        return (
+            'Circle centered at ' +
+            str(self.start) +
+            ' with radius ' +
+            str(self.radius)
+        )
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.radius == other.radius
+        )
