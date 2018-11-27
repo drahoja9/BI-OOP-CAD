@@ -38,5 +38,5 @@ pip install --upgrade pip && pip install -r requirements.txt
 
 Run the app:
 ```
-bin/run.py
+./run.py
 ```
