@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor, QPainter
 from PyQt5.QtCore import QEvent
@@ -6,12 +8,9 @@ from app.shapes import Shape, Dot, Line, Rectangle, Circle
 
 
 class Drawer:
-    def __init__(self, shapes: list):
+    def __init__(self, shapes: List[Shape]):
         super().__init__()
-        if shapes is None:
-            self._shapes = []
-        else:
-            self._shapes = shapes
+        self._shapes = shapes or []
 
     def add_shape(self, shape: Shape):
         self._shapes.append(shape)

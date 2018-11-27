@@ -1,3 +1,5 @@
+import os
+
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtGui import QColor
 
@@ -10,8 +12,8 @@ def main():
     app = QtWidgets.QApplication([])
 
     window = QtWidgets.QMainWindow()
-
-    with open('ui/mainWindow.ui') as f:
+    current_dir = os.path.dirname(__file__)
+    with open(current_dir + '/ui/mainWindow.ui') as f:
         uic.loadUi(f, window)
 
     canvas_area = window.findChild(QtWidgets.QScrollArea, 'scrollArea')
@@ -33,7 +35,3 @@ def main():
     window.show()
 
     return app.exec()
-
-
-if __name__ == '__main__':
-    main()
