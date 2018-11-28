@@ -4,24 +4,24 @@ from PyQt5.QtGui import QColor
 
 from app.shapes import Shape, Dot, Line, Rectangle, Circle
 from app.utils import Point
-from app.drawers import Drawer
+from app.printers import Printer
 
 
-class DrawerMockup(Drawer):
+class PrinterMockup(Printer):
     def __init__(self):
-        super().__init__([])
+        super().__init__()
         self.result = ''
 
-    def draw_dot(self, dot: Dot):
+    def print_dot(self, dot: Dot):
         self.result = 'Drawed a ' + str(dot)
 
-    def draw_line(self, line: Line):
+    def print_line(self, line: Line):
         self.result = 'Drawed a ' + str(line)
 
-    def draw_rectangle(self, rect: Rectangle):
+    def print_rectangle(self, rect: Rectangle):
         self.result = 'Drawed a ' + str(rect)
 
-    def draw_circle(self, circle: Circle):
+    def print_circle(self, circle: Circle):
         self.result = 'Drawed a ' + str(circle)
 
 
@@ -32,7 +32,7 @@ def test_abstract_shape():
     assert abstract_shape.color == QColor('steelblue')
 
     with pytest.raises(NotImplementedError):
-        abstract_shape.draw(None)
+        abstract_shape.print_to(None)
 
     with pytest.raises(NotImplementedError):
         abstract_shape.get_props()
@@ -49,8 +49,8 @@ def test_dot():
     assert dot.color == QColor(1, 2, 3)
     assert dot.get_props() == (10, 200000000)
 
-    d = DrawerMockup()
-    dot.draw(d)
+    d = PrinterMockup()
+    dot.print_to(d)
     assert d.result == 'Drawed a ' + str(dot)
 
     assert str(dot) == 'Dot at [10, 200000000]'
@@ -66,8 +66,8 @@ def test_line():
     assert line.color == QColor(0, 0, 0)
     assert line.get_props() == (1000, -1000, -123, 321)
 
-    d = DrawerMockup()
-    line.draw(d)
+    d = PrinterMockup()
+    line.print_to(d)
     assert d.result == 'Drawed a ' + str(line)
 
     assert str(line) == 'Line from [1000, -1000] to [-123, 321]'
@@ -84,8 +84,8 @@ def test_rectangle():
     assert rect.color == QColor(255, 255, 255)
     assert rect.get_props() == (0, 0, 1, 50000)
 
-    d = DrawerMockup()
-    rect.draw(d)
+    d = PrinterMockup()
+    rect.print_to(d)
     assert d.result == 'Drawed a ' + str(rect)
 
     assert str(rect) == '1x50000 rectangle with top-left corner at [0, 0]'
@@ -101,8 +101,8 @@ def test_circle():
     assert circle.color == QColor(123, 255, 0)
     assert circle.get_props() == (12345, 54321, 999)
 
-    d = DrawerMockup()
-    circle.draw(d)
+    d = PrinterMockup()
+    circle.print_to(d)
     assert d.result == 'Drawed a ' + str(circle)
 
     assert str(circle) == 'Circle centered at [12345, 54321] with radius 999'

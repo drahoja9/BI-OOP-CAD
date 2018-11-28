@@ -8,7 +8,7 @@ class Shape:
         self.start = start
         self.color = color
 
-    def draw(self, drawer):
+    def print_to(self, printer):
         raise NotImplementedError
 
     def get_props(self):
@@ -35,8 +35,8 @@ class Dot(Shape):
     def __init__(self, start: Point, color: QColor):
         super().__init__(start, color)
 
-    def draw(self, drawer):
-        drawer.draw_dot(self)
+    def print_to(self, printer):
+        printer.print_dot(self)
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y
@@ -53,8 +53,8 @@ class Line(Shape):
         super().__init__(start, color)
         self.end = end
 
-    def draw(self, drawer):
-        drawer.draw_line(self)
+    def print_to(self, printer):
+        printer.print_line(self)
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.end.x, self.end.y
@@ -80,8 +80,8 @@ class Rectangle(Shape):
         self.width = width
         self.height = height
 
-    def draw(self, drawer):
-        drawer.draw_rectangle(self)
+    def print_to(self, printer):
+        printer.print_rectangle(self)
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.width, self.height
@@ -108,8 +108,8 @@ class Circle(Shape):
         super().__init__(middle, color)
         self.radius = radius
 
-    def draw(self, drawer):
-        drawer.draw_circle(self)
+    def print_to(self, printer):
+        printer.print_circle(self)
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.radius
