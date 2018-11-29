@@ -3,7 +3,7 @@ from typing import TextIO
 from PyQt5.QtGui import QColor, QPainter
 
 from app.canvas import Canvas
-from app.shapes import Dot, Line, Rectangle, Circle
+from app.shapes import Dot, Line, Rectangle, Circle, Shape
 
 
 class Printer:
@@ -23,32 +23,44 @@ class Printer:
         raise NotImplementedError
 
 
-class TextPrinter(Printer):
+class AbstractTextPrinter(Printer):
+    def __init__(self):
+        super().__init__()
+
+    def _print_shape(self, shape: Shape):
+        raise NotImplementedError
+
+    def print_dot(self, dot: Dot):
+        self._print_shape(dot)
+
+    def print_line(self, line: Line):
+        self._print_shape(line)
+
+    def print_rectangle(self, rect: Rectangle):
+        self._print_shape(rect)
+
+    def print_circle(self, circle: Circle):
+        self._print_shape(circle)
+
+
+class StreamTextPrinter(AbstractTextPrinter):
     def __init__(self, stream: TextIO):
         super().__init__()
         self._stream = stream
 
-    def print_dot(self, dot: Dot):
-        self._stream.write(str(dot) + '\n')
-
-    def print_line(self, line: Line):
-        self._stream.write(str(line) + '\n')
-
-    def print_rectangle(self, rect: Rectangle):
-        self._stream.write(str(rect) + '\n')
-
-    def print_circle(self, circle: Circle):
-        self._stream.write(str(circle) + '\n')
+    def _print_shape(self, shape: Shape):
+        self._stream.write(str(shape) + '\n')
 
 
-class FilePrinter(TextPrinter):
+class FileTextPrinter(AbstractTextPrinter):
     def __init__(self, path: str, append: bool = True):
-        mode = 'a' if append else 'w'
-        self._fd = open(path, mode)
-        super().__init__(self._fd)
+        super().__init__()
+        self._path = path
+        self._mode = 'a' if append else 'w'
 
-    def __del__(self):
-        self._fd.close()
+    def _print_shape(self, shape: Shape):
+        with open(self._path, self._mode) as f:
+            f.write(str(shape) + '\n')
 
 
 class CanvasPrinter(Printer):
