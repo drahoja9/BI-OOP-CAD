@@ -53,10 +53,10 @@ class StreamTextPrinter(AbstractTextPrinter):
 
 
 class FileTextPrinter(AbstractTextPrinter):
-    def __init__(self, path: str, append: bool = True):
+    def __init__(self, path: str):
         super().__init__()
         self._path = path
-        self._mode = 'a' if append else 'w'
+        self._mode = 'a'
 
     def _print_shape(self, shape: Shape):
         with open(self._path, self._mode) as f:
