@@ -4,7 +4,7 @@ from PyQt5.QtCore import QEvent
 
 class Canvas(QtWidgets.QWidget):
     """
-    A (GUI) drawing place for all the shapes. It represents observer in observer design pattern.
+    A (GUI) drawing place for all the shapes. It represents an observer in the observer design pattern.
     """
     def __init__(self, controller):
         super().__init__()

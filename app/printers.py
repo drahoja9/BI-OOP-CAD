@@ -8,7 +8,7 @@ from app.shapes import Dot, Line, Rectangle, Circle
 
 class Printer:
     """
-    Represents a visitor in visitor design patter. Is responsible for HOW to print different shapes.
+    Represents a visitor in the visitor design patter. Is responsible for HOW to print different shapes.
     """
     def print_dot(self, dot: Dot):
         raise NotImplementedError

@@ -10,7 +10,7 @@ from app.shapes_store import ShapesStore
 class Controller:
     """
     Main class of this application. Holds all crucial pieces together.
-    It represents subject in observer design pattern.
+    It represents a subject in the observer design pattern.
     """
     def __init__(self):
         self._command_engine = CommandEngine()

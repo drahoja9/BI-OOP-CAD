@@ -5,7 +5,7 @@ from app.utils import Point
 
 class Shape:
     """
-    Represents an object that is visited by the visitor in visitor design pattern.
+    Represents an object that is visited by a visitor in the visitor design pattern.
     """
     def __init__(self, start: Point, color: QColor):
         self.start = start

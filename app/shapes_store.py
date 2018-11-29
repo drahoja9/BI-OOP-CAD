@@ -7,6 +7,8 @@ from app.printers import Printer
 class ShapesStore:
     """
     Holds together all the shapes and actions provided on them.
+    When anything changes, notifies the main controller (so in a way,
+    this is a subject and the controller is its observer, right?).
     """
     def __init__(self, controller, shapes: List[Shape] = None):
         super().__init__()
