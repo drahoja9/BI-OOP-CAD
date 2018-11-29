@@ -5,17 +5,24 @@ from app.printers import Printer
 
 
 class ShapesStore:
-    def __init__(self, printer: Printer, shapes: List[Shape] = None):
+    """
+    Holds together all the shapes and actions provided on them.
+    """
+    def __init__(self, controller, shapes: List[Shape] = None):
         super().__init__()
         self._shapes = shapes or []
-        self._printer = printer
+        self._controller = controller
 
-    def print_all_shapes(self):
-        self._printer.print_all(self._shapes)
+    def _notify(self):
+        self._controller.update_canvas()
+
+    def print_all(self, printer: Printer):
+        for shape in self._shapes:
+            shape.print_to(printer)
 
     def add_shape(self, shape: Shape):
         self._shapes.append(shape)
-        self.print_all_shapes()
+        self._notify()
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
@@ -24,13 +31,13 @@ class ShapesStore:
     def remove_last_shape(self):
         try:
             self._shapes.pop()
-            self.print_all_shapes()
+            self._notify()
         except IndexError:
             pass
 
     def remove_shape(self, shape: Shape):
         try:
             self._shapes.remove(shape)
-            self.print_all_shapes()
+            self._notify()
         except ValueError:
             pass

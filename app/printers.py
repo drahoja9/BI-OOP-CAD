@@ -1,13 +1,15 @@
-from typing import List, TextIO
+from typing import TextIO
 
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QEvent
 from PyQt5.QtGui import QColor, QPainter
 
-from app.shapes import Shape, Dot, Line, Rectangle, Circle
+from app.canvas import Canvas
+from app.shapes import Dot, Line, Rectangle, Circle
 
 
 class Printer:
+    """
+    Represents a visitor in visitor design patter. Is responsible for HOW to print different shapes.
+    """
     def print_dot(self, dot: Dot):
         raise NotImplementedError
 
@@ -19,10 +21,6 @@ class Printer:
 
     def print_circle(self, circle: Circle):
         raise NotImplementedError
-
-    def print_all(self, shapes: List[Shape]):
-        for shape in shapes:
-            shape.print_to(self)
 
 
 class TextPrinter(Printer):
@@ -53,18 +51,13 @@ class FilePrinter(TextPrinter):
         self._fd.close()
 
 
-class CanvasPrinter(Printer, QtWidgets.QWidget):
-    def __init__(self):
+class CanvasPrinter(Printer):
+    def __init__(self, canvas: Canvas):
         super().__init__()
-        self._shapes = []
-
-    def print_all(self, shapes: List[Shape]):
-        self._shapes = shapes
-        # Schedule repainting of this widget -> when the time comes, the QEvent.Paint will be emitted
-        self.update()
+        self._canvas = canvas
 
     def _prepare_painter(self, color: QColor):
-        painter = QPainter(self)
+        painter = QPainter(self._canvas)
         painter.setBrush(color)
         return painter
 
@@ -85,14 +78,3 @@ class CanvasPrinter(Printer, QtWidgets.QWidget):
         # There's no direct method for drawing circles in PyQt, so we have
         # to draw ellipse with radii rx and ry, where rx == ry
         painter.drawEllipse(*circle.get_props(), circle.radius)
-
-    # -------------------------- QWidget overridden methods ----------------------------
-
-    # Overriding paintEvent method of QWidget to respond to QEvent.Paint.
-    # This method should be the only place from where we draw with QPainter. This means, that the print_* methods
-    # should never be called before executing this method!
-    def paintEvent(self, event: QEvent.Paint):
-        super().print_all(self._shapes)
-
-    def mousePressEvent(self, event: QEvent.MouseButtonPress):
-        ...
