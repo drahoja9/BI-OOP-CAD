@@ -1,5 +1,6 @@
-import pytest
+from typing import Dict
 
+import pytest
 from PyQt5.QtGui import QColor
 
 from app.shapes import Shape, Dot, Line, Rectangle, Circle
@@ -42,8 +43,8 @@ def test_abstract_shape():
     assert abstract_shape != Shape(Point(100, 101), QColor('steelblue'))
 
 
-def test_dot():
-    dot = Dot(Point(10, 200000000), QColor(1, 2, 3))
+def test_dot(shapes: Dict[str, Shape]):
+    dot = shapes['dot']
 
     assert dot.start == Point(10, 200000000)
     assert dot.color == QColor(1, 2, 3)
@@ -58,8 +59,8 @@ def test_dot():
     assert dot != Dot(Point(10, 200000000), QColor(1, 2, 4))
 
 
-def test_line():
-    line = Line(Point(1000, -1000), Point(-123, 321), QColor(0, 0, 0))
+def test_line(shapes: Dict[str, Shape]):
+    line = shapes['line']
 
     assert line.start == Point(1000, -1000)
     assert line.end == Point(-123, 321)
@@ -75,8 +76,8 @@ def test_line():
     assert line != Line(Point(1000, -1000), Point(123, 321), QColor(0, 0, 0))
 
 
-def test_rectangle():
-    rect = Rectangle(Point(0, 0), 1, 50000, QColor(255, 255, 255))
+def test_rectangle(shapes: Dict[str, Shape]):
+    rect = shapes['rectangle']
 
     assert rect.start == Point(0, 0)
     assert rect.width == 1
@@ -93,8 +94,8 @@ def test_rectangle():
     assert rect != Rectangle(Point(0, 0), -1, 50000, QColor(255, 255, 255))
 
 
-def test_circle():
-    circle = Circle(Point(12345, 54321), 999, QColor(123, 255, 0))
+def test_circle(shapes: Dict[str, Shape]):
+    circle = shapes['circle']
 
     assert circle.start == Point(12345, 54321)
     assert circle.radius == 999
@@ -110,7 +111,7 @@ def test_circle():
     assert circle != Circle(Point(12345, 54321), 999, QColor(123, 255, 1))
 
 
-def test_equals():
+def test_shape_class_diff():
     abstract_shape = Shape(Point(100, 100), QColor(100, 100, 100))
     dot = Dot(Point(100, 100), QColor(100, 100, 100))
     line = Line(Point(100, 100), Point(100, 100), QColor(100, 100, 100))
