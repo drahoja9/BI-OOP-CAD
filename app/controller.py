@@ -13,9 +13,10 @@ class Controller:
     It represents a subject in the observer design pattern.
     """
     def __init__(self):
+        self.canvas = Canvas(self)
+
         self._command_engine = CommandEngine()
         self._shapes = ShapesStore(self)
-        self.canvas = Canvas(self)
         self._printer = CanvasPrinter(self.canvas)
 
         r1 = Rectangle(Point(10, 10), 200, 100, QColor(200, 0, 0))
