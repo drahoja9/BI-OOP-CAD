@@ -44,6 +44,13 @@ def shapes_store() -> ShapesStore:
     return shapes_store
 
 
+def test_is_empty(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
+    assert shapes_store.is_empty() is True
+
+    shapes_store.add_shape(shapes['circle'])
+    assert shapes_store.is_empty() is False
+
+
 def test_print_all(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(*shapes.values())
     printer = PrinterMockup()

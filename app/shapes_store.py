@@ -18,6 +18,9 @@ class ShapesStore:
     def _notify(self):
         self._controller.update_canvas()
 
+    def is_empty(self) -> bool:
+        return len(self._shapes) == 0
+
     def print_all(self, printer: Printer):
         for shape in self._shapes:
             shape.print_to(printer)

@@ -98,7 +98,7 @@ def test_circle(shapes: Dict[str, Shape]):
     circle = shapes['circle']
 
     assert circle.start == Point(12345, 54321)
-    assert circle.radius == 999
+    assert circle.diameter == 999
     assert circle.color == QColor(123, 255, 0)
     assert circle.get_props() == (12345, 54321, 999)
 
@@ -106,7 +106,7 @@ def test_circle(shapes: Dict[str, Shape]):
     circle.print_to(d)
     assert d.result == 'Drawed a ' + str(circle)
 
-    assert str(circle) == 'Circle centered at [12345, 54321] with radius 999'
+    assert str(circle) == 'Circle centered at [12345, 54321] with diameter 999'
     assert circle == Circle(Point(12345, 54321), 999, QColor(123, 255, 0))
     assert circle != Circle(Point(12345, 54321), 999, QColor(123, 255, 1))
 

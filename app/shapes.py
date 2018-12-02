@@ -1,3 +1,5 @@
+from typing import List
+
 from PyQt5.QtGui import QColor
 
 from app.utils import Point
@@ -7,7 +9,7 @@ class Shape:
     """
     Represents an object that is visited by a visitor in the visitor design pattern.
     """
-    def __init__(self, start: Point, color: QColor):
+    def __init__(self, start: Point, color: QColor = None):
         self.start = start
         self.color = color
 
@@ -77,6 +79,31 @@ class Line(Shape):
         )
 
 
+# class Polyline(Shape):
+#     def __init__(self, lines: List[Line]):
+#         super().__init__(lines[0].start)
+#         self.lines = lines
+#
+#     def print_to(self, printer):
+#         printer.print_polyline(self)
+#
+#     def get_props(self):
+#         pass
+#
+#     def __repr__(self):
+#         return (
+#             'Polyline composed of [' +
+#             str(self.lines) +
+#             ']'
+#         )
+#
+#     def __eq__(self, other):
+#         return (
+#             super().__eq__(other) and
+#             self.lines == other.lines
+#         )
+
+
 class Rectangle(Shape):
     def __init__(self, top_left: Point, width: int, height: int, color: QColor):
         super().__init__(top_left, color)
@@ -128,5 +155,5 @@ class Circle(Shape):
     def __eq__(self, other):
         return (
             super().__eq__(other) and
-            self.diameter == other.radius
+            self.diameter == other.diameter
         )

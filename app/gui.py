@@ -1,7 +1,10 @@
+import sys
+
 from PyQt5 import QtWidgets
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
+from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -9,12 +12,23 @@ class MainWindow(QtWidgets.QMainWindow):
         # We have to create the Qt application first
         self._app = QtWidgets.QApplication([])
         super().__init__()
+
+        # Initializing the whole UI
         self._ui = Ui_MainWindow()
+        self._ui.setupUi(self)
+
         self.canvas = Canvas(controller)
 
-        self._ui.setupUi(self)
-        self._ui.scrollArea.setWidget(self.canvas)
+        # Setting specific brush for canvas after clicking on one of the tool buttons
+        self._ui.dotButton.clicked.connect(lambda: self.canvas.set_brush(DotBrush))
+        self._ui.lineButton.clicked.connect(lambda: self.canvas.set_brush(LineBrush))
+        self._ui.rectagleButton.clicked.connect(lambda: self.canvas.set_brush(RectBrush))
+        self._ui.circleButton.clicked.connect(lambda: self.canvas.set_brush(CircleBrush))
+
+        self._ui.canvasHolder.setWidget(self.canvas)
 
     def run(self):
         self.show()
-        self._app.exec()
+        # Wrapping the GUI execution into `sys.exit()` to ensure that proper result code
+        # will be returned when the window closes (otherwise it's always 0)
+        sys.exit(self._app.exec())
