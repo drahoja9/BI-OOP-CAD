@@ -19,6 +19,9 @@ class Ui_MainWindow(object):
         self.brushes = QtWidgets.QVBoxLayout()
         self.brushes.setSpacing(0)
         self.brushes.setObjectName("brushes")
+        self.dotButton = QtWidgets.QPushButton(self.mainArea)
+        self.dotButton.setObjectName("dotButton")
+        self.brushes.addWidget(self.dotButton)
         self.lineButton = QtWidgets.QPushButton(self.mainArea)
         self.lineButton.setObjectName("lineButton")
         self.brushes.addWidget(self.lineButton)
@@ -117,6 +120,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.dotButton.setText(_translate("MainWindow", "Dot"))
         self.lineButton.setText(_translate("MainWindow", "Line"))
         self.polylineButton.setText(_translate("MainWindow", "Polyline"))
         self.circleButton.setText(_translate("MainWindow", "Circle"))
