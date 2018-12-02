@@ -1,9 +1,8 @@
 from typing import Dict
-import io
 
 import pytest
 
-from app import Circle, Rectangle, Line, Dot
+from app.shapes import Circle, Rectangle, Line, Dot
 from app.printers import Printer
 from app.shapes_store import ShapesStore
 from app.shapes import Shape
