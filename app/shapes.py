@@ -107,26 +107,26 @@ class Rectangle(Shape):
 
 
 class Circle(Shape):
-    def __init__(self, middle: Point, radius: int, color: QColor):
+    def __init__(self, middle: Point, diameter: int, color: QColor):
         super().__init__(middle, color)
-        self.radius = radius
+        self.diameter = diameter
 
     def print_to(self, printer):
         printer.print_circle(self)
 
     def get_props(self) -> tuple:
-        return self.start.x, self.start.y, self.radius
+        return self.start.x, self.start.y, self.diameter
 
     def __repr__(self):
         return (
             'Circle centered at ' +
             str(self.start) +
-            ' with radius ' +
-            str(self.radius)
+            ' with diameter ' +
+            str(self.diameter)
         )
 
     def __eq__(self, other):
         return (
             super().__eq__(other) and
-            self.radius == other.radius
+            self.diameter == other.radius
         )

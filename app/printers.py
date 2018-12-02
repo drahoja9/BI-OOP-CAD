@@ -1,5 +1,6 @@
 from typing import TextIO
 
+from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QColor, QPainter
 
 from app.canvas import Canvas
@@ -88,5 +89,8 @@ class CanvasPrinter(Printer):
     def print_circle(self, circle: Circle):
         painter = self._prepare_painter(circle.color)
         # There's no direct method for drawing circles in PyQt, so we have
-        # to draw ellipse with radii rx and ry, where rx == ry
-        painter.drawEllipse(*circle.get_props(), circle.radius)
+        # to draw ellipse inside a rectangle starting at [start_x, start_y],
+        # with height and width set to radius of circle
+        start_x = circle.start.x - circle.diameter // 2
+        start_y = circle.start.y - circle.diameter // 2
+        painter.drawEllipse(start_x, start_y, circle.diameter, circle.diameter)
