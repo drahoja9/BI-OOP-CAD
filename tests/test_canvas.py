@@ -12,7 +12,7 @@ class ControllerMockup:
         self.command = None
 
     def print_all_shapes(self):
-        self.all_shapes = 'all'
+        self.all_shapes = 'printed all shapes'
 
     def execute_command(self, command: Command):
         self.command = command
@@ -28,10 +28,14 @@ class EventMockup:
         return 20
 
 
-@pytest.fixture(scope='module')
-def canvas() -> Canvas:
+@pytest.fixture
+def canvas(qtbot) -> Canvas:
     controller = ControllerMockup()
+
     gui = MainWindow(controller)
+    gui.show()
+    qtbot.addWidget(gui)
+
     canvas = Canvas(controller)
     return canvas
 
@@ -54,11 +58,10 @@ def test_set_brush(canvas: Canvas):
 
 def test_pain_event(canvas: Canvas):
     canvas.paintEvent(EventMockup)
-    assert canvas._controller.all_shapes == 'all'
+    assert canvas._controller.all_shapes == 'printed all shapes'
 
 
 def test_mouse_move_event(canvas: Canvas):
-    canvas.set_brush(RectBrush)
     assert canvas._brush is None
 
     canvas.mouseMoveEvent(EventMockup)
@@ -74,8 +77,6 @@ def test_mouse_move_event(canvas: Canvas):
 
 
 def test_mouse_press_event(canvas: Canvas):
-    canvas.set_brush(RectBrush)
-    canvas.set_brush(RectBrush)
     assert canvas._start is None
     assert canvas._brush is None
 
