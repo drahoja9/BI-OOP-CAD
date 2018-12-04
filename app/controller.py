@@ -32,4 +32,4 @@ class Controller:
 
     def run_app(self):
         # Run the whole app
-        self._gui.run()
+        self._gui.show()

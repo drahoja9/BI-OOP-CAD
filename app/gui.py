@@ -1,5 +1,3 @@
-import sys
-
 from PyQt5 import QtWidgets
 
 from app.ui.main_window import Ui_MainWindow
@@ -9,8 +7,6 @@ from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, controller):
-        # We have to create the Qt application first
-        self._app = QtWidgets.QApplication([])
         super().__init__()
 
         # Initializing the whole UI
@@ -26,9 +22,3 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.circleButton.clicked.connect(lambda: self.canvas.set_brush(CircleBrush))
 
         self._ui.canvasHolder.setWidget(self.canvas)
-
-    def run(self):
-        self.show()
-        # Wrapping the GUI execution into `sys.exit()` to ensure that proper result code
-        # will be returned when the window closes (otherwise it's always 0)
-        sys.exit(self._app.exec())
