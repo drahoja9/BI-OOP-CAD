@@ -27,7 +27,10 @@ class Command:
 class PrintDotCommand(Command):
     def __init__(self, receiver, x: int, y: int, color: Tuple[int, int, int]):
         super().__init__(receiver)
-        self.dot = Dot(Point(x, y), QColor(*color))
+        self.dot = Dot(
+            Point(x, y),
+            QColor(*color)
+        )
 
     def execute(self):
         self.receiver.add_shape(self.dot)
@@ -50,7 +53,11 @@ class PrintDotCommand(Command):
 class PrintLineCommand(Command):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: Tuple[int, int, int]):
         super().__init__(receiver)
-        self.line = Line(Point(start_x, start_y), Point(end_x, end_y), QColor(*color))
+        self.line = Line(
+            Point(start_x, start_y),
+            Point(end_x, end_y),
+            QColor(*color)
+        )
 
     def execute(self):
         self.receiver.add_shape(self.line)
@@ -91,7 +98,12 @@ class PrintRectCommand(Command):
         super().__init__(receiver)
         width = abs(start_x - end_x)
         height = abs(start_y - end_y)
-        self.rect = Rectangle(Point(min(start_x, end_x), min(start_y, end_y)), width, height, QColor(*color))
+        self.rect = Rectangle(
+            Point(min(start_x, end_x), min(start_y, end_y)),
+            width,
+            height,
+            QColor(*color)
+        )
 
     def execute(self):
         self.receiver.add_shape(self.rect)
@@ -120,7 +132,11 @@ class PrintCircleCommand(Command):
         super().__init__(receiver)
         center = ((start_x + end_x) // 2, (start_y + end_y) // 2)
         diameter = math.floor(math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2))
-        self.circle = Circle(Point(*center), diameter, QColor(*color))
+        self.circle = Circle(
+            Point(*center),
+            diameter,
+            QColor(*color)
+        )
 
     def execute(self):
         self.receiver.add_shape(self.circle)
