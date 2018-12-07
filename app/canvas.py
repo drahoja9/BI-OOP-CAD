@@ -36,7 +36,7 @@ class Canvas(QtWidgets.QWidget):
         self._controller.execute_command(shape_command)
 
     def _complete_command(self, start_x: int, start_y: int, end_x: int, end_y: int):
-        self._addCommand(start_x, start_y, end_x, end_y)
+        self._add_command(start_x, start_y, end_x, end_y)
         self._start = None
 
     # -------------------------- QWidget overridden methods ----------------------------
@@ -49,7 +49,7 @@ class Canvas(QtWidgets.QWidget):
 
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         if self._brush == DotBrush:
-            self._addCommand(event.x(), event.y(), 0, 0)
+            self._add_command(event.x(), event.y(), 0, 0)
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
         if self._brush:
@@ -59,7 +59,7 @@ class Canvas(QtWidgets.QWidget):
 
                 # Dot
                 if self._brush == DotBrush:
-                    self._completeCommand(
+                    self._complete_command(
                         self._start[0], self._start[1], event.x(), event.y()
                     )
             else:
@@ -70,13 +70,13 @@ class Canvas(QtWidgets.QWidget):
                         self._start = None
                         return
 
-                    self._addCommand(
+                    self._add_command(
                         self._start[0], self._start[1], event.x(), event.y()
                     )
                     self._start = (event.x(), event.y())
 
                 # Draw other
                 else:
-                    self._completeCommand(
+                    self._complete_command(
                         self._start[0], self._start[1], event.x(), event.y()
                     )
