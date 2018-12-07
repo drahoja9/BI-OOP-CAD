@@ -10,6 +10,7 @@ class ShapesStore:
     When anything changes, notifies the main controller (so in a way,
     this is a subject and the controller is its observer, right?).
     """
+
     def __init__(self, controller, shapes: List[Shape] = None):
         super().__init__()
         self._shapes = shapes or []

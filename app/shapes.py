@@ -9,6 +9,7 @@ class Shape:
     """
     Represents an object that is visited by a visitor in the visitor design pattern.
     """
+
     def __init__(self, start: Point, color: QColor = None):
         self.start = start
         self.color = color
