@@ -72,3 +72,22 @@ def test_update_canvas(controller: Controller):
     controller._gui.canvas = canvas
     controller.update_canvas()
     assert canvas.updated is True
+
+
+def test_restart(controller: Controller, shapes: Dict[str, Shape]):
+    controller.add_shape(shapes['line'])
+    controller.add_shape(shapes['rectangle'])
+    c1 = CommandMockup()
+    c2 = CommandMockup()
+    controller.execute_command(c1)
+    controller.execute_command(c2)
+    assert controller._shapes._shapes == [shapes['line'], shapes['rectangle']]
+    assert controller._commands == [c1, c2]
+
+    canvas = CanvasMockup()
+    controller._gui.canvas = canvas
+    assert canvas.updated is False
+    controller.restart()
+    assert controller._shapes.is_empty() is True
+    assert controller._commands == []
+    assert canvas.updated is True

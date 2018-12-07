@@ -64,12 +64,10 @@ def test_rect_command(receiver: ReceiverMockup):
 
 
 def test_circle_command(receiver: ReceiverMockup):
-    # The circle is circumscribed inside a rectangle with top-left
-    # corner at [0, 0] and bottom-right corner at [100, 100]
     command = PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
     command.execute()
-    assert receiver.received == Circle(Point(50, 50), 141, QColor(0, 0, 0))
-    assert str(command) == 'circle 50,50 141'
+    assert receiver.received == Circle(Point(0, 0), 141, QColor(0, 0, 0))
+    assert str(command) == 'circle 0,0 141'
     assert (
         PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
         ==

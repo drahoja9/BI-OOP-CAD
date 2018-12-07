@@ -1,4 +1,11 @@
-from app.utils import Point
+from app.utils import Point, Singleton
+
+
+class TestSingletonClass(metaclass=Singleton):
+    a = 1
+
+    def __init__(self):
+        self.b = 20
 
 
 def test_point():
@@ -18,3 +25,17 @@ def test_point():
 
     assert p1.__repr__() == '[123, 321]'
     assert str(p2) == '[-40, 0]'
+
+
+def test_singleton():
+    a = TestSingletonClass()
+    b = TestSingletonClass()
+    c = TestSingletonClass()
+    assert a == b == c
+
+    a.a = 2
+    assert a.a == b.a == c.a == 2
+    b.b = 123
+    assert a.b == b.b == c.b == 123
+
+    assert a == b == c

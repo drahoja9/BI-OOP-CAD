@@ -3,7 +3,6 @@ from app.commands import Command
 from app.printers import CanvasPrinter
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
-from PyQt5.QtWidgets import QAction
 
 
 class Controller:
@@ -17,15 +16,6 @@ class Controller:
         self._commands = []
         self._shapes = ShapesStore(self)
         self._printer = CanvasPrinter(self._gui.canvas)
-
-        action = self._gui.findChild(QAction, 'actionNew')
-        action.triggered.connect(
-            lambda: self._handleNewAction())
-
-    def _handleNewAction(self):
-        self._commands = []
-        self._shapes = ShapesStore(self)
-        self._gui.canvas.update()
 
     def add_shape(self, shape: Shape):
         self._shapes.add_shape(shape)
@@ -44,3 +34,8 @@ class Controller:
     def run_app(self):
         # Run the whole app
         self._gui.show()
+
+    def restart(self):
+        self._commands = []
+        self._shapes = ShapesStore(self)
+        self._gui.canvas.update()

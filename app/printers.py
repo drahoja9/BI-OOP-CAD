@@ -100,8 +100,8 @@ class CanvasPrinter(Printer):
     def print_circle(self, circle: Circle):
         painter = self._prepare_painter(circle.color)
         # There's no direct method for drawing circles in PyQt, so we have
-        # to draw ellipse inside a rectangle starting at [start_x, start_y],
+        # to draw ellipse outside a rectangle starting at [start_x, start_y],
         # with height and width set to radius of circle
-        start_x = circle.start.x - circle.diameter // 2
-        start_y = circle.start.y - circle.diameter // 2
-        painter.drawEllipse(start_x, start_y, circle.diameter, circle.diameter)
+        start_x = circle.start.x - circle.radius
+        start_y = circle.start.y - circle.radius
+        painter.drawEllipse(start_x, start_y, circle.radius * 2, circle.radius * 2)

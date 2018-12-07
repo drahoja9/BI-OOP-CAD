@@ -132,12 +132,12 @@ class PrintCircleCommand(Command):
         super().__init__(receiver)
         center = (start_x, start_y)
         # Classic formula for distance of two points
-        diameter = math.floor(
-            math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2) * 2
+        radius = math.floor(
+            math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2)
         )
         self.circle = Circle(
             Point(*center),
-            diameter,
+            radius,
             QColor(*color)
         )
 
@@ -154,7 +154,7 @@ class PrintCircleCommand(Command):
             ',' +
             str(self.circle.start.y) +
             ' ' +
-            str(self.circle.diameter)
+            str(self.circle.radius)
         )
 
     def __eq__(self, other):

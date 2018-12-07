@@ -1,6 +1,3 @@
-import math
-from typing import Type
-
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent
 
