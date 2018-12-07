@@ -131,7 +131,8 @@ class PrintCircleCommand(Command):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: Tuple[int, int, int]):
         super().__init__(receiver)
         center = ((start_x + end_x) // 2, (start_y + end_y) // 2)
-        diameter = math.floor(math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2))
+        diameter = math.floor(
+            math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2))
         self.circle = Circle(
             Point(*center),
             diameter,
