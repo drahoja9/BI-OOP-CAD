@@ -1,3 +1,4 @@
+import math
 from typing import Type
 
 from PyQt5 import QtWidgets
@@ -18,6 +19,9 @@ class Canvas(QtWidgets.QWidget):
 
         self._start = None
         self._brush = None
+
+        # Used for pen
+        self._last = None
 
     def set_brush(self, brush: Type[Brush]):
         if self._brush != brush:
@@ -40,6 +44,17 @@ class Canvas(QtWidgets.QWidget):
         self._addCommand(start_x, start_y, end_x, end_y)
         self._start = None
 
+    def _pointDistance(self, p1, p2):
+        return math.floor(
+            math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2))
+
+    def _lerp(self, v0, v1, i):
+        return v0 + i * (v1 - v0)
+
+    def _getEquidistantPoints(self, p1, p2):
+        n = self._pointDistance(p1, p2)
+        return [(self._lerp(p1[0], p2[0], 1./n*i), self._lerp(p1[1], p2[1], 1./n*i)) for i in range(n+1)]
+
     # -------------------------- QWidget overridden methods ----------------------------
 
     # Overriding paintEvent method of QWidget to respond to QEvent.Paint.
@@ -50,9 +65,15 @@ class Canvas(QtWidgets.QWidget):
 
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         if self._brush == DotBrush:
+            if (self._last):
+                for point in self._getEquidistantPoints(self._last, (event.x(), event.y())):
+                    self._addCommand(point[0], point[1], 0, 0)
             self._addCommand(event.x(), event.y(), 0, 0)
+            self._last = (event.x(), event.y())
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
+        self._last = None
+
         if self._brush:
             # Init everything
             if self._start is None:
