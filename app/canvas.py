@@ -13,6 +13,9 @@ class Canvas(QtWidgets.QWidget):
         super().__init__()
         self._controller = controller
         self._brush = None
+        # Tracking the mouse movement even without any mouse button pressed down
+        # in order to enable preview of drawn shape
+        self.setMouseTracking(True)
 
     def set_brush(self, brush: Brush):
         if self._brush != brush:
@@ -31,7 +34,7 @@ class Canvas(QtWidgets.QWidget):
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         if self._brush is not None:
-            self._brush.mouse_move(self._controller, event.x(), event.y())
+            self._brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
         if self._brush is not None:

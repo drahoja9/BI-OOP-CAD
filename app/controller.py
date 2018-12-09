@@ -20,6 +20,12 @@ class Controller:
     def add_shape(self, shape: Shape):
         self._shapes.add_shape(shape)
 
+    def preview_shape(self, shape: Shape):
+        self._shapes.set_preview(shape)
+
+    def end_preview(self):
+        self._shapes.set_preview(None)
+
     def execute_command(self, command: Command):
         self._commands.append(command)
         command.execute()

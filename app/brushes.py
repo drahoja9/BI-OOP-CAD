@@ -1,4 +1,7 @@
 import math
+
+from PyQt5.QtCore import Qt
+
 from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand
 from app.utils import Singleton
 
@@ -8,8 +11,19 @@ class Brush(metaclass=Singleton):
         self._start = None
         self._shape_command_class = None
 
-    def mouse_move(self, controller, x: int, y: int):
-        pass
+    def mouse_move(self, controller, x: int, y: int, button):
+        if self._start is not None:
+            shape_command = self._shape_command_class(
+                controller,
+                self._start[0],
+                self._start[1],
+                x,
+                y,
+                (255, 255, 255)
+            )
+            shape = shape_command.shape
+            shape.color.setAlpha(200)
+            controller.preview_shape(shape)
 
     def mouse_press(self, controller, x: int, y: int):
         if self._start is None:
@@ -23,6 +37,7 @@ class Brush(metaclass=Singleton):
                 y,
                 (255, 255, 255)
             )
+            controller.end_preview()
             controller.execute_command(shape_command)
             self._start = None
 
@@ -48,8 +63,9 @@ class DotBrush(Brush):
         shape_command = self._shape_command_class(controller, x, y, (0, 0, 0))
         controller.execute_command(shape_command)
 
-    def mouse_move(self, controller, x: int, y: int):
-        self._dot_command(controller, x, y)
+    def mouse_move(self, controller, x: int, y: int, button):
+        if button == Qt.LeftButton:
+            self._dot_command(controller, x, y)
 
     def mouse_press(self, controller, x: int, y: int):
         self._dot_command(controller, x, y)
