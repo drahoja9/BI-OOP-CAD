@@ -1,9 +1,10 @@
 from typing import TextIO
 
+from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QColor, QPainter, QPen
 
 from app.canvas import Canvas
-from app.shapes import Dot, Line, Rectangle, Circle, Shape
+from app.shapes import Dot, Line, Polyline, Rectangle, Circle, Shape
 
 
 class Printer:
@@ -16,8 +17,8 @@ class Printer:
     def print_line(self, line: Line):
         raise NotImplementedError
 
-    # def print_polyline(self, polyline: Polyline):
-    #     raise NotImplementedError
+    def print_polyline(self, polyline: Polyline):
+        raise NotImplementedError
 
     def print_rectangle(self, rect: Rectangle):
         raise NotImplementedError
@@ -39,9 +40,8 @@ class AbstractTextPrinter(Printer):
     def print_line(self, line: Line):
         self._print_shape(line)
 
-    # def print_polyline(self, polyline: Polyline):
-    #     for line in polyline.lines:
-    #         self._print_shape(line)
+    def print_polyline(self, polyline: Polyline):
+        self._print_shape(polyline)
 
     def print_rectangle(self, rect: Rectangle):
         self._print_shape(rect)
@@ -89,9 +89,12 @@ class CanvasPrinter(Printer):
         painter = self._prepare_painter(line.color)
         painter.drawLine(*line.get_props())
 
-    # def print_polyline(self, polyline: Polyline):
-    #     for line in polyline.lines:
-    #         self.print_line(line)
+    def print_polyline(self, polyline: Polyline):
+        painter = self._prepare_painter(polyline.color)
+        q_points = []
+        for point in polyline.get_props():
+            q_points.append(QPointF(point.x, point.y))
+        painter.drawPolyline(*q_points)
 
     def print_rectangle(self, rect: Rectangle):
         painter = self._prepare_painter(rect.color)

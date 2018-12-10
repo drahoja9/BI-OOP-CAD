@@ -1,9 +1,9 @@
 import math
-from typing import Tuple
+from typing import Tuple, List
 
 from PyQt5.QtGui import QColor
 
-from app.shapes import Dot, Line, Rectangle, Circle
+from app.shapes import Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point
 
 
@@ -64,16 +64,19 @@ class PrintLineCommand(ShapeCommand):
         return f'line {self.shape.start.x},{self.shape.start.y} {self.shape.end.x},{self.shape.end.y}'
 
 
-# class PrintPolylineCommand(Command):
-#     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: Tuple[int, int, int]):
-#         super().__init__(receiver)
-#         self._line = Line(Point(start_x, start_y), Point(end_x, end_y), QColor(*color))
-#
-#     def execute(self):
-#         self._receiver.add_shape(self._line)
-#
-#     def reverse(self):
-#         pass
+class PrintPolylineCommand(ShapeCommand):
+    def __init__(self, receiver, points: List[Tuple[int, int]], color: Tuple[int, int, int]):
+        super().__init__(receiver)
+        points_ = []
+        for point in points:
+            points_.append(Point(point[0], point[1]))
+        self.shape = Polyline(*points_, color=QColor(*color))
+
+    def __str__(self):
+        res = f'line'
+        for point in self.shape.get_props():
+            res += f' {point.x},{point.y}'
+        return res
 
 
 class PrintRectCommand(ShapeCommand):

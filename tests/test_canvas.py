@@ -63,28 +63,6 @@ def test_set_brush(canvas: Canvas):
     canvas.set_brush(RectBrush())
     assert canvas._brush == RectBrush()
 
-    assert canvas._is_tracking_mouse is False
-    canvas._is_tracking_mouse = True
-    canvas.set_brush(LineBrush())
-    assert canvas._is_tracking_mouse is False
-
-
-def test_toggle_mouse_tracking(canvas: Canvas):
-    assert canvas._is_tracking_mouse is False
-    canvas._toggle_mouse_tracking()
-    assert canvas._is_tracking_mouse is True
-    canvas._toggle_mouse_tracking()
-    assert canvas._is_tracking_mouse is False
-
-    canvas._toggle_mouse_tracking(False)
-    assert canvas._is_tracking_mouse is False
-    canvas._toggle_mouse_tracking(False)
-    assert canvas._is_tracking_mouse is False
-    canvas._toggle_mouse_tracking(True)
-    assert canvas._is_tracking_mouse is True
-    canvas._toggle_mouse_tracking(True)
-    assert canvas._is_tracking_mouse is True
-
 
 def test_pain_event(canvas: Canvas):
     canvas.paintEvent(EventMockup)

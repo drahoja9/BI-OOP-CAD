@@ -2,7 +2,7 @@ from typing import Dict
 
 import pytest
 
-from app.shapes import Circle, Rectangle, Line, Dot
+from app.shapes import Circle, Rectangle, Line, Dot, Polyline
 from app.printers import Printer
 from app.shapes_store import ShapesStore
 from app.shapes import Shape
@@ -21,6 +21,7 @@ class PrinterMockup(Printer):
         super().__init__()
         self.dot = ''
         self.line = ''
+        self.polyline = ''
         self.rect = ''
         self.circle = ''
 
@@ -29,6 +30,9 @@ class PrinterMockup(Printer):
 
     def print_line(self, line: Line):
         self.line += 'printed'
+
+    def print_polyline(self, polyline: Polyline):
+        self.polyline += 'printed'
 
     def print_rectangle(self, rect: Rectangle):
         self.rect += 'printed'
