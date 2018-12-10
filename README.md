@@ -1,8 +1,9 @@
 # CAD (Computer Aided Design)
 
 This project aims for perfect and flawless object-oriented development. 
-It's focused on using best practices, suitable design patterns, proper testing, and overall healthy code 
-as it is a semestral project for an object-oriented programming course (BI-OOP) at FIT CTU.
+It's focused on using best practices, suitable design patterns, proper testing, 
+and overall healthy code as it is a semestral project for an object-oriented 
+programming course (BI-OOP) at FIT CTU.
 
 The subject of this project is a simple version of Computer Aided Design (CAD). 
 It provides GUI with following features:
@@ -21,7 +22,8 @@ First, make sure you have Python 3 installed.
 python3 --version
 ```
 
-Create a virtual environment via `venv` (2nd *venv* is name of the folder with virtual environment):
+Create a virtual environment via `venv` (2nd *venv* is name of the folder with 
+virtual environment):
 ```
 python3 -m venv venv
 ```
@@ -39,4 +41,12 @@ pip install --upgrade pip && pip install -r requirements.txt
 Run the app:
 ```
 ./run.py
+```
+
+## Tests
+
+To run tests, just make sure you are inside the application's root directory and 
+that you are working under your virtual environment. Then just run tests via:
+```
+pytest
 ```
