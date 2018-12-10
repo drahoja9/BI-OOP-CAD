@@ -21,9 +21,8 @@ class Brush(metaclass=Singleton):
                 y,
                 (255, 255, 255)
             )
-            shape = shape_command.shape
-            shape.color.setAlpha(200)
-            controller.preview_shape(shape)
+            shape_command.shape.color.setAlpha(200)
+            controller.preview_shape(shape_command.shape)
 
     def mouse_press(self, controller, x: int, y: int):
         if self._start is None:
