@@ -12,6 +12,9 @@ class Brush(metaclass=Singleton):
         self._shape_command_class = None
 
     def mouse_move(self, controller, x: int, y: int, button):
+        if self._shape_command_class is None:
+            raise AttributeError(f'Can not draw with instance of {self.__class__}, there is no shape to draw!')
+
         if self._start is not None:
             shape_command = self._shape_command_class(
                 controller,
@@ -25,6 +28,9 @@ class Brush(metaclass=Singleton):
             controller.preview_shape(shape_command.shape)
 
     def mouse_press(self, controller, x: int, y: int):
+        if self._shape_command_class is None:
+            raise AttributeError(f'Can not draw with instance of {self.__class__}, there is no shape to draw!')
+        
         if self._start is None:
             self._start = (x, y)
         else:

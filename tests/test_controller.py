@@ -44,6 +44,14 @@ def test_add_shape(controller: Controller, shapes: Dict[str, Shape]):
     assert controller._shapes._shapes[0] == shapes['circle']
 
 
+def test_preview(controller: Controller, shapes: Dict[str, Shape]):
+    assert controller._shapes._preview is None
+    controller.preview_shape(shapes['line'])
+    assert controller._shapes._preview == shapes['line']
+    controller.end_preview()
+    assert controller._shapes._preview is None
+
+
 def test_execute_command(controller: Controller):
     assert controller._commands == []
     command = CommandMockup()

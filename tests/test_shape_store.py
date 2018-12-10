@@ -19,22 +19,22 @@ class ControllerMockup:
 class PrinterMockup(Printer):
     def __init__(self):
         super().__init__()
-        self.dot = None
-        self.line = None
-        self.rect = None
-        self.circle = None
+        self.dot = ''
+        self.line = ''
+        self.rect = ''
+        self.circle = ''
 
     def print_dot(self, dot: Dot):
-        self.dot = 'printed'
+        self.dot += 'printed'
 
     def print_line(self, line: Line):
-        self.line = 'printed'
+        self.line += 'printed'
 
     def print_rectangle(self, rect: Rectangle):
-        self.rect = 'printed'
+        self.rect += 'printed'
 
     def print_circle(self, circle: Circle):
-        self.circle = 'printed'
+        self.circle += 'printed'
 
 
 @pytest.fixture
@@ -53,13 +53,21 @@ def test_is_empty(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
 
 def test_print_all(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(*shapes.values())
+    shapes_store.set_preview(shapes['rectangle'])
     printer = PrinterMockup()
     shapes_store.print_all(printer)
 
     assert printer.dot == 'printed'
     assert printer.line == 'printed'
-    assert printer.rect == 'printed'
+    assert printer.rect == 'printedprinted'
     assert printer.circle == 'printed'
+
+
+def test_set_preview(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
+    assert shapes_store._preview is None
+    shapes_store.set_preview(shapes['line'])
+    assert shapes_store._preview == shapes['line']
+    assert len(shapes_store._controller.result) == 1
 
 
 def test_add_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
