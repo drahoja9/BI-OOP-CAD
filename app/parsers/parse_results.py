@@ -5,15 +5,7 @@ class ParseResult:
     """
     Describes the result of parsing. Every method of any parser should return
     one of ParseResult's subtypes.
-
-    :param expected: expected object
     """
-    def __init__(self, expected):
-        self.expected = expected
-
-    def get_expected(self):
-        return self.expected
-
     @abc.abstractmethod
     def is_successful(self) -> bool:
         return
@@ -25,18 +17,21 @@ class ParseResult:
 
 class Success(ParseResult):
     """
-    Indicates that parsing was successful.
-    Contains information about expected result of parsing and
-    a remainder of the parsed input.
+    Indicates that parsing has been successful.
+    Contains the matched object parsed from input and a remainder of the parsed input.
 
+    :param match: the matched object
     :param remainder: the input remainder
     """
-    def __init__(self, expected, remainder):
-        super().__init__(expected)
+    def __init__(self, match, remainder):
+        self.match = match
         self.remainder = remainder
 
     def __eq__(self, other):
-        return self.expected == self.expected and self.remainder == other.remainder
+        return self.match == self.match and self.remainder == other.remainder
+
+    def get_match(self):
+        return self.match
 
     def has_remainder(self):
         if len(self.remainder) > 0:
@@ -50,21 +45,26 @@ class Success(ParseResult):
     def is_successful(self):
         return True
 
+    "TODO: tady bude potreba neco jako 'match.toString'"
     def print(self):
         remainder_str = ''.join(self.remainder)
-        return "Suceesfully matched \"" + self.expected + "\", remainder is \"" + remainder_str + "\""
+        return "Successfully matched \"" + self.match + "\", remainder is \"" + remainder_str + "\""
 
 
 class Failure(ParseResult):
     """
-    Indicates that parsing failed. Contains information about
-    expected result of parsing and actual result of parsing.
+    Indicates that parsing has failed. Contains expected result of parsing
+    and the actual result of parsing.
 
+    :param expected: expected string
     :param actual: actual string that was parsed from the input
     """
     def __init__(self, expected, actual):
-        super().__init__(expected)
+        self.expected = expected
         self.actual = actual
+
+    def get_expected(self):
+        return self.expected
 
     def get_actual(self):
         return self.actual

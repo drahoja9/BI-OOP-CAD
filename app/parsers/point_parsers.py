@@ -11,11 +11,7 @@ class AbsPointParser:
         :return: Success(Point, string) if input contains natural number within
         range, Failure(string, string) otherwise
         """
-        self.point = "TODO"
         return NotImplementedError
-
-    def get_point(self):
-        return self.point
 
 
 class RelPointParser:
@@ -27,8 +23,4 @@ class RelPointParser:
         :return: Success(Point, string) if input contains integer within
         range, Failure(string, string) otherwise
         """
-        self.point = "TODO"
         return NotImplementedError
-
-    def get_point(self):
-        return self.point

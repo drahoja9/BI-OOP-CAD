@@ -21,6 +21,8 @@ class InvalidCommand(Command):
 class CommandParser:
     """
     Parses command from CLI input.
+    If Command (and it's parameters, if there are any required) is successfully parsed,
+    Success(Command, string) is returned.
     """
     def __init__(self, string_parser):
         self.string_parser = string_parser
@@ -43,13 +45,6 @@ class CommandParser:
     def has_parameters(self) -> bool:
         return
 
-    @abc.abstractmethod
-    def get_command(self, *params) -> Command:
-        """
-        Return instance of corresponding Command with given parameters.
-        """
-        return
-
 
 class ListParser(CommandParser):
     """
@@ -67,9 +62,6 @@ class ListParser(CommandParser):
 
     def has_parameters(self):
         return True
-
-    def get_command(self, *params) -> ListCommand:
-        return ListCommand(*params)
 
 
 class RectParser(CommandParser):
@@ -91,5 +83,20 @@ class RectParser(CommandParser):
     def has_parameters(self):
         return True
 
-    def get_command(self, *params) -> RectCommand:
-        return RectCommand(*params)
+
+class QuitParser(CommandParser):
+    """
+    Parser for "quit" Command.
+    """
+    def __init__(self, string_parser):
+        super().__init__(string_parser)
+
+    def parse_command(self, cli_input):
+        result = self.string_parser.parse_string("quit", cli_input)
+        return result
+
+    def parse_params(self, cli_input):
+        return NotImplementedError
+
+    def has_parameters(self):
+        return False

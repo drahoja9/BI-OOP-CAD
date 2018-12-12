@@ -9,16 +9,20 @@ class CliParser:
     def parse_input(self, command_parsers, cli_input):
         """
         Parse given command line input.
-        Parse a command using give CommandParsers. If successful, parse
+        Parse a command using given CommandParsers. If successful, parse
         parameters from the rest of the input.
-        :param command_parsers:
-        :param cli_input:
-        :return:
+        :param command_parsers: list of CommandParsers
+        :param cli_input: the input from CLI
+        :return: corresponding Command if parsing is successful,
+        InvalidCommand otherwise
         """
         for parser in command_parsers:
             command_result = parser.parse_command(cli_input)
             if command_result.is_successful():
-                return self.parse_params(parser, command_result.remainder)
+                if parser.has_parameters():
+                    return self.parse_params(parser, command_result.get_remainder())
+                else:
+                    return command_result.get_match()
 
         return InvalidCommand()
 
@@ -26,16 +30,13 @@ class CliParser:
         """
         Parse remaining input using given CommandParser into parameters
         if given parser requires any.
-        :param command_parser: sucessfully matched command parser
+        :param command_parser: successfully matched command parser
         :param remainder: the remainder of CLI input to be parsed
         :return: corresponding Command if parsing is successful,
         InvalidCommand otherwise
         """
-        if command_parser.has_parameters():
-            params_result = command_parser.parse_params(remainder)
-            if params_result.is_successful():
-                return command_parser.get_command(params_result.expected)  # tady to chce asi nejak vylepsit
-            else:
-                return InvalidCommand()
+        params_result = command_parser.parse_params(remainder)
+        if params_result.is_successful():
+            return params_result.get_match
         else:
-            return command_parser.get_command()
+            return InvalidCommand()

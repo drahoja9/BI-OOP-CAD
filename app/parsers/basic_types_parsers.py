@@ -9,7 +9,7 @@ class StringParser:
         Remaining string is split by spaces into a list.
         :param expected: expected word
         :param cli_input: string
-        :return: Success(string, string) if input containts expected word,
+        :return: Success(string, string) if input contains expected word,
         Failure(string, string) otherwise
         """
         cli_input = cli_input.split()  # split words separated by space to list
@@ -40,7 +40,7 @@ class NatParser:
             remainder = cli_input[match.end():(len(cli_input))]
             return Success(nat, remainder)
         else:
-            return Failure("an integer", cli_input)
+            return Failure("a natural number", cli_input)
 
 
 class IntParser:
