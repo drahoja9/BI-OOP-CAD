@@ -37,6 +37,6 @@ class CliParser:
         """
         params_result = command_parser.parse_params(remainder)
         if params_result.is_successful():
-            return params_result.get_match
+            return params_result.get_match()
         else:
             return InvalidCommand()
