@@ -26,14 +26,14 @@ class CommandParser:
         self.string_parser = string_parser
 
     @abc.abstractmethod
-    def parse_command(self, input) -> ParseResult:
+    def parse_command(self, cli_input) -> ParseResult:
         """
         Parse corresponding command from given input.
         """
         return
 
     @abc.abstractmethod
-    def parse_params(self, input) -> ParseResult:
+    def parse_params(self, cli_input) -> ParseResult:
         """
         Parse command's parameters from given input.
         """
@@ -58,11 +58,11 @@ class ListParser(CommandParser):
     def __init__(self, string_parser):
         super().__init__(string_parser)
 
-    def parse_command(self, input):
-        result = self.string_parser.parse_string("ls", input)
+    def parse_command(self, cli_input):
+        result = self.string_parser.parse_string("ls", cli_input)
         return result
 
-    def parse_params(self, input):
+    def parse_params(self, cli_input):
         return Success("Temporary for debugging", "not implemented yet")
 
     def has_parameters(self):
@@ -81,11 +81,11 @@ class RectParser(CommandParser):
         self.rel_point_parser = rel_point_parser
         self.abs_point_parser = abs_point_parser
 
-    def parse_command(self, input):
-        result = self.string_parser.parse_string("rect", input)
+    def parse_command(self, cli_input):
+        result = self.string_parser.parse_string("rect", cli_input)
         return result
 
-    def parse_params(self, input):
+    def parse_params(self, cli_input):
         return Success("Temporary for debugging", "not implemented yet")
 
     def has_parameters(self):
