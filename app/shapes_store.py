@@ -55,3 +55,8 @@ class ShapesStore:
             self._notify()
         except ValueError:
             pass
+
+    def restart(self):
+        self._shapes = []
+        self._preview = None
+        self._notify()

@@ -134,8 +134,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1030</width>
-            <height>398</height>
+            <width>1023</width>
+            <height>396</height>
            </rect>
           </property>
          </widget>
@@ -166,7 +166,7 @@
      <x>0</x>
      <y>0</y>
      <width>1134</width>
-     <height>17</height>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -181,7 +181,15 @@
      <string>Help</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>E&amp;dit</string>
+    </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -214,6 +222,22 @@
   <action name="actionCircle">
    <property name="text">
     <string>Circle</string>
+   </property>
+  </action>
+  <action name="actionUndo">
+   <property name="text">
+    <string>&amp;Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actionRedo">
+   <property name="text">
+    <string>&amp;Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Z</string>
    </property>
   </action>
  </widget>

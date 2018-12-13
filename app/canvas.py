@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent
 
-from app.brushes import Brush, PolylineBrush
+from app.brushes import Brush
 
 
 class Canvas(QtWidgets.QWidget):
