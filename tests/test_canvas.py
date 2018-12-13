@@ -1,4 +1,5 @@
 import pytest
+from PyQt5.QtCore import Qt
 
 from app.canvas import Canvas
 from app.brushes import LineBrush, RectBrush, DotBrush
@@ -17,6 +18,9 @@ class ControllerMockup:
     def execute_command(self, command: Command):
         self.command = command
 
+    def end_preview(self):
+        pass
+
 
 class EventMockup:
     @staticmethod
@@ -26,6 +30,10 @@ class EventMockup:
     @staticmethod
     def y() -> int:
         return 20
+
+    @staticmethod
+    def buttons() -> Qt.LeftButton:
+        return Qt.LeftButton
 
 
 @pytest.fixture
@@ -64,10 +72,6 @@ def test_pain_event(canvas: Canvas):
 def test_mouse_move_event(canvas: Canvas):
     assert canvas._brush is None
 
-    canvas.mouseMoveEvent(EventMockup)
-    assert canvas._controller.command is None
-
-    canvas.set_brush(LineBrush())
     canvas.mouseMoveEvent(EventMockup)
     assert canvas._controller.command is None
 

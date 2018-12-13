@@ -3,7 +3,7 @@ from typing import Dict
 import pytest
 from PyQt5.QtGui import QColor
 
-from app.shapes import Shape, Dot, Line, Rectangle, Circle
+from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point
 from app.printers import Printer
 
@@ -18,6 +18,9 @@ class PrinterMockup(Printer):
 
     def print_line(self, line: Line):
         self.result = 'Drawed a ' + str(line)
+
+    def print_polyline(self, polyline: Polyline):
+        self.result = 'Drawed a ' + str(polyline)
 
     def print_rectangle(self, rect: Rectangle):
         self.result = 'Drawed a ' + str(rect)
@@ -76,6 +79,25 @@ def test_line(shapes: Dict[str, Shape]):
     assert line != Line(Point(1000, -1000), Point(123, 321), QColor(0, 0, 0))
 
 
+def test_polyline(shapes: Dict[str, Shape]):
+    with pytest.raises(ValueError):
+        Polyline(Point(10, 10), color=QColor(0, 0, 0))
+
+    polyline: Polyline = shapes['polyline']
+
+    assert polyline.start == Point(10, 10)
+    assert polyline.color == QColor(48, 210, 111)
+    assert polyline.get_props() == polyline.points == (Point(10, 10), Point(20, 20), Point(30, 10))
+
+    d = PrinterMockup()
+    polyline.print_to(d)
+    assert d.result == 'Drawed a ' + str(polyline)
+
+    assert str(polyline) == 'Polyline with points at ([10, 10], [20, 20], [30, 10])'
+    assert polyline == Polyline(Point(10, 10), Point(20, 20), Point(30, 10), color=QColor(48, 210, 111))
+    assert polyline != Polyline(Point(10, 10), Point(20, 20), color=QColor(48, 210, 111))
+
+
 def test_rectangle(shapes: Dict[str, Shape]):
     rect: Rectangle = shapes['rectangle']
 
@@ -115,7 +137,8 @@ def test_shape_class_diff():
     abstract_shape = Shape(Point(100, 100), QColor(100, 100, 100))
     dot = Dot(Point(100, 100), QColor(100, 100, 100))
     line = Line(Point(100, 100), Point(100, 100), QColor(100, 100, 100))
+    polyline = Polyline(Point(100, 100), Point(100, 100), color=QColor(100, 100, 100))
     rect = Rectangle(Point(100, 100), 100, 100, QColor(100, 100, 100))
     circle = Circle(Point(100, 100), 100, QColor(100, 100, 100))
 
-    assert abstract_shape != dot != line != rect != circle
+    assert abstract_shape != dot != line != polyline != rect != circle

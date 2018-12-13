@@ -1,4 +1,4 @@
-from typing import List
+from typing import Tuple
 
 from PyQt5.QtGui import QColor
 
@@ -80,29 +80,27 @@ class Line(Shape):
         )
 
 
-# class Polyline(Shape):
-#     def __init__(self, lines: List[Line]):
-#         super().__init__(lines[0].start)
-#         self.lines = lines
-#
-#     def print_to(self, printer):
-#         printer.print_polyline(self)
-#
-#     def get_props(self):
-#         pass
-#
-#     def __repr__(self):
-#         return (
-#             'Polyline composed of [' +
-#             str(self.lines) +
-#             ']'
-#         )
-#
-#     def __eq__(self, other):
-#         return (
-#             super().__eq__(other) and
-#             self.lines == other.lines
-#         )
+class Polyline(Shape):
+    def __init__(self, *points: Point, color: QColor):
+        if len(points) < 2:
+            raise ValueError('There must be at least 2 points to define a Polyline!')
+        super().__init__(points[0], color)
+        self.points = points
+
+    def print_to(self, printer):
+        printer.print_polyline(self)
+
+    def get_props(self) -> Tuple[Point]:
+        return self.points
+
+    def __repr__(self):
+        return 'Polyline with points at ' + str(self.points)
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.points == other.points
+        )
 
 
 class Rectangle(Shape):

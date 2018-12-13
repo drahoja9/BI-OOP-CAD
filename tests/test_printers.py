@@ -18,6 +18,9 @@ def test_abstract_printer():
         empty_printer.print_line(None)
 
     with pytest.raises(NotImplementedError):
+        empty_printer.print_polyline(None)
+
+    with pytest.raises(NotImplementedError):
         empty_printer.print_rectangle(None)
 
     with pytest.raises(NotImplementedError):
@@ -32,6 +35,9 @@ def test_abstract_text_printer():
 
     with pytest.raises(NotImplementedError):
         empty_printer.print_line(None)
+
+    with pytest.raises(NotImplementedError):
+        empty_printer.print_polyline(None)
 
     with pytest.raises(NotImplementedError):
         empty_printer.print_rectangle(None)

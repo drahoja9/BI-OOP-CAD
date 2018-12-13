@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
-from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush
+from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush, PolylineBrush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -25,8 +25,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.dotButton.clicked.connect(
             lambda: self.canvas.set_brush(DotBrush())
         )
-        # self._ui.polylineButton.clicked.connect(
-        #     lambda: self.canvas.set_brush(PolylineBrush))
+        self._ui.polylineButton.clicked.connect(
+            lambda: self.canvas.set_brush(PolylineBrush())
+        )
         self._ui.lineButton.clicked.connect(
             lambda: self.canvas.set_brush(LineBrush())
         )

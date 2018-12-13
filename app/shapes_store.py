@@ -15,6 +15,7 @@ class ShapesStore:
         super().__init__()
         self._shapes = shapes or []
         self._controller = controller
+        self._preview = None
 
     def _notify(self):
         self._controller.update_canvas()
@@ -23,8 +24,15 @@ class ShapesStore:
         return len(self._shapes) == 0
 
     def print_all(self, printer: Printer):
+        # Order is important - first we want to print all stored shapes and after that the shape preview
         for shape in self._shapes:
             shape.print_to(printer)
+        if self._preview is not None:
+            self._preview.print_to(printer)
+
+    def set_preview(self, shape: Shape = None):
+        self._preview = shape
+        self._notify()
 
     def add_shape(self, shape: Shape):
         self._shapes.append(shape)

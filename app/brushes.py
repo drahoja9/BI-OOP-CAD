@@ -1,5 +1,8 @@
 import math
-from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand
+
+from PyQt5.QtCore import Qt
+
+from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand
 from app.utils import Singleton
 
 
@@ -8,10 +11,26 @@ class Brush(metaclass=Singleton):
         self._start = None
         self._shape_command_class = None
 
-    def mouse_move(self, controller, x: int, y: int):
-        pass
+    def mouse_move(self, controller, x: int, y: int, button):
+        if self._shape_command_class is None:
+            raise AttributeError(f'Can not draw with instance of {self.__class__}, there is no shape to draw!')
 
-    def mouse_press(self, controller, x: int, y: int):
+        if self._start is not None:
+            shape_command = self._shape_command_class(
+                controller,
+                self._start[0],
+                self._start[1],
+                x,
+                y,
+                (255, 255, 255)
+            )
+            shape_command.shape.color.setAlpha(200)
+            controller.preview_shape(shape_command.shape)
+
+    def mouse_press(self, controller, x: int, y: int, button):
+        if self._shape_command_class is None:
+            raise AttributeError(f'Can not draw with instance of {self.__class__}, there is no shape to draw!')
+
         if self._start is None:
             self._start = (x, y)
         else:
@@ -23,6 +42,7 @@ class Brush(metaclass=Singleton):
                 y,
                 (255, 255, 255)
             )
+            controller.end_preview()
             controller.execute_command(shape_command)
             self._start = None
 
@@ -48,10 +68,11 @@ class DotBrush(Brush):
         shape_command = self._shape_command_class(controller, x, y, (0, 0, 0))
         controller.execute_command(shape_command)
 
-    def mouse_move(self, controller, x: int, y: int):
-        self._dot_command(controller, x, y)
+    def mouse_move(self, controller, x: int, y: int, button):
+        if button == Qt.LeftButton:
+            self._dot_command(controller, x, y)
 
-    def mouse_press(self, controller, x: int, y: int):
+    def mouse_press(self, controller, x: int, y: int, button):
         self._dot_command(controller, x, y)
 
     # def mouse_move(self, controller, x: int, y: int):
@@ -72,25 +93,36 @@ class LineBrush(Brush):
         self._shape_command_class = PrintLineCommand
 
 
-# class PolylineBrush(Brush):
-#     @classmethod
-#     def paint(cls, controller, x: int, y: int):
-#         if cls._start is None:
-#             cls._start = (x, y)
-#         else:
-#             shape_command = PrintLineCommand(
-#                 controller,
-#                 cls._start[0],
-#                 cls._start[0],
-#                 x,
-#                 y,
-#                 (255, 255, 255)
-#             )
-#             controller.execute_command(shape_command)
-#
-#     @staticmethod
-#     def shape(controller, start_x: int, start_y: int, end_x: int, end_y: int) -> Command:
-#         return PrintLineCommand(controller, start_x, start_y, end_x, end_y, (255, 255, 255))
+class PolylineBrush(Brush):
+    def __init__(self):
+        super().__init__()
+        self._shape_command_class = PrintPolylineCommand
+        self._points = []
+
+    def mouse_move(self, controller, x: int, y: int, button):
+        if len(self._points) > 0:
+            shape_command = self._shape_command_class(
+                controller,
+                [
+                    *self._points,
+                    (x, y)
+                ],
+                (255, 255, 255)
+            )
+            shape_command.shape.color.setAlpha(200)
+            controller.preview_shape(shape_command.shape)
+
+    def mouse_press(self, controller, x: int, y: int, button):
+        self._points.append((x, y))
+        if button == Qt.RightButton and len(self._points) > 1:
+            shape_command = self._shape_command_class(
+                controller,
+                self._points,
+                (255, 255, 255)
+            )
+            controller.end_preview()
+            controller.execute_command(shape_command)
+            self._points = []
 
 
 class RectBrush(Brush):

@@ -1,8 +1,9 @@
 import pytest
 from PyQt5.QtGui import QColor
 
-from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand
-from app.shapes import Shape, Dot, Line, Rectangle, Circle
+from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
+    PrintPolylineCommand
+from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point
 
 
@@ -48,6 +49,21 @@ def test_line_command(receiver: ReceiverMockup):
         PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
         ==
         PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
+    )
+
+
+def test_polyline_command(receiver: ReceiverMockup):
+    command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+    command.execute()
+    assert receiver.received == Polyline(
+        Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10),
+        color=QColor(100, 200, 300)
+    )
+    assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10'
+    assert (
+        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+        ==
+        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
     )
 
 
