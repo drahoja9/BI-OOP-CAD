@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.setupUi(self)
 
         self.canvas = Canvas(controller)
+        self.color = (0, 0, 0)
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
@@ -23,19 +24,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
-            lambda: self.canvas.set_brush(DotBrush())
+            lambda: self.canvas.set_brush(DotBrush(self.color))
         )
         self._ui.polylineButton.clicked.connect(
-            lambda: self.canvas.set_brush(PolylineBrush())
+            lambda: self.canvas.set_brush(PolylineBrush(self.color))
         )
         self._ui.lineButton.clicked.connect(
-            lambda: self.canvas.set_brush(LineBrush())
+            lambda: self.canvas.set_brush(LineBrush(self.color))
         )
         self._ui.rectagleButton.clicked.connect(
-            lambda: self.canvas.set_brush(RectBrush())
+            lambda: self.canvas.set_brush(RectBrush(self.color))
         )
         self._ui.circleButton.clicked.connect(
-            lambda: self.canvas.set_brush(CircleBrush())
+            lambda: self.canvas.set_brush(CircleBrush(self.color))
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)

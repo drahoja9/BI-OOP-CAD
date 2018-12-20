@@ -77,12 +77,14 @@ class CanvasPrinter(Printer):
 
     def _prepare_painter(self, color: QColor):
         painter = QPainter(self._canvas)
-        painter.setBrush(color)
+        painter.setPen(color) # lines use pen instead of brush, same for circle and rectangles circumferences, brush is fill
         return painter
 
     def print_dot(self, dot: Dot):
         painter = self._prepare_painter(dot.color)
-        painter.setPen(QPen(painter.brush(), 5))
+        pen = QPen(painter.brush(), 5)
+        pen.setColor(dot.color)
+        painter.setPen(pen) # fix, since _prepare_painter() overrides pen, for dot it needs to be overriden back
         painter.drawPoint(*dot.get_props())
 
     def print_line(self, line: Line):
