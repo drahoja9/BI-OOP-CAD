@@ -30,10 +30,10 @@ class ShapeCommand(Command):
         self.shape = None
 
     def execute(self):
-        self.receiver.add_shape(self.shape)
+        self.receiver.add_shapes(self.shape)
 
     def reverse(self):
-        self.receiver.remove_shape(self.shape)
+        self.receiver.remove_last_shape()
 
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape
@@ -111,3 +111,20 @@ class PrintCircleCommand(ShapeCommand):
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}'
+
+
+class RemoveShapeCommand(Command):
+    def __init__(self, receiver, point_x: int, point_y: int):
+        super().__init__(receiver)
+        self._point = Point(point_x, point_y)
+        self._removed_shapes = []
+
+    def execute(self):
+        self._removed_shapes = self.receiver.remove_shapes_at(self._point)
+
+    def reverse(self):
+        if self._removed_shapes:
+            self.receiver.add_shapes(*self._removed_shapes)
+
+    def __str__(self):
+        return f'remove {self._point.x},{self._point.y}'

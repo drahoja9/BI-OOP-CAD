@@ -108,11 +108,11 @@ def test_remove_last_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
 def test_remove_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(*shapes.values())
     for shape in shapes.values():
-        shapes_store.remove_shape(shape)
+        shapes_store._remove_shapes(shape)
         assert shape not in shapes_store._shapes
 
     assert len(shapes_store._controller.result) == 2 * len(shapes)
     assert len(shapes_store._shapes) == 0
 
     # Removing shape that's not inside shouldn't do anything
-    shapes_store.remove_shape(shapes['line'])
+    shapes_store._remove_shapes(shapes['line'])

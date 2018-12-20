@@ -1,8 +1,9 @@
+import math
 from typing import Tuple
 
 from PyQt5.QtGui import QColor
 
-from app.utils import Point
+from app.utils import Point, distance
 
 
 class Shape:
@@ -18,6 +19,9 @@ class Shape:
         raise NotImplementedError
 
     def get_props(self):
+        raise NotImplementedError
+
+    def contains(self, point: Point) -> bool:
         raise NotImplementedError
 
     def __repr__(self):
@@ -47,6 +51,9 @@ class Dot(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y
 
+    def contains(self, point: Point) -> bool:
+        return self.start == point
+
     def __repr__(self):
         return (
             'Dot at ' +
@@ -64,6 +71,12 @@ class Line(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.end.x, self.end.y
+
+    def contains(self, point: Point) -> bool:
+        return math.isclose(
+            distance(self.start, point) + distance(self.end, point),
+            distance(self.start, self.end)
+        )
 
     def __repr__(self):
         return (
@@ -93,6 +106,15 @@ class Polyline(Shape):
     def get_props(self) -> Tuple[Point]:
         return self.points
 
+    def contains(self, point: Point) -> bool:
+        for i in range(len(self.points) - 1):
+            if math.isclose(
+                distance(self.points[i], point) + distance(self.points[i + 1], point),
+                distance(self.points[i], self.points[i + 1])
+            ):
+                return True
+        return False
+
     def __repr__(self):
         return 'Polyline with points at ' + str(self.points)
 
@@ -114,6 +136,13 @@ class Rectangle(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.width, self.height
+
+    def contains(self, point: Point) -> bool:
+        return (
+            self.start.x <= point.x <= self.start.x + self.width
+            and
+            self.start.y <= point.y <= self.start.y + self.height
+        )
 
     def __repr__(self):
         return (
@@ -142,6 +171,9 @@ class Circle(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.radius
+
+    def contains(self, point: Point) -> bool:
+        return distance(self.start, point) <= self.radius
 
     def __repr__(self):
         return (

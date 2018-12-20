@@ -2,7 +2,7 @@ import pytest
 from PyQt5.QtCore import Qt
 
 from app.canvas import Canvas
-from app.brushes import LineBrush, RectBrush, DotBrush
+from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush
 from app.commands import Command, PrintDotCommand, PrintRectCommand
 from app.gui import MainWindow
 
@@ -51,17 +51,17 @@ def canvas(qtbot) -> Canvas:
 def test_set_brush(canvas: Canvas):
     assert canvas._brush is None
 
-    canvas.set_brush(LineBrush())
-    assert canvas._brush == LineBrush()
+    canvas.set_brush(LineShapeBrush())
+    assert canvas._brush == LineShapeBrush()
 
-    canvas.set_brush(LineBrush())
+    canvas.set_brush(LineShapeBrush())
     assert canvas._brush is None
 
-    canvas.set_brush(LineBrush())
-    assert canvas._brush == LineBrush()
+    canvas.set_brush(LineShapeBrush())
+    assert canvas._brush == LineShapeBrush()
 
-    canvas.set_brush(RectBrush())
-    assert canvas._brush == RectBrush()
+    canvas.set_brush(RectShapeBrush())
+    assert canvas._brush == RectShapeBrush()
 
 
 def test_pain_event(canvas: Canvas):
@@ -75,7 +75,7 @@ def test_mouse_move_event(canvas: Canvas):
     canvas.mouseMoveEvent(EventMockup)
     assert canvas._controller.command is None
 
-    canvas.set_brush(DotBrush())
+    canvas.set_brush(DotShapeBrush())
     canvas.mouseMoveEvent(EventMockup)
     assert (
         canvas._controller.command
@@ -90,7 +90,7 @@ def test_mouse_press_event(canvas: Canvas):
     canvas.mousePressEvent(EventMockup)
     assert canvas._controller.command is None
 
-    canvas.set_brush(RectBrush())
+    canvas.set_brush(RectShapeBrush())
     canvas.mousePressEvent(EventMockup)
     canvas.mousePressEvent(EventMockup)
     assert (

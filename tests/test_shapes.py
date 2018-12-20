@@ -41,6 +41,9 @@ def test_abstract_shape():
     with pytest.raises(NotImplementedError):
         abstract_shape.get_props()
 
+    with pytest.raises(NotImplementedError):
+        abstract_shape.contains(Point(1, 1))
+
     assert str(abstract_shape) == 'Abstract shape at [100, 100]'
     assert abstract_shape == Shape(Point(100, 100), QColor('steelblue'))
     assert abstract_shape != Shape(Point(100, 101), QColor('steelblue'))
@@ -60,6 +63,8 @@ def test_dot(shapes: Dict[str, Shape]):
     assert str(dot) == 'Dot at [10, 200000000]'
     assert dot == Dot(Point(10, 200000000), QColor(1, 2, 3))
     assert dot != Dot(Point(10, 200000000), QColor(1, 2, 4))
+    assert dot.contains(Point(10, 200000000)) is True
+    assert dot.contains(Point(11, 200000000)) is False
 
 
 def test_line(shapes: Dict[str, Shape]):
@@ -77,6 +82,8 @@ def test_line(shapes: Dict[str, Shape]):
     assert str(line) == 'Line from [1000, -1000] to [-123, 321]'
     assert line == Line(Point(1000, -1000), Point(-123, 321), QColor(0, 0, 0))
     assert line != Line(Point(1000, -1000), Point(123, 321), QColor(0, 0, 0))
+    assert line.contains(Point(1000, -1000)) is True
+    assert line.contains(Point(1000, 1000)) is False
 
 
 def test_polyline(shapes: Dict[str, Shape]):
@@ -96,6 +103,11 @@ def test_polyline(shapes: Dict[str, Shape]):
     assert str(polyline) == 'Polyline with points at ([10, 10], [20, 20], [30, 10])'
     assert polyline == Polyline(Point(10, 10), Point(20, 20), Point(30, 10), color=QColor(48, 210, 111))
     assert polyline != Polyline(Point(10, 10), Point(20, 20), color=QColor(48, 210, 111))
+    assert polyline.contains(Point(10, 10)) is True
+    assert polyline.contains(Point(15, 15)) is True
+    assert polyline.contains(Point(25, 15)) is True
+    assert polyline.contains(Point(15, 16)) is False
+    assert polyline.contains(Point(24, 15)) is False
 
 
 def test_rectangle(shapes: Dict[str, Shape]):
@@ -114,6 +126,11 @@ def test_rectangle(shapes: Dict[str, Shape]):
     assert str(rect) == '1x50000 rectangle with top-left corner at [0, 0]'
     assert rect == Rectangle(Point(0, 0), 1, 50000, QColor(255, 255, 255))
     assert rect != Rectangle(Point(0, 0), -1, 50000, QColor(255, 255, 255))
+    assert rect.contains(Point(0, 0)) is True
+    assert rect.contains(Point(1, 0)) is True
+    assert rect.contains(Point(1, 50000)) is True
+    assert rect.contains(Point(2, 0)) is False
+    assert rect.contains(Point(0, 50001)) is False
 
 
 def test_circle(shapes: Dict[str, Shape]):
@@ -131,6 +148,11 @@ def test_circle(shapes: Dict[str, Shape]):
     assert str(circle) == 'Circle centered at [12345, 54321] with radius 999'
     assert circle == Circle(Point(12345, 54321), 999, QColor(123, 255, 0))
     assert circle != Circle(Point(12345, 54321), 999, QColor(123, 255, 1))
+    assert circle.contains(Point(12345, 54321)) is True
+    assert circle.contains(Point(13344, 54321)) is True
+    assert circle.contains(Point(12345, 53322)) is True
+    assert circle.contains(Point(12344, 53322)) is False
+    assert circle.contains(Point(13344, 54322)) is False
 
 
 def test_shape_class_diff():
