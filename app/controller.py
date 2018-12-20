@@ -24,6 +24,9 @@ class Controller:
     def add_shapes(self, *shapes: Shape):
         self._shapes.add_shapes(*shapes)
 
+    def replace_shapes_store(self, shapes: List[Shape]):
+        self._shapes = ShapesStore(self, shapes)
+
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
 

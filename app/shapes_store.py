@@ -1,3 +1,4 @@
+import copy
 from typing import List
 
 from app.shapes import Shape
@@ -17,6 +18,7 @@ class ShapesStore:
         self._shapes = shapes or []
         self._controller = controller
         self._preview = None
+        self._notify()
 
     def _notify(self):
         self._controller.update_canvas()
@@ -56,12 +58,13 @@ class ShapesStore:
             pass
 
     def remove_shapes_at(self, point: Point) -> List[Shape]:
+        before_remove = copy.deepcopy(self._shapes)
         to_remove = []
         for shape in self._shapes:
             if shape.contains(point):
                 to_remove.append(shape)
         self._remove_shapes(*to_remove)
-        return to_remove
+        return before_remove
 
     def restart(self):
         self._shapes = []

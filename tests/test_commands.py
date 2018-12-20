@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 from PyQt5.QtGui import QColor
 
@@ -16,6 +18,9 @@ class ReceiverMockup:
             self.received = shapes[0]
         else:
             self.received = shapes
+
+    def replace_shapes_store(self, shapes: List[Shape]):
+        self.received = shapes
 
     def remove_last_shape(self):
         self.received = None
@@ -159,13 +164,13 @@ def test_remove_shape_command(receiver: ReceiverMockup):
 
     command.execute()
     assert receiver.received == Point(123, 321)
-    assert command._removed_shapes == [
+    assert command._before_remove == [
         Dot(Point(10, 10), QColor(0, 0, 0)),
         Line(Point(10, 10), Point(11, 11), QColor(0, 0, 0))
     ]
 
     command.reverse()
-    assert receiver.received == (
+    assert receiver.received == [
         Dot(Point(10, 10), QColor(0, 0, 0)),
         Line(Point(10, 10), Point(11, 11), QColor(0, 0, 0))
-    )
+    ]

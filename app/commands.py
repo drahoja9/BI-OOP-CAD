@@ -117,14 +117,14 @@ class RemoveShapeCommand(Command):
     def __init__(self, receiver, point_x: int, point_y: int):
         super().__init__(receiver)
         self.point = Point(point_x, point_y)
-        self._removed_shapes = []
+        self._before_remove = []
 
     def execute(self):
-        self._removed_shapes = self.receiver.remove_shapes_at(self.point)
+        self._before_remove = self.receiver.remove_shapes_at(self.point)
 
     def reverse(self):
-        if self._removed_shapes:
-            self.receiver.add_shapes(*self._removed_shapes)
+        if self._before_remove:
+            self.receiver.replace_shapes_store(self._before_remove)
 
     def __str__(self):
         return f'remove {self.point.x},{self.point.y}'
