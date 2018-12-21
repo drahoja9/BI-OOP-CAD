@@ -49,19 +49,13 @@ def canvas(qtbot) -> Canvas:
 
 
 def test_set_brush(canvas: Canvas):
-    assert canvas._brush is None
+    assert canvas.brush is None
 
     canvas.set_brush(LineBrush())
-    assert canvas._brush == LineBrush()
-
-    canvas.set_brush(LineBrush())
-    assert canvas._brush is None
-
-    canvas.set_brush(LineBrush())
-    assert canvas._brush == LineBrush()
+    assert canvas.brush == LineBrush()
 
     canvas.set_brush(RectBrush())
-    assert canvas._brush == RectBrush()
+    assert canvas.brush == RectBrush()
 
 
 def test_pain_event(canvas: Canvas):
@@ -70,7 +64,7 @@ def test_pain_event(canvas: Canvas):
 
 
 def test_mouse_move_event(canvas: Canvas):
-    assert canvas._brush is None
+    assert canvas.brush is None
 
     canvas.mouseMoveEvent(EventMockup)
     assert canvas._controller.command is None
@@ -85,7 +79,7 @@ def test_mouse_move_event(canvas: Canvas):
 
 
 def test_mouse_press_event(canvas: Canvas):
-    assert canvas._brush is None
+    assert canvas.brush is None
 
     canvas.mousePressEvent(EventMockup)
     assert canvas._controller.command is None

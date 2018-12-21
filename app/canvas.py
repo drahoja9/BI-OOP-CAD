@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent
 
-from app.brushes import Brush, PolylineBrush
+from app.brushes import Brush
 
 
 class Canvas(QtWidgets.QWidget):
@@ -12,10 +12,10 @@ class Canvas(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
         self._controller = controller
-        self._brush = None
+        self.brush = None
 
     def set_brush(self, brush: Brush = None):
-        self._brush = brush
+        self.brush = brush
         if brush is None:
             self.setMouseTracking(False)
         else:
@@ -31,9 +31,9 @@ class Canvas(QtWidgets.QWidget):
 
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
-        if self._brush is not None:
-            self._brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
+        if self.brush is not None:
+            self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
-        if self._brush is not None:
-            self._brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
+        if self.brush is not None:
+            self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
