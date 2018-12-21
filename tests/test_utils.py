@@ -1,4 +1,6 @@
-from app.utils import Point, Singleton
+import pytest
+
+from app.utils import Point, Singleton, Color
 
 
 class TestSingletonClass(metaclass=Singleton):
@@ -25,6 +27,42 @@ def test_point():
 
     assert p1.__repr__() == '[123, 321]'
     assert str(p2) == '[-40, 0]'
+
+
+def test_color():
+    c1 = Color(255, 123, 0)
+    c2 = Color(255, 123, 0, 255)
+    c3 = Color(123, 255, 0)
+
+    assert c1.r == 255
+    assert c1.g == 123
+    assert c1.b == 0
+    assert c1.alpha == 255
+
+    def unpacking(r, g, b, alpha):
+        assert r == 255
+        assert g == 123
+        assert b == 0
+        assert alpha == 255
+
+    unpacking(*c1)
+    unpacking(*c2)
+
+    assert c1 == c2
+    assert c1 != c3
+    assert c2 != c3
+
+    assert str(c1) == str(c2) == 'Color(255, 123, 0, alpha=255)'
+    assert str(c3) == 'Color(123, 255, 0, alpha=255)'
+
+    with pytest.raises(ValueError):
+        c4 = Color(255, 255, 256)
+
+    with pytest.raises(ValueError):
+        c5 = Color(0, -1, 0)
+
+    with pytest.raises(ValueError):
+        c6 = Color(255, 255, 255, 256)
 
 
 def test_singleton():

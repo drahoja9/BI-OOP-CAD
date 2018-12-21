@@ -1,10 +1,8 @@
 import math
-from typing import Tuple, List
-
-from PyQt5.QtGui import QColor
+from typing import List, Tuple
 
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point
+from app.utils import Point, Color
 
 
 class Command:
@@ -40,11 +38,11 @@ class ShapeCommand(Command):
 
 
 class PrintDotCommand(ShapeCommand):
-    def __init__(self, receiver, x: int, y: int, color: QColor):
+    def __init__(self, receiver, x: int, y: int, color: tuple):
         super().__init__(receiver)
         self.shape = Dot(
             Point(x, y),
-            color
+            Color(*color)
         )
 
     def __str__(self):
@@ -52,12 +50,12 @@ class PrintDotCommand(ShapeCommand):
 
 
 class PrintLineCommand(ShapeCommand):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: QColor):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         self.shape = Line(
             Point(start_x, start_y),
             Point(end_x, end_y),
-            color
+            Color(*color)
         )
 
     def __str__(self):
@@ -65,12 +63,12 @@ class PrintLineCommand(ShapeCommand):
 
 
 class PrintPolylineCommand(ShapeCommand):
-    def __init__(self, receiver, points: List[Tuple[int, int]], color: QColor):
+    def __init__(self, receiver, points: List[Tuple[int, int]], color: tuple):
         super().__init__(receiver)
         points_ = []
         for point in points:
             points_.append(Point(point[0], point[1]))
-        self.shape = Polyline(*points_, color=color)
+        self.shape = Polyline(*points_, color=Color(*color))
 
     def __str__(self):
         res = f'line'
@@ -80,7 +78,7 @@ class PrintPolylineCommand(ShapeCommand):
 
 
 class PrintRectCommand(ShapeCommand):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: QColor):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         width = abs(start_x - end_x)
         height = abs(start_y - end_y)
@@ -88,7 +86,7 @@ class PrintRectCommand(ShapeCommand):
             Point(min(start_x, end_x), min(start_y, end_y)),
             width,
             height,
-            color
+            Color(*color)
         )
 
     def __str__(self):
@@ -96,7 +94,7 @@ class PrintRectCommand(ShapeCommand):
 
 
 class PrintCircleCommand(ShapeCommand):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: QColor):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         center = (start_x, start_y)
         # Classic formula for distance of two points
@@ -106,7 +104,7 @@ class PrintCircleCommand(ShapeCommand):
         self.shape = Circle(
             Point(*center),
             radius,
-            color
+            Color(*color)
         )
 
     def __str__(self):

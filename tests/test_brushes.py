@@ -8,6 +8,7 @@ from app.brushes import Brush, DotBrush, LineBrush, RectBrush, CircleBrush, Poly
 from app.commands import PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, Command, ShapeCommand, \
     PrintPolylineCommand
 from app.shapes import Shape
+from app.utils import Color
 
 
 class ControllerMockup:
@@ -66,9 +67,8 @@ def test_polyline_brush(controller: ControllerMockup):
     points = []
     for x in range(0, 1000, 100):
         points.append((x, x))
-        shape_command = PrintPolylineCommand(controller, [*points, (x*x, x+x)], (255, 255, 255))
+        shape_command = PrintPolylineCommand(controller, [*points, (x*x, x+x)], (0, 0, 0, 200))
         preview_shape = copy.deepcopy(shape_command.shape)
-        preview_shape.color.setAlpha(200)
 
         b1.mouse_press(controller, x, x, Qt.LeftButton)
         b1.mouse_move(controller, x*x, x+x, None)
@@ -76,7 +76,7 @@ def test_polyline_brush(controller: ControllerMockup):
         assert controller.preview == preview_shape
 
     b1.mouse_press(controller, -999, 100, Qt.RightButton)
-    assert controller.command == PrintPolylineCommand(controller, [*points, (-999, 100)], (255, 255, 255))
+    assert controller.command == PrintPolylineCommand(controller, [*points, (-999, 100)], (0, 0, 0))
     assert controller.preview is None
 
 
@@ -91,9 +91,9 @@ def test_brush(controller: ControllerMockup, brush_class: Type[Brush], shape_com
     assert b1 == b2
     assert b1._shape_command_class == b2._shape_command_class == shape_command_class
 
-    shape_command = shape_command_class(controller, -999, 0, -999, 100, (255, 255, 255))
+    shape_command = shape_command_class(controller, -999, 0, -999, 100, (0, 0, 0))
     preview_shape = copy.deepcopy(shape_command.shape)
-    preview_shape.color.setAlpha(200)
+    preview_shape.color = Color(0, 0, 0, 200)
 
     b1.mouse_move(controller, 10, 20, None)
     assert controller.command is None

@@ -5,6 +5,7 @@ from PyQt5.QtGui import QColor, QPainter, QPen
 
 from app.canvas import Canvas
 from app.shapes import Dot, Line, Polyline, Rectangle, Circle, Shape
+from app.utils import Color
 
 
 class Printer:
@@ -75,16 +76,17 @@ class CanvasPrinter(Printer):
         super().__init__()
         self._canvas = canvas
 
-    def _prepare_painter(self, color: QColor):
+    def _prepare_painter(self, color: Color):
         painter = QPainter(self._canvas)
-        painter.setPen(color) # lines use pen instead of brush, same for circle and rectangles circumferences, brush is fill
+        # TODO: Do we want filled shapes or not???
+        painter.setPen(QColor(*color))
         return painter
 
     def print_dot(self, dot: Dot):
         painter = self._prepare_painter(dot.color)
         pen = QPen(painter.brush(), 5)
-        pen.setColor(dot.color)
-        painter.setPen(pen) # fix, since _prepare_painter() overrides pen, for dot it needs to be overriden back
+        pen.setColor(QColor(*dot.color))
+        painter.setPen(pen)
         painter.drawPoint(*dot.get_props())
 
     def print_line(self, line: Line):
