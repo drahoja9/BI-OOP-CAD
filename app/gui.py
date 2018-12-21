@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
-from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush, PolylineBrush
+from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush, PolylineBrush, Brush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -15,7 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.setupUi(self)
         self.set_status()
 
-        self.canvas = Canvas(self, controller)
+        self.canvas = Canvas(controller)
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
@@ -24,19 +24,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
-            lambda: self.canvas.set_brush(DotBrush())
+            lambda: self._toggle_brush(DotBrush())
         )
         self._ui.polylineButton.clicked.connect(
-            lambda: self.canvas.set_brush(PolylineBrush())
+            lambda: self._toggle_brush(PolylineBrush())
         )
         self._ui.lineButton.clicked.connect(
-            lambda: self.canvas.set_brush(LineBrush())
+            lambda: self._toggle_brush(LineBrush())
         )
         self._ui.rectagleButton.clicked.connect(
-            lambda: self.canvas.set_brush(RectBrush())
+            lambda: self._toggle_brush(RectBrush())
         )
         self._ui.circleButton.clicked.connect(
-            lambda: self.canvas.set_brush(CircleBrush())
+            lambda: self._toggle_brush(CircleBrush())
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
@@ -46,3 +46,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _handle_new_action(self):
         self._controller.restart()
+
+    def _toggle_brush(self, brush: Brush):
+        if self.canvas.brush != brush:
+            self.canvas.set_brush(brush)
+            self.set_status(str(brush))
+        else:
+            self.canvas.set_brush()
+            self.set_status()

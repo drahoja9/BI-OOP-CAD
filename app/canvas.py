@@ -9,21 +9,17 @@ class Canvas(QtWidgets.QWidget):
     A (GUI) drawing place for all the shapes. It represents an observer in the observer design pattern.
     """
 
-    def __init__(self, gui, controller):
+    def __init__(self, controller):
         super().__init__()
-        self._gui = gui
         self._controller = controller
         self._brush = None
 
-    def set_brush(self, brush: Brush):
-        if self._brush != brush:
-            self._brush = brush
-            self.setMouseTracking(True)
-            self._gui.set_status(str(brush))
-        else:
-            self._brush = None
+    def set_brush(self, brush: Brush = None):
+        self._brush = brush
+        if brush is None:
             self.setMouseTracking(False)
-            self._gui.set_status()
+        else:
+            self.setMouseTracking(True)
 
     # -------------------------- QWidget overridden methods ----------------------------
 
