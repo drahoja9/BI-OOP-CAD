@@ -13,7 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initializing the whole UI
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
-        self.set_status()
+        self._set_status()
 
         self.canvas = Canvas(controller)
 
@@ -41,16 +41,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._ui.canvasHolder.setWidget(self.canvas)
 
-    def set_status(self, message: str = 'No tool'):
-        self.statusBar().showMessage(message)
-
     def _handle_new_action(self):
         self._controller.restart()
+
+    def _set_status(self, message: str = 'No tool'):
+        self.statusBar().showMessage(message)
 
     def _toggle_brush(self, brush: Brush):
         if self.canvas.brush != brush:
             self.canvas.set_brush(brush)
-            self.set_status(str(brush))
+            self._set_status(str(brush))
         else:
             self.canvas.set_brush()
-            self.set_status()
+            self._set_status()
