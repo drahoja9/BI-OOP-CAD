@@ -1,9 +1,12 @@
+from typing import List
+
 from app.command_engine import CommandEngine
 from app.commands import Command
 from app.gui import MainWindow
 from app.printers import CanvasPrinter
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
+from app.utils import Point
 
 
 class Controller:
@@ -18,11 +21,17 @@ class Controller:
         self._shapes = ShapesStore(self)
         self._printer = CanvasPrinter(self._gui.canvas)
 
-    def add_shape(self, shape: Shape):
-        self._shapes.add_shape(shape)
+    def add_shapes(self, *shapes: Shape):
+        self._shapes.add_shapes(*shapes)
 
-    def remove_shape(self, shape: Shape):
-        self._shapes.remove_shape(shape)
+    def replace_shapes_store(self, shapes: List[Shape]):
+        self._shapes = ShapesStore(self, shapes)
+
+    def remove_last_shape(self):
+        self._shapes.remove_last_shape()
+
+    def remove_shapes_at(self, point: Point) -> List[Shape]:
+        return self._shapes.remove_shapes_at(point)
 
     def preview_shape(self, shape: Shape):
         self._shapes.set_preview(shape)

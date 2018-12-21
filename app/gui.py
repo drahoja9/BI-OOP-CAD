@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import QColorDialog
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
-from app.brushes import LineBrush, RectBrush, CircleBrush, DotBrush, PolylineBrush
+from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
+    RemoveShapeBrush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -20,32 +21,35 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
-            lambda: self._handle_new_action()
+            lambda: self._controller.restart()
         )
         self._ui.actionUndo.triggered.connect(
-            lambda: self._handle_undo()
+            lambda: self._controller.undo()
         )
         self._ui.actionRedo.triggered.connect(
-            lambda: self._handle_redo()
+            lambda: self._controller.redo()
         )
         self.disable_undo()
         self.disable_redo()
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
-            lambda: self.canvas.set_brush(DotBrush())
+            lambda: self.canvas.set_brush(DotShapeBrush())
         )
         self._ui.polylineButton.clicked.connect(
-            lambda: self.canvas.set_brush(PolylineBrush())
+            lambda: self.canvas.set_brush(PolylineShapeBrush())
         )
         self._ui.lineButton.clicked.connect(
-            lambda: self.canvas.set_brush(LineBrush())
+            lambda: self.canvas.set_brush(LineShapeBrush())
         )
         self._ui.rectagleButton.clicked.connect(
-            lambda: self.canvas.set_brush(RectBrush())
+            lambda: self.canvas.set_brush(RectShapeBrush())
         )
         self._ui.circleButton.clicked.connect(
-            lambda: self.canvas.set_brush(CircleBrush())
+            lambda: self.canvas.set_brush(CircleShapeBrush())
+        )
+        self._ui.removeButton.clicked.connect(
+            lambda: self.canvas.set_brush(RemoveShapeBrush())
         )
 
         self._ui.colorButton.clicked.connect(
@@ -60,15 +64,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._ui.colorButton.setStyleSheet(f'background-color: {color.name()}')
             r, g, b, alpha = color.getRgb()
             self.canvas.set_color((r, g, b))
-
-    def _handle_new_action(self):
-        self._controller.restart()
-
-    def _handle_undo(self):
-        self._controller.undo()
-
-    def _handle_redo(self):
-        self._controller.redo()
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)

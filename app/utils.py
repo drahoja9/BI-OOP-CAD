@@ -1,3 +1,4 @@
+import math
 from typing import Iterator
 
 
@@ -42,3 +43,7 @@ class Singleton(type):
             # Calling __init__ of given class even though we return the same instance
             cls._instances[cls].__init__(*args, **kwargs)
         return cls._instances[cls]
+
+
+def distance(a: Point, b: Point):
+    return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)

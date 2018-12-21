@@ -1,7 +1,9 @@
+import copy
 from typing import List
 
 from app.shapes import Shape
 from app.printers import Printer
+from app.utils import Point
 
 
 class ShapesStore:
@@ -16,6 +18,7 @@ class ShapesStore:
         self._shapes = shapes or []
         self._controller = controller
         self._preview = None
+        self._notify()
 
     def _notify(self):
         self._controller.update_canvas()
@@ -34,13 +37,10 @@ class ShapesStore:
         self._preview = shape
         self._notify()
 
-    def add_shape(self, shape: Shape):
-        self._shapes.append(shape)
-        self._notify()
-
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
-            self.add_shape(shape)
+            self._shapes.append(shape)
+        self._notify()
 
     def remove_last_shape(self):
         try:
@@ -49,12 +49,22 @@ class ShapesStore:
         except IndexError:
             pass
 
-    def remove_shape(self, shape: Shape):
+    def _remove_shapes(self, *shapes: Shape):
         try:
-            self._shapes.remove(shape)
+            for shape in shapes:
+                self._shapes.remove(shape)
             self._notify()
         except ValueError:
             pass
+
+    def remove_shapes_at(self, point: Point) -> List[Shape]:
+        before_remove = copy.deepcopy(self._shapes)
+        to_remove = []
+        for shape in self._shapes:
+            if shape.contains(point):
+                to_remove.append(shape)
+        self._remove_shapes(*to_remove)
+        return before_remove
 
     def restart(self):
         self._shapes = []

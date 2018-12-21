@@ -1,7 +1,9 @@
+from typing import List
+
 import pytest
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
-    PrintPolylineCommand
+    PrintPolylineCommand, RemoveShapeCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -10,8 +12,21 @@ class ReceiverMockup:
     def __init__(self):
         self.received = None
 
-    def add_shape(self, shape: Shape):
-        self.received = shape
+    def add_shapes(self, *shapes: Shape):
+        if len(shapes) == 1:
+            self.received = shapes[0]
+        else:
+            self.received = shapes
+
+    def replace_shapes_store(self, shapes: List[Shape]):
+        self.received = shapes
+
+    def remove_last_shape(self):
+        self.received = None
+
+    def remove_shapes_at(self, point: Point):
+        self.received = point
+        return [Dot(Point(10, 10), Color(0, 0, 0)), Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))]
 
 
 @pytest.fixture
@@ -33,61 +48,80 @@ def test_abstract_command():
 
 def test_dot_command(receiver: ReceiverMockup):
     command = PrintDotCommand(receiver, 0, -12, (1, 2, 3))
+    assert str(command) == 'dot 0,-12'
+    assert command == PrintDotCommand(receiver, 0, -12, (1, 2, 3))
+
     command.execute()
     assert receiver.received == Dot(Point(0, -12), Color(1, 2, 3))
-    assert str(command) == 'dot 0,-12'
-    assert PrintDotCommand(receiver, 0, -12, (1, 2, 3)) == PrintDotCommand(receiver, 0, -12, (1, 2, 3))
+
+    command.reverse()
+    assert receiver.received is None
 
 
 def test_line_command(receiver: ReceiverMockup):
     command = PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
-    command.execute()
-    assert receiver.received == Line(Point(10, 10), Point(20, 20), Color(100, 200, 100))
     assert str(command) == 'line 10,10 20,20'
     assert (
-        PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
+        command
         ==
         PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
     )
+
+    command.execute()
+    assert receiver.received == Line(Point(10, 10), Point(20, 20), Color(100, 200, 100))
+
+    command.reverse()
+    assert receiver.received is None
 
 
 def test_polyline_command(receiver: ReceiverMockup):
     command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
-    command.execute()
-    assert receiver.received == Polyline(
-        Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10),
-        color=Color(100, 200, 255)
-    )
     assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10'
     assert (
-        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
+        command
         ==
         PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
     )
+
+    command.execute()
+    assert receiver.received == Polyline(
+        Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10), color=Color(100, 200, 255)
+    )
+
+    command.reverse()
+    assert receiver.received is None
 
 
 def test_rect_command(receiver: ReceiverMockup):
     command = PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
-    command.execute()
-    assert receiver.received == Rectangle(Point(50, 50), 50, 50, Color(255, 255, 255))
     assert str(command) == 'rect 50,50 50 50'
     assert (
-        PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
+        command
         ==
         PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
     )
+
+    command.execute()
+    assert receiver.received == Rectangle(Point(50, 50), 50, 50, Color(255, 255, 255))
+
+    command.reverse()
+    assert receiver.received is None
 
 
 def test_circle_command(receiver: ReceiverMockup):
     command = PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
-    command.execute()
-    assert receiver.received == Circle(Point(0, 0), 141, Color(0, 0, 0))
     assert str(command) == 'circle 0,0 141'
     assert (
-        PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
+        command
         ==
         PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
     )
+
+    command.execute()
+    assert receiver.received == Circle(Point(0, 0), 141, Color(0, 0, 0))
+
+    command.reverse()
+    assert receiver.received is None
 
 
 def test_not_equals(receiver: ReceiverMockup):
@@ -120,3 +154,22 @@ def test_not_equals(receiver: ReceiverMockup):
         !=
         PrintCircleCommand(receiver, 0, 0, 0, 1, (0, 0, 0))
     )
+
+
+def test_remove_shape_command(receiver: ReceiverMockup):
+    command = RemoveShapeCommand(receiver, 123, 321)
+    assert str(command) == 'remove 123,321'
+    assert command == RemoveShapeCommand(receiver, 123, 321)
+
+    command.execute()
+    assert receiver.received == Point(123, 321)
+    assert command._before_remove == [
+        Dot(Point(10, 10), Color(0, 0, 0)),
+        Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))
+    ]
+
+    command.reverse()
+    assert receiver.received == [
+        Dot(Point(10, 10), Color(0, 0, 0)),
+        Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))
+    ]

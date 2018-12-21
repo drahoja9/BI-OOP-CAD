@@ -1,6 +1,7 @@
+import math
 from typing import Tuple
 
-from app.utils import Point, Color
+from app.utils import Point, distance, Color
 
 
 class Shape:
@@ -16,6 +17,9 @@ class Shape:
         raise NotImplementedError
 
     def get_props(self):
+        raise NotImplementedError
+
+    def contains(self, point: Point) -> bool:
         raise NotImplementedError
 
     def __repr__(self):
@@ -42,6 +46,9 @@ class Dot(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y
 
+    def contains(self, point: Point) -> bool:
+        return self.start == point
+
     def __repr__(self):
         return f'Dot at {self.start}' + super().__repr__()
 
@@ -56,6 +63,12 @@ class Line(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.end.x, self.end.y
+
+    def contains(self, point: Point) -> bool:
+        return math.isclose(
+            distance(self.start, point) + distance(self.end, point),
+            distance(self.start, self.end)
+        )
 
     def __repr__(self):
         return f'Line from {self.start} to {self.end}' + super().__repr__()
@@ -80,6 +93,15 @@ class Polyline(Shape):
     def get_props(self) -> Tuple[Point]:
         return self.points
 
+    def contains(self, point: Point) -> bool:
+        for i in range(len(self.points) - 1):
+            if math.isclose(
+                distance(self.points[i], point) + distance(self.points[i + 1], point),
+                distance(self.points[i], self.points[i + 1])
+            ):
+                return True
+        return False
+
     def __repr__(self):
         return f'Polyline with points at {self.points}' + super().__repr__()
 
@@ -102,6 +124,13 @@ class Rectangle(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.width, self.height
 
+    def contains(self, point: Point) -> bool:
+        return (
+            self.start.x <= point.x <= self.start.x + self.width
+            and
+            self.start.y <= point.y <= self.start.y + self.height
+        )
+
     def __repr__(self):
         return f'{self.width}x{self.height} rectangle with top-left corner at {self.start}' + super().__repr__()
 
@@ -123,6 +152,9 @@ class Circle(Shape):
 
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.radius
+
+    def contains(self, point: Point) -> bool:
+        return distance(self.start, point) <= self.radius
 
     def __repr__(self):
         return f'Circle centered at {self.start} with radius {self.radius}' + super().__repr__()

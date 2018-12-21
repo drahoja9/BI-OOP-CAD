@@ -1,11 +1,13 @@
 from typing import Dict
 
 import pytest
+from PyQt5.QtGui import QColor
 
 from app.shapes import Circle, Rectangle, Line, Dot, Polyline
 from app.printers import Printer
 from app.shapes_store import ShapesStore
 from app.shapes import Shape
+from app.utils import Point
 
 
 class ControllerMockup:
@@ -51,7 +53,7 @@ def shapes_store() -> ShapesStore:
 def test_is_empty(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store.is_empty() is True
 
-    shapes_store.add_shape(shapes['circle'])
+    shapes_store.add_shapes(shapes['circle'])
     assert shapes_store.is_empty() is False
 
 
@@ -71,25 +73,21 @@ def test_set_preview(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store._preview is None
     shapes_store.set_preview(shapes['line'])
     assert shapes_store._preview == shapes['line']
-    assert len(shapes_store._controller.result) == 1
-
-
-def test_add_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
-    shapes_store.add_shape(shapes['dot'])
-    assert shapes_store._shapes.index(shapes['dot']) == 0
-    assert len(shapes_store._controller.result) == 1
-    assert len(shapes_store._shapes) == 1
+    assert len(shapes_store._controller.result) == 2
 
 
 def test_add_shapes(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
-    shapes_store.add_shapes(*shapes.values())
+    shapes_store.add_shapes(shapes['dot'])
+    assert shapes_store._shapes.index(shapes['dot']) == 0
+    assert len(shapes_store._controller.result) == 2
+    assert len(shapes_store._shapes) == 1
 
-    assert len(shapes_store._controller.result) == len(shapes)
-    assert len(shapes_store._shapes) == len(shapes)
-
-    for idx, shape in enumerate(shapes_store._shapes):
-        key = [*shapes][idx]
-        assert shape == shapes[key]
+    shapes_store.add_shapes(shapes['line'], shapes['rectangle'], shapes['circle'])
+    assert shapes_store._shapes.index(shapes['line']) == 1
+    assert shapes_store._shapes.index(shapes['rectangle']) == 2
+    assert shapes_store._shapes.index(shapes['circle']) == 3
+    assert len(shapes_store._controller.result) == 3
+    assert len(shapes_store._shapes) == 4
 
 
 def test_remove_last_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
@@ -98,21 +96,33 @@ def test_remove_last_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
 
     shapes_store.add_shapes(*shapes.values())
     shapes_store.remove_last_shape()
-    last_item = shapes[[*shapes][len(shapes)-1]]
+    last_item = shapes['circle']
 
-    assert len(shapes_store._controller.result) == len(shapes) + 1
+    assert len(shapes_store._controller.result) == 3
     assert len(shapes_store._shapes) == len(shapes) - 1
     assert last_item not in shapes_store._shapes
 
 
-def test_remove_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
+def test_remove_shapes_at(shapes_store: ShapesStore):
+    r1 = Rectangle(Point(0, 0), 100, 100, QColor(0, 0, 0))
+    r2 = Rectangle(Point(1, 1), 100, 100, QColor(0, 0, 0))
+    c = Circle(Point(0, 0), 50, QColor(0, 0, 0))
+    l1 = Line(Point(-10, 0), Point(10, 0), QColor(0, 0, 0))
+    l2 = Line(Point(-10, 1), Point(10, 1), QColor(0, 0, 0))
+    d = Dot(Point(0, 0), QColor(0, 0, 0))
+
+    shapes_store.add_shapes(r1, r2, c, l1, l2, d)
+    before_remove = shapes_store.remove_shapes_at(Point(0, 0))
+
+    assert before_remove == [r1, r2, c, l1, l2, d]
+    assert shapes_store._shapes == [r2, l2]
+
+
+def test_restart(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(*shapes.values())
-    for shape in shapes.values():
-        shapes_store.remove_shape(shape)
-        assert shape not in shapes_store._shapes
+    shapes_store._preview = shapes['line']
+    shapes_store.restart()
 
-    assert len(shapes_store._controller.result) == 2 * len(shapes)
-    assert len(shapes_store._shapes) == 0
-
-    # Removing shape that's not inside shouldn't do anything
-    shapes_store.remove_shape(shapes['line'])
+    assert shapes_store.is_empty() is True
+    assert shapes_store._preview is None
+    assert len(shapes_store._controller.result) == 3

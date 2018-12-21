@@ -4,9 +4,10 @@ from typing import Type
 import pytest
 from PyQt5.QtCore import Qt
 
-from app.brushes import Brush, DotBrush, LineBrush, RectBrush, CircleBrush, PolylineBrush
+from app.brushes import ShapeBrush, DotShapeBrush, LineShapeBrush, RectShapeBrush, CircleShapeBrush, PolylineShapeBrush, \
+    Brush, RemoveShapeBrush
 from app.commands import PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, Command, ShapeCommand, \
-    PrintPolylineCommand
+    PrintPolylineCommand, RemoveShapeCommand
 from app.shapes import Shape
 from app.utils import Color
 
@@ -32,8 +33,18 @@ def controller() -> ControllerMockup:
 
 
 def test_abstract_brush():
-    b1 = Brush()
-    b2 = Brush()
+    b = Brush()
+
+    with pytest.raises(NotImplementedError):
+        b.mouse_move(None, 1, 2, None)
+
+    with pytest.raises(NotImplementedError):
+        b.mouse_press(None, 1, 2, None)
+
+
+def test_abstract_shape_brush():
+    b1 = ShapeBrush()
+    b2 = ShapeBrush()
     assert b1 == b2
 
     with pytest.raises(AttributeError):
@@ -44,8 +55,8 @@ def test_abstract_brush():
 
 
 def test_dot_brush(controller: ControllerMockup):
-    b1 = DotBrush()
-    b2 = DotBrush()
+    b1 = DotShapeBrush()
+    b2 = DotShapeBrush()
     assert b1 == b2
 
     b1.mouse_move(controller, 10, 20, Qt.LeftButton)
@@ -56,8 +67,8 @@ def test_dot_brush(controller: ControllerMockup):
 
 
 def test_polyline_brush(controller: ControllerMockup):
-    b1 = PolylineBrush()
-    b2 = PolylineBrush()
+    b1 = PolylineShapeBrush()
+    b2 = PolylineShapeBrush()
     assert b1 == b2
 
     b1.mouse_move(controller, 10, 20, None)
@@ -67,11 +78,11 @@ def test_polyline_brush(controller: ControllerMockup):
     points = []
     for x in range(0, 1000, 100):
         points.append((x, x))
-        shape_command = PrintPolylineCommand(controller, [*points, (x*x, x+x)], (0, 0, 0, 200))
+        shape_command = PrintPolylineCommand(controller, [*points, (x * x, x + x)], (0, 0, 0, 200))
         preview_shape = copy.deepcopy(shape_command.shape)
 
         b1.mouse_press(controller, x, x, Qt.LeftButton)
-        b1.mouse_move(controller, x*x, x+x, None)
+        b1.mouse_move(controller, x * x, x + x, None)
         assert controller.command is None
         assert controller.preview == preview_shape
 
@@ -81,11 +92,15 @@ def test_polyline_brush(controller: ControllerMockup):
 
 
 @pytest.mark.parametrize('brush_class, shape_command_class', [
-    (LineBrush, PrintLineCommand),
-    (RectBrush, PrintRectCommand),
-    (CircleBrush, PrintCircleCommand)
+    (LineShapeBrush, PrintLineCommand),
+    (RectShapeBrush, PrintRectCommand),
+    (CircleShapeBrush, PrintCircleCommand)
 ])
-def test_brush(controller: ControllerMockup, brush_class: Type[Brush], shape_command_class: Type[ShapeCommand]):
+def test_shape_brush(
+    controller: ControllerMockup,
+    brush_class: Type[ShapeBrush],
+    shape_command_class: Type[ShapeCommand]
+):
     b1 = brush_class()
     b2 = brush_class()
     assert b1 == b2
@@ -107,3 +122,10 @@ def test_brush(controller: ControllerMockup, brush_class: Type[Brush], shape_com
     b1.mouse_press(controller, -999, 100, Qt.LeftButton)
     assert controller.command == shape_command
     assert controller.preview is None
+
+
+def test_remove_shape_brush(controller: ControllerMockup):
+    brush = RemoveShapeBrush()
+
+    brush.mouse_press(controller, 10, 10, None)
+    assert controller.command == RemoveShapeCommand(controller, 10, 10)

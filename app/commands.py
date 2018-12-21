@@ -1,8 +1,7 @@
-import math
 from typing import List, Tuple
 
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point, Color
+from app.utils import Point, Color, distance
 
 
 class Command:
@@ -28,10 +27,10 @@ class ShapeCommand(Command):
         self.shape = None
 
     def execute(self):
-        self.receiver.add_shape(self.shape)
+        self.receiver.add_shapes(self.shape)
 
     def reverse(self):
-        self.receiver.remove_shape(self.shape)
+        self.receiver.remove_last_shape()
 
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape
@@ -97,10 +96,7 @@ class PrintCircleCommand(ShapeCommand):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         center = (start_x, start_y)
-        # Classic formula for distance of two points
-        radius = math.floor(
-            math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2)
-        )
+        radius = distance(Point(start_x, end_x), Point(start_y, end_y))
         self.shape = Circle(
             Point(*center),
             radius,
@@ -109,3 +105,23 @@ class PrintCircleCommand(ShapeCommand):
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}'
+
+
+class RemoveShapeCommand(Command):
+    def __init__(self, receiver, point_x: int, point_y: int):
+        super().__init__(receiver)
+        self.point = Point(point_x, point_y)
+        self._before_remove = []
+
+    def execute(self):
+        self._before_remove = self.receiver.remove_shapes_at(self.point)
+
+    def reverse(self):
+        if self._before_remove:
+            self.receiver.replace_shapes_store(self._before_remove)
+
+    def __str__(self):
+        return f'remove {self.point.x},{self.point.y}'
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.point == other.point

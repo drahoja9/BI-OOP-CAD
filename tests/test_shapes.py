@@ -40,6 +40,9 @@ def test_abstract_shape():
     with pytest.raises(NotImplementedError):
         abstract_shape.get_props()
 
+    with pytest.raises(NotImplementedError):
+        abstract_shape.contains(Point(1, 1))
+
     assert str(abstract_shape) == ' with Color(0, 1, 2, alpha=255)'
     assert abstract_shape == Shape(Point(100, 100), Color(0, 1, 2))
     assert abstract_shape != Shape(Point(100, 101), Color(0, 1, 2))
@@ -59,6 +62,8 @@ def test_dot(shapes: Dict[str, Shape]):
     assert str(dot) == 'Dot at [10, 200000000] with Color(1, 2, 3, alpha=255)'
     assert dot == Dot(Point(10, 200000000), Color(1, 2, 3))
     assert dot != Dot(Point(10, 200000000), Color(1, 2, 4))
+    assert dot.contains(Point(10, 200000000)) is True
+    assert dot.contains(Point(11, 200000000)) is False
 
 
 def test_line(shapes: Dict[str, Shape]):
@@ -72,10 +77,12 @@ def test_line(shapes: Dict[str, Shape]):
     d = PrinterMockup()
     line.print_to(d)
     assert d.result == 'Drawed a ' + str(line)
-
+    
     assert str(line) == 'Line from [1000, -1000] to [-123, 321] with Color(0, 0, 0, alpha=255)'
     assert line == Line(Point(1000, -1000), Point(-123, 321), Color(0, 0, 0))
     assert line != Line(Point(1000, -1000), Point(123, 321), Color(0, 0, 0))
+    assert line.contains(Point(1000, -1000)) is True
+    assert line.contains(Point(1000, 1000)) is False
 
 
 def test_polyline(shapes: Dict[str, Shape]):
@@ -91,10 +98,15 @@ def test_polyline(shapes: Dict[str, Shape]):
     d = PrinterMockup()
     polyline.print_to(d)
     assert d.result == 'Drawed a ' + str(polyline)
-
+    
     assert str(polyline) == 'Polyline with points at ([10, 10], [20, 20], [30, 10]) with Color(48, 210, 111, alpha=255)'
     assert polyline == Polyline(Point(10, 10), Point(20, 20), Point(30, 10), color=Color(48, 210, 111))
     assert polyline != Polyline(Point(10, 10), Point(20, 20), color=Color(48, 210, 111))
+    assert polyline.contains(Point(10, 10)) is True
+    assert polyline.contains(Point(15, 15)) is True
+    assert polyline.contains(Point(25, 15)) is True
+    assert polyline.contains(Point(15, 16)) is False
+    assert polyline.contains(Point(24, 15)) is False
 
 
 def test_rectangle(shapes: Dict[str, Shape]):
@@ -109,10 +121,15 @@ def test_rectangle(shapes: Dict[str, Shape]):
     d = PrinterMockup()
     rect.print_to(d)
     assert d.result == 'Drawed a ' + str(rect)
-
+    
     assert str(rect) == '1x50000 rectangle with top-left corner at [0, 0] with Color(255, 255, 255, alpha=255)'
     assert rect == Rectangle(Point(0, 0), 1, 50000, Color(255, 255, 255))
     assert rect != Rectangle(Point(0, 0), -1, 50000, Color(255, 255, 255))
+    assert rect.contains(Point(0, 0)) is True
+    assert rect.contains(Point(1, 0)) is True
+    assert rect.contains(Point(1, 50000)) is True
+    assert rect.contains(Point(2, 0)) is False
+    assert rect.contains(Point(0, 50001)) is False
 
 
 def test_circle(shapes: Dict[str, Shape]):
@@ -126,10 +143,15 @@ def test_circle(shapes: Dict[str, Shape]):
     d = PrinterMockup()
     circle.print_to(d)
     assert d.result == 'Drawed a ' + str(circle)
-
+    
     assert str(circle) == 'Circle centered at [12345, 54321] with radius 999 with Color(123, 255, 0, alpha=255)'
     assert circle == Circle(Point(12345, 54321), 999, Color(123, 255, 0))
     assert circle != Circle(Point(12345, 54321), 999, Color(123, 255, 1))
+    assert circle.contains(Point(12345, 54321)) is True
+    assert circle.contains(Point(13344, 54321)) is True
+    assert circle.contains(Point(12345, 53322)) is True
+    assert circle.contains(Point(12344, 53322)) is False
+    assert circle.contains(Point(13344, 54322)) is False
 
 
 def test_shape_class_diff():

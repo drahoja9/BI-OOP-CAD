@@ -1,6 +1,8 @@
+import math
+
 import pytest
 
-from app.utils import Point, Singleton, Color
+from app.utils import Point, Singleton, Color, distance
 
 
 class TestSingletonClass(metaclass=Singleton):
@@ -77,3 +79,10 @@ def test_singleton():
     assert a.b == b.b == c.b == 123
 
     assert a == b == c
+
+
+def test_distance():
+    assert distance(Point(0, 0), Point(0, 0)) == 0
+    assert distance(Point(0, 0), Point(10, 0)) == 10
+    assert distance(Point(0, 0), Point(0, -100)) == 100
+    assert math.isclose(distance(Point(0, 0), Point(20, 20)), 28.284271247461902) is True

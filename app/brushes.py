@@ -2,12 +2,22 @@ import math
 
 from PyQt5.QtCore import Qt
 
-from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand
+from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand, \
+    RemoveShapeCommand
 from app.utils import Singleton
 
 
 class Brush(metaclass=Singleton):
+    def mouse_move(self, controller, x: int, y: int, button):
+        raise NotImplementedError
+
+    def mouse_press(self, controller, x: int, y: int, button):
+        raise NotImplementedError
+
+
+class ShapeBrush(Brush):
     def __init__(self):
+        super().__init__()
         self._start = None
         self._shape_command_class = None
         self.color = (0, 0, 0)
@@ -47,7 +57,7 @@ class Brush(metaclass=Singleton):
             self._start = None
 
 
-class DotBrush(Brush):
+class DotShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintDotCommand
@@ -87,13 +97,13 @@ class DotBrush(Brush):
     #     self._start = None
 
 
-class LineBrush(Brush):
+class LineShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintLineCommand
 
 
-class PolylineBrush(Brush):
+class PolylineShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintPolylineCommand
@@ -124,13 +134,22 @@ class PolylineBrush(Brush):
             self._points = []
 
 
-class RectBrush(Brush):
-    def __init__(self,):
+class RectShapeBrush(ShapeBrush):
+    def __init__(self):
         super().__init__()
         self._shape_command_class = PrintRectCommand
 
 
-class CircleBrush(Brush):
+class CircleShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintCircleCommand
+
+
+class RemoveShapeBrush(Brush):
+    def mouse_move(self, controller, x: int, y: int, button):
+        pass
+
+    def mouse_press(self, controller, x: int, y: int, button):
+        command = RemoveShapeCommand(controller, x, y)
+        controller.execute_command(command)
