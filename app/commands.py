@@ -96,10 +96,10 @@ class PrintCircleCommand(ShapeCommand):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         center = (start_x, start_y)
-        radius = distance(Point(start_x, end_x), Point(start_y, end_y))
+        radius = distance(Point(start_x, start_y), Point(end_x, end_y))
         self.shape = Circle(
             Point(*center),
-            radius,
+            int(radius),
             Color(*color)
         )
 
