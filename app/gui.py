@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initializing the whole UI
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
+        self.setStatus("No tool")
 
         self.canvas = Canvas(controller)
 
@@ -23,22 +24,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
-            lambda: self.canvas.set_brush(DotBrush())
+            lambda: (self.canvas.set_brush(DotBrush()), self.setStatus("Dot"))
         )
         self._ui.polylineButton.clicked.connect(
-            lambda: self.canvas.set_brush(PolylineBrush())
+            lambda: (self.canvas.set_brush(PolylineBrush()), self.setStatus("Polyline"))
         )
         self._ui.lineButton.clicked.connect(
-            lambda: self.canvas.set_brush(LineBrush())
+            lambda: (self.canvas.set_brush(LineBrush()), self.setStatus("Line"))
         )
         self._ui.rectagleButton.clicked.connect(
-            lambda: self.canvas.set_brush(RectBrush())
+            lambda: (self.canvas.set_brush(RectBrush()), self.setStatus("Rectangle"))
         )
         self._ui.circleButton.clicked.connect(
-            lambda: self.canvas.set_brush(CircleBrush())
+            lambda: (self.canvas.set_brush(CircleBrush()), self.setStatus("Circle"))
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
+
+    def setStatus(self, message):
+        self.statusBar().showMessage(message)
 
     def _handle_new_action(self):
         self._controller.restart()

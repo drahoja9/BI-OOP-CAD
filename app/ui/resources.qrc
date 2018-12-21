@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>assets/dot.png</file>
+    <file>assets/line.png</file>
+    <file>assets/polyline.png</file>
+    <file>assets/circle.png</file>
+    <file>assets/rectangle.png</file>
+</qresource>
+</RCC>
