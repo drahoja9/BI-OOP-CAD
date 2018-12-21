@@ -49,19 +49,32 @@ def canvas(qtbot) -> Canvas:
 
 
 def test_set_brush(canvas: Canvas):
+    canvas.set_color((10, 20, 30))
     assert canvas._brush is None
 
-    canvas.set_brush(LineShapeBrush())
-    assert canvas._brush == LineShapeBrush()
+    canvas.set_brush(LineBrush())
+    assert canvas._brush.color == (10, 20, 30)
+    assert canvas._brush == LineBrush()
 
     canvas.set_brush(LineShapeBrush())
     assert canvas._brush is None
 
-    canvas.set_brush(LineShapeBrush())
-    assert canvas._brush == LineShapeBrush()
+    canvas.set_brush(LineBrush())
+    assert canvas._brush.color == (10, 20, 30)
+    assert canvas._brush == LineBrush()
 
-    canvas.set_brush(RectShapeBrush())
-    assert canvas._brush == RectShapeBrush()
+    canvas.set_brush(RectBrush())
+    assert canvas._brush.color == (10, 20, 30)
+    assert canvas._brush == RectBrush()
+
+
+def test_color(canvas: Canvas):
+    assert canvas._color == (0, 0, 0)
+
+    canvas.set_brush(CircleBrush())
+    canvas.set_color((100, 200, 100))
+    assert canvas._color == (100, 200, 100)
+    assert canvas._brush.color == (100, 200, 100)
 
 
 def test_pain_event(canvas: Canvas):
@@ -100,6 +113,6 @@ def test_mouse_press_event(canvas: Canvas):
             canvas._controller,
             EventMockup.x(), EventMockup.y(),
             EventMockup.x(), EventMockup.y(),
-            (255, 255, 255)
+            (0, 0, 0)
         )
     )

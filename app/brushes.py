@@ -20,6 +20,7 @@ class ShapeBrush(Brush):
         super().__init__()
         self._start = None
         self._shape_command_class = None
+        self.color = (0, 0, 0)
 
     def mouse_move(self, controller, x: int, y: int, button):
         if self._shape_command_class is None:
@@ -32,9 +33,8 @@ class ShapeBrush(Brush):
                 self._start[1],
                 x,
                 y,
-                (255, 255, 255)
+                (*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
             )
-            shape_command.shape.color.setAlpha(200)
             controller.preview_shape(shape_command.shape)
 
     def mouse_press(self, controller, x: int, y: int, button):
@@ -50,7 +50,7 @@ class ShapeBrush(Brush):
                 self._start[1],
                 x,
                 y,
-                (255, 255, 255)
+                self.color
             )
             controller.end_preview()
             controller.execute_command(shape_command)
@@ -75,7 +75,7 @@ class DotShapeBrush(ShapeBrush):
     #     return [(self._lerp(p1[0], p2[0], 1./n*i), self._lerp(p1[1], p2[1], 1./n*i)) for i in range(n+1)]
 
     def _dot_command(self, controller, x: int, y: int):
-        shape_command = self._shape_command_class(controller, x, y, (0, 0, 0))
+        shape_command = self._shape_command_class(controller, x, y, self.color)
         controller.execute_command(shape_command)
 
     def mouse_move(self, controller, x: int, y: int, button):
@@ -117,9 +117,8 @@ class PolylineShapeBrush(ShapeBrush):
                     *self._points,
                     (x, y)
                 ],
-                (255, 255, 255)
+                (*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
             )
-            shape_command.shape.color.setAlpha(200)
             controller.preview_shape(shape_command.shape)
 
     def mouse_press(self, controller, x: int, y: int, button):
@@ -128,7 +127,7 @@ class PolylineShapeBrush(ShapeBrush):
             shape_command = self._shape_command_class(
                 controller,
                 self._points,
-                (255, 255, 255)
+                self.color
             )
             controller.end_preview()
             controller.execute_command(shape_command)

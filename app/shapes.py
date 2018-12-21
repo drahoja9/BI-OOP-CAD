@@ -3,15 +3,14 @@ from typing import Tuple
 
 from PyQt5.QtGui import QColor
 
-from app.utils import Point, distance
-
+from app.utils import Point, distance, Color
 
 class Shape:
     """
     Represents an object that is visited by a visitor in the visitor design pattern.
     """
 
-    def __init__(self, start: Point, color: QColor = None):
+    def __init__(self, start: Point, color: Color = Color(0, 0, 0)):
         self.start = start
         self.color = color
 
@@ -25,10 +24,7 @@ class Shape:
         raise NotImplementedError
 
     def __repr__(self):
-        return (
-            'Abstract shape at ' +
-            str(self.start)
-        )
+        return f' with {self.color}'
 
     def __eq__(self, other):
         return (
@@ -42,7 +38,7 @@ class Shape:
 
 
 class Dot(Shape):
-    def __init__(self, start: Point, color: QColor):
+    def __init__(self, start: Point, color: Color):
         super().__init__(start, color)
 
     def print_to(self, printer):
@@ -55,14 +51,11 @@ class Dot(Shape):
         return self.start == point
 
     def __repr__(self):
-        return (
-            'Dot at ' +
-            str(self.start)
-        )
+        return f'Dot at {self.start}' + super().__repr__()
 
 
 class Line(Shape):
-    def __init__(self, start: Point, end: Point, color: QColor):
+    def __init__(self, start: Point, end: Point, color: Color):
         super().__init__(start, color)
         self.end = end
 
@@ -79,12 +72,7 @@ class Line(Shape):
         )
 
     def __repr__(self):
-        return (
-            'Line from ' +
-            str(self.start) +
-            ' to ' +
-            str(self.end)
-        )
+        return f'Line from {self.start} to {self.end}' + super().__repr__()
 
     def __eq__(self, other):
         return (
@@ -94,7 +82,7 @@ class Line(Shape):
 
 
 class Polyline(Shape):
-    def __init__(self, *points: Point, color: QColor):
+    def __init__(self, *points: Point, color: Color):
         if len(points) < 2:
             raise ValueError('There must be at least 2 points to define a Polyline!')
         super().__init__(points[0], color)
@@ -116,7 +104,7 @@ class Polyline(Shape):
         return False
 
     def __repr__(self):
-        return 'Polyline with points at ' + str(self.points)
+        return f'Polyline with points at {self.points}' + super().__repr__()
 
     def __eq__(self, other):
         return (
@@ -126,7 +114,7 @@ class Polyline(Shape):
 
 
 class Rectangle(Shape):
-    def __init__(self, top_left: Point, width: int, height: int, color: QColor):
+    def __init__(self, top_left: Point, width: int, height: int, color: Color):
         super().__init__(top_left, color)
         self.width = width
         self.height = height
@@ -145,13 +133,7 @@ class Rectangle(Shape):
         )
 
     def __repr__(self):
-        return (
-            str(self.width) +
-            'x' +
-            str(self.height) +
-            ' rectangle with top-left corner at ' +
-            str(self.start)
-        )
+        return f'{self.width}x{self.height} rectangle with top-left corner at {self.start}' + super().__repr__()
 
     def __eq__(self, other):
         return (
@@ -162,7 +144,7 @@ class Rectangle(Shape):
 
 
 class Circle(Shape):
-    def __init__(self, middle: Point, radius: int, color: QColor):
+    def __init__(self, middle: Point, radius: int, color: Color):
         super().__init__(middle, color)
         self.radius = radius
 
@@ -176,12 +158,7 @@ class Circle(Shape):
         return distance(self.start, point) <= self.radius
 
     def __repr__(self):
-        return (
-            'Circle centered at ' +
-            str(self.start) +
-            ' with radius ' +
-            str(self.radius)
-        )
+        return f'Circle centered at {self.start} with radius {self.radius}' + super().__repr__()
 
     def __eq__(self, other):
         return (

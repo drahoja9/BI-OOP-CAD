@@ -1,12 +1,11 @@
 from typing import List
 
 import pytest
-from PyQt5.QtGui import QColor
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
     PrintPolylineCommand, RemoveShapeCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point
+from app.utils import Point, Color
 
 
 class ReceiverMockup:
@@ -76,12 +75,12 @@ def test_line_command(receiver: ReceiverMockup):
 
 
 def test_polyline_command(receiver: ReceiverMockup):
-    command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+    command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
     assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10'
     assert (
         command
         ==
-        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
     )
 
     command.execute()
@@ -97,7 +96,7 @@ def test_rect_command(receiver: ReceiverMockup):
     command = PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
     assert str(command) == 'rect 50,50 50 50'
     assert (
-        PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
+        command
         ==
         PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
     )
@@ -113,7 +112,7 @@ def test_circle_command(receiver: ReceiverMockup):
     command = PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
     assert str(command) == 'circle 0,0 141'
     assert (
-        PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
+        command
         ==
         PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
     )
