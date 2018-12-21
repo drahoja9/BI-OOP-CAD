@@ -1,4 +1,6 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QColorDialog
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
@@ -38,7 +40,18 @@ class MainWindow(QtWidgets.QMainWindow):
             lambda: self.canvas.set_brush(CircleBrush())
         )
 
+        self._ui.colorButton.clicked.connect(
+            lambda: self._handle_color_pick()
+        )
+
         self._ui.canvasHolder.setWidget(self.canvas)
+
+    def _handle_color_pick(self):
+        color = QColorDialog().getColor(QColor(0, 0, 0))
+        if color.isValid():
+            self._ui.colorButton.setStyleSheet(f'background-color: {color.name()}')
+            r, g, b, alpha = color.getRgb()
+            self.canvas.set_color((r, g, b))
 
     def _handle_new_action(self):
         self._controller.restart()

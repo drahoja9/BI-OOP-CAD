@@ -1,10 +1,9 @@
 import pytest
-from PyQt5.QtGui import QColor
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
     PrintPolylineCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point
+from app.utils import Point, Color
 
 
 class ReceiverMockup:
@@ -35,7 +34,7 @@ def test_abstract_command():
 def test_dot_command(receiver: ReceiverMockup):
     command = PrintDotCommand(receiver, 0, -12, (1, 2, 3))
     command.execute()
-    assert receiver.received == Dot(Point(0, -12), QColor(1, 2, 3))
+    assert receiver.received == Dot(Point(0, -12), Color(1, 2, 3))
     assert str(command) == 'dot 0,-12'
     assert PrintDotCommand(receiver, 0, -12, (1, 2, 3)) == PrintDotCommand(receiver, 0, -12, (1, 2, 3))
 
@@ -43,7 +42,7 @@ def test_dot_command(receiver: ReceiverMockup):
 def test_line_command(receiver: ReceiverMockup):
     command = PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
     command.execute()
-    assert receiver.received == Line(Point(10, 10), Point(20, 20), QColor(100, 200, 100))
+    assert receiver.received == Line(Point(10, 10), Point(20, 20), Color(100, 200, 100))
     assert str(command) == 'line 10,10 20,20'
     assert (
         PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
@@ -53,24 +52,24 @@ def test_line_command(receiver: ReceiverMockup):
 
 
 def test_polyline_command(receiver: ReceiverMockup):
-    command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+    command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
     command.execute()
     assert receiver.received == Polyline(
         Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10),
-        color=QColor(100, 200, 300)
+        color=Color(100, 200, 255)
     )
     assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10'
     assert (
-        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
         ==
-        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 300))
+        PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
     )
 
 
 def test_rect_command(receiver: ReceiverMockup):
     command = PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
     command.execute()
-    assert receiver.received == Rectangle(Point(50, 50), 50, 50, QColor(255, 255, 255))
+    assert receiver.received == Rectangle(Point(50, 50), 50, 50, Color(255, 255, 255))
     assert str(command) == 'rect 50,50 50 50'
     assert (
         PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
@@ -82,7 +81,7 @@ def test_rect_command(receiver: ReceiverMockup):
 def test_circle_command(receiver: ReceiverMockup):
     command = PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
     command.execute()
-    assert receiver.received == Circle(Point(0, 0), 141, QColor(0, 0, 0))
+    assert receiver.received == Circle(Point(0, 0), 141, Color(0, 0, 0))
     assert str(command) == 'circle 0,0 141'
     assert (
         PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
