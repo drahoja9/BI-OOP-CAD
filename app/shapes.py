@@ -1,9 +1,8 @@
 import math
 from typing import Tuple
 
-from PyQt5.QtGui import QColor
-
 from app.utils import Point, distance, Color
+
 
 class Shape:
     """

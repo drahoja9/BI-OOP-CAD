@@ -26,7 +26,7 @@ class ReceiverMockup:
 
     def remove_shapes_at(self, point: Point):
         self.received = point
-        return [Dot(Point(10, 10), QColor(0, 0, 0)), Line(Point(10, 10), Point(11, 11), QColor(0, 0, 0))]
+        return [Dot(Point(10, 10), Color(0, 0, 0)), Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))]
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def test_dot_command(receiver: ReceiverMockup):
     assert command == PrintDotCommand(receiver, 0, -12, (1, 2, 3))
 
     command.execute()
-    assert receiver.received == Dot(Point(0, -12), QColor(1, 2, 3))
+    assert receiver.received == Dot(Point(0, -12), Color(1, 2, 3))
 
     command.reverse()
     assert receiver.received is None
@@ -68,7 +68,7 @@ def test_line_command(receiver: ReceiverMockup):
     )
 
     command.execute()
-    assert receiver.received == Line(Point(10, 10), Point(20, 20), QColor(100, 200, 100))
+    assert receiver.received == Line(Point(10, 10), Point(20, 20), Color(100, 200, 100))
 
     command.reverse()
     assert receiver.received is None
@@ -85,7 +85,7 @@ def test_polyline_command(receiver: ReceiverMockup):
 
     command.execute()
     assert receiver.received == Polyline(
-        Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10), color=QColor(100, 200, 300)
+        Point(10, 10), Point(20, 20), Point(30, 30), Point(40, 20), Point(50, 10), color=Color(100, 200, 255)
     )
 
     command.reverse()
@@ -102,7 +102,7 @@ def test_rect_command(receiver: ReceiverMockup):
     )
 
     command.execute()
-    assert receiver.received == Rectangle(Point(50, 50), 50, 50, QColor(255, 255, 255))
+    assert receiver.received == Rectangle(Point(50, 50), 50, 50, Color(255, 255, 255))
 
     command.reverse()
     assert receiver.received is None
@@ -118,7 +118,7 @@ def test_circle_command(receiver: ReceiverMockup):
     )
 
     command.execute()
-    assert receiver.received == Circle(Point(0, 0), 141, QColor(0, 0, 0))
+    assert receiver.received == Circle(Point(0, 0), 141, Color(0, 0, 0))
 
     command.reverse()
     assert receiver.received is None
@@ -164,12 +164,12 @@ def test_remove_shape_command(receiver: ReceiverMockup):
     command.execute()
     assert receiver.received == Point(123, 321)
     assert command._before_remove == [
-        Dot(Point(10, 10), QColor(0, 0, 0)),
-        Line(Point(10, 10), Point(11, 11), QColor(0, 0, 0))
+        Dot(Point(10, 10), Color(0, 0, 0)),
+        Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))
     ]
 
     command.reverse()
     assert receiver.received == [
-        Dot(Point(10, 10), QColor(0, 0, 0)),
-        Line(Point(10, 10), Point(11, 11), QColor(0, 0, 0))
+        Dot(Point(10, 10), Color(0, 0, 0)),
+        Line(Point(10, 10), Point(11, 11), Color(0, 0, 0))
     ]

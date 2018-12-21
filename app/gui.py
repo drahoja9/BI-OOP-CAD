@@ -21,13 +21,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
-            lambda: self._handle_new_action()
+            lambda: self._controller.restart()
         )
         self._ui.actionUndo.triggered.connect(
-            lambda: self._handle_undo()
+            lambda: self._controller.undo()
         )
         self._ui.actionRedo.triggered.connect(
-            lambda: self._handle_redo()
+            lambda: self._controller.redo()
         )
         self.disable_undo()
         self.disable_redo()
@@ -64,15 +64,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self._ui.colorButton.setStyleSheet(f'background-color: {color.name()}')
             r, g, b, alpha = color.getRgb()
             self.canvas.set_color((r, g, b))
-
-    def _handle_new_action(self):
-        self._controller.restart()
-
-    def _handle_undo(self):
-        self._controller.undo()
-
-    def _handle_redo(self):
-        self._controller.redo()
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)

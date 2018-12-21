@@ -78,7 +78,7 @@ def test_polyline_brush(controller: ControllerMockup):
     points = []
     for x in range(0, 1000, 100):
         points.append((x, x))
-        shape_command = PrintPolylineCommand(controller, [*points, (x*x, x+x)], (0, 0, 0, 200))
+        shape_command = PrintPolylineCommand(controller, [*points, (x * x, x + x)], (0, 0, 0, 200))
         preview_shape = copy.deepcopy(shape_command.shape)
 
         b1.mouse_press(controller, x, x, Qt.LeftButton)

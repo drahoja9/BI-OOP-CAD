@@ -1,8 +1,7 @@
-import math
 from typing import List, Tuple
 
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point, Color
+from app.utils import Point, Color, distance
 
 
 class Command:
@@ -97,10 +96,7 @@ class PrintCircleCommand(ShapeCommand):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
         super().__init__(receiver)
         center = (start_x, start_y)
-        # Classic formula for distance of two points
-        radius = math.floor(
-            math.sqrt((start_x - end_x) ** 2 + (start_y - end_y) ** 2)
-        )
+        radius = distance(Point(start_x, end_x), Point(start_y, end_y))
         self.shape = Circle(
             Point(*center),
             radius,
