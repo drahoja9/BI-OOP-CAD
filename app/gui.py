@@ -1,4 +1,6 @@
 from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QColorDialog
+from PyQt5.QtGui import QColor
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
@@ -15,11 +17,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.setupUi(self)
 
         self.canvas = Canvas(controller)
-        self.color = (0, 0, 0)
+        self.color = QColor(0, 0, 0)
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
             lambda: self._handle_new_action()
+        )
+
+        self._ui.colorButton.clicked.connect(
+            lambda: self._hadne_color_pick()
         )
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
@@ -40,6 +46,16 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
+
+    def _hadne_color_pick(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.color = color
+            self._ui.colorButton.setStyleSheet(f"background-color: {self.color.name()}")
+            # this should update brush, but it ain't workin for some reason
+            brushClass = self.canvas.get_brush().__class__
+            if brushClass is not None:
+                self.canvas.set_brush(brushClass(self.color))
 
     def _handle_new_action(self):
         self._controller.restart()

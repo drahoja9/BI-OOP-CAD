@@ -1,13 +1,14 @@
 import math
 from typing import Tuple
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QColor
 
 from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand
 from app.utils import Singleton
 
 
 class Brush(metaclass=Singleton):
-    def __init__(self, color=(255, 255, 255)):
+    def __init__(self, color = QColor(255, 255, 255)):
         self._start = None
         self._shape_command_class = None
         self._shape_color = color
@@ -49,7 +50,7 @@ class Brush(metaclass=Singleton):
 
 
 class DotBrush(Brush):
-    def __init__(self, color = (0, 0, 0)):
+    def __init__(self, color = QColor(0, 0, 0)):
         super().__init__(color = color)
         self._shape_command_class = PrintDotCommand
 
@@ -65,7 +66,7 @@ class DotBrush(Brush):
     #     n = self._point_distance(p1, p2)
     #     return [(self._lerp(p1[0], p2[0], 1./n*i), self._lerp(p1[1], p2[1], 1./n*i)) for i in range(n+1)]
 
-    def _dot_command(self, controller, x: int, y: int, color: Tuple[int, int, int] = (0, 0, 0)):
+    def _dot_command(self, controller, x: int, y: int, color: QColor = QColor(0, 0, 0)):
         shape_command = self._shape_command_class(controller, x, y, color)
         controller.execute_command(shape_command)
 
@@ -89,13 +90,13 @@ class DotBrush(Brush):
 
 
 class LineBrush(Brush):
-    def __init__(self, color = (0, 0, 0)):
+    def __init__(self, color = QColor(0, 0, 0)):
         super().__init__(color = color)
         self._shape_command_class = PrintLineCommand
 
 
 class PolylineBrush(Brush):
-    def __init__(self, color = (0, 0, 0)):
+    def __init__(self, color = QColor(0, 0, 0)):
         super().__init__(color = color)
         self._shape_command_class = PrintPolylineCommand
         self._points = []
@@ -127,12 +128,12 @@ class PolylineBrush(Brush):
 
 
 class RectBrush(Brush):
-    def __init__(self, color=(0, 0, 0)):
+    def __init__(self, color = QColor(0, 0, 0)):
         super().__init__(color = color)
         self._shape_command_class = PrintRectCommand
 
 
 class CircleBrush(Brush):
-    def __init__(self, color=(0, 0, 0)):
+    def __init__(self, color = QColor(0, 0, 0)):
         super().__init__(color = color)
         self._shape_command_class = PrintCircleCommand

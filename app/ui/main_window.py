@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file '.\app\ui\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -35,6 +35,11 @@ class Ui_MainWindow(object):
         self.rectagleButton.setEnabled(True)
         self.rectagleButton.setObjectName("rectagleButton")
         self.brushes.addWidget(self.rectagleButton)
+        self.colorButton = QtWidgets.QPushButton(self.mainArea)
+        self.colorButton.setStyleSheet("background-color: rgb(0, 0, 0);")
+        self.colorButton.setFlat(False)
+        self.colorButton.setObjectName("colorButton")
+        self.brushes.addWidget(self.colorButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.brushes.addItem(spacerItem)
         self.horizontalLayout.addLayout(self.brushes)
@@ -64,7 +69,7 @@ class Ui_MainWindow(object):
         self.canvasHolder.setWidgetResizable(True)
         self.canvasHolder.setObjectName("canvasHolder")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1030, 398))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1029, 398))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.canvasHolder.setWidget(self.scrollAreaWidgetContents)
         self.textBrowser = QtWidgets.QTextBrowser(self.splitter)
@@ -79,7 +84,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.canvasAndInput)
         MainWindow.setCentralWidget(self.mainArea)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 17))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")

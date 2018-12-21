@@ -14,6 +14,9 @@ class Canvas(QtWidgets.QWidget):
         self._controller = controller
         self._brush = None
 
+    def get_brush(self):
+        return self._brush
+
     def set_brush(self, brush: Brush):
         if self._brush != brush:
             self._brush = brush
