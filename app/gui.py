@@ -22,6 +22,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.actionNew.triggered.connect(
             lambda: self._handle_new_action()
         )
+        self._ui.actionUndo.triggered.connect(
+            lambda: self._handle_undo()
+        )
+        self._ui.actionRedo.triggered.connect(
+            lambda: self._handle_redo()
+        )
+        self.disable_undo()
+        self.disable_redo()
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
@@ -55,3 +63,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _handle_new_action(self):
         self._controller.restart()
+
+    def _handle_undo(self):
+        self._controller.undo()
+
+    def _handle_redo(self):
+        self._controller.redo()
+
+    def enable_undo(self):
+        self._ui.actionUndo.setEnabled(True)
+
+    def disable_undo(self):
+        self._ui.actionUndo.setEnabled(False)
+
+    def enable_redo(self):
+        self._ui.actionRedo.setEnabled(True)
+
+    def disable_redo(self):
+        self._ui.actionRedo.setEnabled(False)

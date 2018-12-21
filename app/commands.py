@@ -31,7 +31,7 @@ class ShapeCommand(Command):
         self.receiver.add_shape(self.shape)
 
     def reverse(self):
-        pass
+        self.receiver.remove_shape(self.shape)
 
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape

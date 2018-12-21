@@ -53,10 +53,10 @@ def test_preview(controller: Controller, shapes: Dict[str, Shape]):
 
 
 def test_execute_command(controller: Controller):
-    assert controller._commands == []
+    assert controller._undos == []
     command = CommandMockup()
     controller.execute_command(command)
-    assert controller._commands[0] == command
+    assert controller._undos[0] == command
     assert command.executed is True
 
 
@@ -90,12 +90,12 @@ def test_restart(controller: Controller, shapes: Dict[str, Shape]):
     controller.execute_command(c1)
     controller.execute_command(c2)
     assert controller._shapes._shapes == [shapes['line'], shapes['rectangle']]
-    assert controller._commands == [c1, c2]
+    assert controller._undos == [c1, c2]
 
     canvas = CanvasMockup()
     controller._gui.canvas = canvas
     assert canvas.updated is False
     controller.restart()
     assert controller._shapes.is_empty() is True
-    assert controller._commands == []
+    assert controller._undos == []
     assert canvas.updated is True
