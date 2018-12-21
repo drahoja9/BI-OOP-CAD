@@ -86,11 +86,17 @@ class DotBrush(Brush):
     #     self._dot_command(controller, x, y)
     #     self._start = None
 
+    def __str__(self) -> str:
+        return 'Dot'
+
 
 class LineBrush(Brush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintLineCommand
+
+    def __str__(self) -> str:
+        return 'Line'
 
 
 class PolylineBrush(Brush):
@@ -124,14 +130,23 @@ class PolylineBrush(Brush):
             controller.execute_command(shape_command)
             self._points = []
 
+    def __str__(self) -> str:
+        return 'Polyline'
+
 
 class RectBrush(Brush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintRectCommand
 
+    def __str__(self) -> str:
+        return 'Rectangle'
+
 
 class CircleBrush(Brush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintCircleCommand
+
+    def __str__(self) -> str:
+        return 'Circle'
