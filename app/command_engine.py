@@ -1,3 +1,5 @@
+from typing import List, Dict
+
 from app.commands import Command
 
 
@@ -44,6 +46,9 @@ class CommandEngine:
     def redo(self):
         command = self._pop_redo()
         self.execute_command(command, from_redo=True)
+
+    def get_all_commands(self) -> Dict[str, List[Command]]:
+        return {'undos': self._undos, 'redos': self._redos}
 
     def restart(self):
         self._undos = []
