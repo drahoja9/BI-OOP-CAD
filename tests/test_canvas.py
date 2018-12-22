@@ -69,11 +69,11 @@ def test_set_brush(canvas: Canvas):
 
 
 def test_set_color(canvas: Canvas):
-    assert canvas._color == (0, 0, 0)
+    assert canvas.color == (0, 0, 0)
 
     canvas.set_brush(CircleShapeBrush())
     canvas.set_color((100, 200, 100))
-    assert canvas._color == (100, 200, 100)
+    assert canvas.color == (100, 200, 100)
     assert canvas._brush.color == (100, 200, 100)
 
 

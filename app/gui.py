@@ -59,7 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.canvasHolder.setWidget(self.canvas)
 
     def _handle_color_pick(self):
-        color = QColorDialog().getColor(QColor(0, 0, 0))
+        color = QColorDialog().getColor(QColor(*self.canvas.color))
         if color.isValid():
             self._ui.colorButton.setStyleSheet(f'background-color: {color.name()}')
             r, g, b, alpha = color.getRgb()
