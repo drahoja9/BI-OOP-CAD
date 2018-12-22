@@ -1,6 +1,8 @@
+import getpass
+
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor
-from PyQt5.QtWidgets import QColorDialog
+from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
@@ -22,6 +24,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Menu buttons
         self._ui.actionNew.triggered.connect(
             lambda: self._controller.restart()
+        )
+        self._ui.actionSave.triggered.connect(
+            lambda: self._handle_file_save()
         )
         self._ui.actionUndo.triggered.connect(
             lambda: self._controller.undo()
@@ -59,11 +64,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.canvasHolder.setWidget(self.canvas)
 
     def _handle_color_pick(self):
+        # Color picker will popup and returns chosen color
         color = QColorDialog().getColor(QColor(*self.canvas.color))
         if color.isValid():
             self._ui.colorButton.setStyleSheet(f'background-color: {color.name()}')
             r, g, b, alpha = color.getRgb()
             self.canvas.set_color((r, g, b))
+
+    def _handle_file_save(self):
+        # Save file dialog will open and returns tuple (name of the saved file, type)
+        user = getpass.getuser()
+        name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
+        self._controller.save(name[0])
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)

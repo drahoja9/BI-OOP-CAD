@@ -67,6 +67,13 @@ class Controller:
     def disable_redo(self):
         self._gui.disable_redo()
 
+    def save(self, file: str):
+        commands = self._command_engine.get_all_commands()
+        with open(file, 'w+', encoding='utf-8') as f:
+            f.write(f'{len(commands["redos"])}\n')
+            [f.write(str(c) + '\n') for c in commands['undos']]
+            [f.write(str(c) + '\n') for c in commands['redos']]
+
     def run_app(self):
         # Run the whole app
         self._gui.show()
