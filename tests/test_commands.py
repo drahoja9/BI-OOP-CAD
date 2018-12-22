@@ -48,7 +48,7 @@ def test_abstract_command():
 
 def test_dot_command(receiver: ReceiverMockup):
     command = PrintDotCommand(receiver, 0, -12, (1, 2, 3))
-    assert str(command) == 'dot 0,-12'
+    assert str(command) == 'dot 0,-12 (1,2,3)'
     assert command == PrintDotCommand(receiver, 0, -12, (1, 2, 3))
 
     command.execute()
@@ -60,7 +60,7 @@ def test_dot_command(receiver: ReceiverMockup):
 
 def test_line_command(receiver: ReceiverMockup):
     command = PrintLineCommand(receiver, 10, 10, 20, 20, (100, 200, 100))
-    assert str(command) == 'line 10,10 20,20'
+    assert str(command) == 'line 10,10 20,20 (100,200,100)'
     assert (
         command
         ==
@@ -76,7 +76,7 @@ def test_line_command(receiver: ReceiverMockup):
 
 def test_polyline_command(receiver: ReceiverMockup):
     command = PrintPolylineCommand(receiver, [(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)], (100, 200, 255))
-    assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10'
+    assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10 (100,200,255)'
     assert (
         command
         ==
@@ -94,7 +94,7 @@ def test_polyline_command(receiver: ReceiverMockup):
 
 def test_rect_command(receiver: ReceiverMockup):
     command = PrintRectCommand(receiver, 50, 50, 100, 100, (255, 255, 255))
-    assert str(command) == 'rect 50,50 50 50'
+    assert str(command) == 'rect 50,50 50 50 (255,255,255)'
     assert (
         command
         ==
@@ -110,7 +110,7 @@ def test_rect_command(receiver: ReceiverMockup):
 
 def test_circle_command(receiver: ReceiverMockup):
     command = PrintCircleCommand(receiver, 0, 0, 100, 100, (0, 0, 0))
-    assert str(command) == 'circle 0,0 141'
+    assert str(command) == 'circle 0,0 141 (0,0,0)'
     assert (
         command
         ==

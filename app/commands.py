@@ -35,6 +35,9 @@ class ShapeCommand(Command):
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape
 
+    def __str__(self):
+        return f' ({self.shape.color.r},{self.shape.color.g},{self.shape.color.b})'
+
 
 class PrintDotCommand(ShapeCommand):
     def __init__(self, receiver, x: int, y: int, color: tuple):
@@ -45,7 +48,7 @@ class PrintDotCommand(ShapeCommand):
         )
 
     def __str__(self):
-        return f'dot {self.shape.start.x},{self.shape.start.y}'
+        return f'dot {self.shape.start.x},{self.shape.start.y}' + super().__str__()
 
 
 class PrintLineCommand(ShapeCommand):
@@ -58,7 +61,8 @@ class PrintLineCommand(ShapeCommand):
         )
 
     def __str__(self):
-        return f'line {self.shape.start.x},{self.shape.start.y} {self.shape.end.x},{self.shape.end.y}'
+        return (f'line {self.shape.start.x},{self.shape.start.y} {self.shape.end.x},{self.shape.end.y}' +
+                super().__str__())
 
 
 class PrintPolylineCommand(ShapeCommand):
@@ -73,7 +77,7 @@ class PrintPolylineCommand(ShapeCommand):
         res = f'line'
         for point in self.shape.get_props():
             res += f' {point.x},{point.y}'
-        return res
+        return res + super().__str__()
 
 
 class PrintRectCommand(ShapeCommand):
@@ -89,7 +93,8 @@ class PrintRectCommand(ShapeCommand):
         )
 
     def __str__(self):
-        return f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}'
+        return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
+                super().__str__())
 
 
 class PrintCircleCommand(ShapeCommand):
@@ -104,7 +109,7 @@ class PrintCircleCommand(ShapeCommand):
         )
 
     def __str__(self):
-        return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}'
+        return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()
 
 
 class RemoveShapeCommand(Command):
