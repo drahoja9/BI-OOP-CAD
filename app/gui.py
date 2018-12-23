@@ -88,3 +88,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def disable_redo(self):
         self._ui.actionRedo.setEnabled(False)
+
+    def print_newline_to_history(self, line: str):
+        history = self._ui.history.text()
+        self._ui.history.setText(history + line + '\n')
+
+    def delete_from_history(self, number_of_lines: int = 1):
+        history = self._ui.history.text()
+        # Subtracting 1 from `number of lines` as the last line is always empty (there's always `\n` at the end)
+        history = history.split('\n')[:(-number_of_lines - 1)]
+        history = '\n'.join(history)
+        if history:
+            history += '\n'
+        self._ui.history.setText(history)

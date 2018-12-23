@@ -1,9 +1,10 @@
-from typing import List
+import io
+from typing import List, Dict
 
 from app.command_engine import CommandEngine
 from app.commands import Command
 from app.gui import MainWindow
-from app.printers import CanvasPrinter
+from app.printers import CanvasPrinter, Printer, StreamTextPrinter
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
 from app.utils import Point
@@ -22,6 +23,8 @@ class Controller:
         self._printer = CanvasPrinter(self._gui.canvas)
 
     def add_shapes(self, *shapes: Shape):
+        for shape in shapes:
+            self._gui.print_newline_to_history(str(shape))
         self._shapes.add_shapes(*shapes)
 
     def replace_shapes_store(self, shapes: List[Shape]):
@@ -30,7 +33,7 @@ class Controller:
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
 
-    def remove_shapes_at(self, point: Point) -> List[Shape]:
+    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
         return self._shapes.remove_shapes_at(point)
 
     def preview_shape(self, shape: Shape):
@@ -39,11 +42,25 @@ class Controller:
     def end_preview(self):
         self._shapes.set_preview(None)
 
-    def execute_command(self, command: Command):
-        self._command_engine.execute_command(command)
+    def execute_command(self, command: Command, from_redo: bool = False):
+        self._gui.print_newline_to_history(' > ' + str(command))
+        self._command_engine.execute_command(command, from_redo=from_redo)
 
-    def print_all_shapes(self):
-        self._shapes.print_all(self._printer)
+    def remove_last_command(self):
+        self._command_engine.remove_last_command()
+
+    def delete_from_history(self, number_of_lines: int = 1):
+        self._gui.delete_from_history(number_of_lines)
+
+    def list_shapes(self, point: Point = None) -> List[Shape]:
+        stream = io.StringIO()
+        printed = self.print_all_shapes(StreamTextPrinter(stream), point)
+        # Ignoring the last newline `\n`
+        self._gui.print_newline_to_history(stream.getvalue()[:-1])
+        return printed
+
+    def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
+        return self._shapes.print_all(printer or self._printer, point)
 
     def update_canvas(self):
         # Emitting the QEvent.Paint event

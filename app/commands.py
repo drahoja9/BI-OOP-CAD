@@ -31,6 +31,7 @@ class ShapeCommand(Command):
 
     def reverse(self):
         self.receiver.remove_last_shape()
+        self.receiver.delete_from_history(2)
 
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape
@@ -113,20 +114,52 @@ class PrintCircleCommand(ShapeCommand):
 
 
 class RemoveShapeCommand(Command):
-    def __init__(self, receiver, point_x: int, point_y: int):
+    def __init__(self, receiver, x: int, y: int):
         super().__init__(receiver)
-        self.point = Point(point_x, point_y)
+        self.point = Point(x, y)
         self._before_remove = []
 
     def execute(self):
-        self._before_remove = self.receiver.remove_shapes_at(self.point)
+        res = self.receiver.remove_shapes_at(self.point)
+        self._before_remove = res['before_remove']
+        # If nothing was removed, there's no need to keep empty remove command in command engine
+        if not res['removed']:
+            self.receiver.remove_last_command()
+            self.receiver.delete_from_history(1)
 
     def reverse(self):
         if self._before_remove:
             self.receiver.replace_shapes_store(self._before_remove)
+            self.receiver.delete_from_history(1)
 
     def __str__(self):
         return f'remove {self.point.x},{self.point.y}'
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.point == other.point
+
+
+class ListShapeCommand(Command):
+    def __init__(self, receiver, x: int = None, y: int = None):
+        super().__init__(receiver)
+        self.listed = []
+        if x and y:
+            self.point = Point(x, y)
+        else:
+            self.point = None
+
+    def execute(self):
+        self.listed = self.receiver.list_shapes(self.point)
+
+    def reverse(self):
+        if self.listed:
+            self.receiver.delete_from_history(len(self.listed) + 1)
+
+    def __str__(self):
+        if self.point:
+            return f'ls {self.point.x},{self.point.y}'
+        else:
+            return 'ls'
 
     def __eq__(self, other):
         return super().__eq__(other) and self.point == other.point
