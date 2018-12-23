@@ -120,6 +120,7 @@ class RemoveShapeCommand(Command):
 
     def execute(self):
         self._before_remove = self.receiver.remove_shapes_at(self.point)
+        # self.receiver.delete_from_history(2)
 
     def reverse(self):
         if self._before_remove:
@@ -144,7 +145,7 @@ class ListShapeCommand(Command):
         self.receiver.list_shapes(self.point)
 
     def reverse(self):
-        pass
+        self.receiver.delete_from_history(2)
 
     def __str__(self):
         if self.point:

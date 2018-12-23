@@ -46,6 +46,9 @@ class Controller:
         self._gui.print_newline_to_history(' > ' + str(command))
         self._command_engine.execute_command(command)
 
+    def delete_from_history(self, number_of_lines: int = 1):
+        self._gui.delete_from_history(number_of_lines)
+
     def list_shapes(self, point: Point):
         stream = io.StringIO()
         self.print_all_shapes(StreamTextPrinter(stream), point)
