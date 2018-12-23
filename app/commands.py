@@ -31,6 +31,7 @@ class ShapeCommand(Command):
 
     def reverse(self):
         self.receiver.remove_last_shape()
+        self.receiver.delete_from_history(2)
 
     def __eq__(self, other):
         return super().__eq__(other) and self.shape == other.shape
@@ -119,12 +120,17 @@ class RemoveShapeCommand(Command):
         self._before_remove = []
 
     def execute(self):
-        self._before_remove = self.receiver.remove_shapes_at(self.point)
-        # self.receiver.delete_from_history(2)
+        res = self.receiver.remove_shapes_at(self.point)
+        self._before_remove = res['before_remove']
+        # If nothing was removed, there's no need to keep empty remove command in command engine
+        if not res['removed']:
+            self.receiver.remove_last_command()
+            self.receiver.delete_from_history(1)
 
     def reverse(self):
         if self._before_remove:
             self.receiver.replace_shapes_store(self._before_remove)
+            self.receiver.delete_from_history(1)
 
     def __str__(self):
         return f'remove {self.point.x},{self.point.y}'

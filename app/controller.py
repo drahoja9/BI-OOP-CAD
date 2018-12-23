@@ -1,5 +1,5 @@
 import io
-from typing import List
+from typing import List, Dict
 
 from app.command_engine import CommandEngine
 from app.commands import Command
@@ -33,7 +33,7 @@ class Controller:
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
 
-    def remove_shapes_at(self, point: Point) -> List[Shape]:
+    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
         return self._shapes.remove_shapes_at(point)
 
     def preview_shape(self, shape: Shape):
@@ -42,9 +42,12 @@ class Controller:
     def end_preview(self):
         self._shapes.set_preview(None)
 
-    def execute_command(self, command: Command):
+    def execute_command(self, command: Command, from_redo: bool = False):
         self._gui.print_newline_to_history(' > ' + str(command))
-        self._command_engine.execute_command(command)
+        self._command_engine.execute_command(command, from_redo=from_redo)
+
+    def remove_last_command(self):
+        self._command_engine.remove_last_command()
 
     def delete_from_history(self, number_of_lines: int = 1):
         self._gui.delete_from_history(number_of_lines)

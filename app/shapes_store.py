@@ -1,5 +1,5 @@
 import copy
-from typing import List
+from typing import List, Dict
 
 from app.shapes import Shape
 from app.printers import Printer
@@ -60,14 +60,14 @@ class ShapesStore:
         except ValueError:
             pass
 
-    def remove_shapes_at(self, point: Point) -> List[Shape]:
+    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
         before_remove = copy.deepcopy(self._shapes)
         to_remove = []
         for shape in self._shapes:
             if shape.contains(point):
                 to_remove.append(shape)
         self._remove_shapes(*to_remove)
-        return before_remove
+        return {'removed': to_remove, 'before_remove': before_remove}
 
     def restart(self):
         self._shapes = []
