@@ -142,16 +142,18 @@ class RemoveShapeCommand(Command):
 class ListShapeCommand(Command):
     def __init__(self, receiver, x: int = None, y: int = None):
         super().__init__(receiver)
+        self.listed = []
         if x and y:
             self.point = Point(x, y)
         else:
             self.point = None
 
     def execute(self):
-        self.receiver.list_shapes(self.point)
+        self.listed = self.receiver.list_shapes(self.point)
 
     def reverse(self):
-        self.receiver.delete_from_history(2)
+        if self.listed:
+            self.receiver.delete_from_history(len(self.listed) + 1)
 
     def __str__(self):
         if self.point:

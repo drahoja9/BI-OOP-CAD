@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
+from app.commands import ListShapeCommand
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
@@ -56,6 +57,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.removeButton.clicked.connect(
             lambda: self.canvas.set_brush(RemoveShapeBrush())
         )
+        self._ui.listButton.clicked.connect(
+            lambda: self._controller.execute_command(ListShapeCommand(self._controller))
+        )
 
         self._ui.colorButton.clicked.connect(
             lambda: self._handle_color_pick()
@@ -97,4 +101,7 @@ class MainWindow(QtWidgets.QMainWindow):
         history = self._ui.history.text()
         # Subtracting 1 from `number of lines` as the last line is always empty (there's always `\n` at the end)
         history = history.split('\n')[:(-number_of_lines - 1)]
-        self._ui.history.setText('\n'.join(history) + '\n')
+        history = '\n'.join(history)
+        if history:
+            history += '\n'
+        self._ui.history.setText(history)
