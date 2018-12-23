@@ -4,7 +4,6 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
-from app.commands import ListShapeCommand
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
@@ -56,9 +55,6 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         self._ui.removeButton.clicked.connect(
             lambda: self.canvas.set_brush(RemoveShapeBrush())
-        )
-        self._ui.listButton.clicked.connect(
-            lambda: self._controller.execute_command(ListShapeCommand(self._controller))
         )
 
         self._ui.colorButton.clicked.connect(
