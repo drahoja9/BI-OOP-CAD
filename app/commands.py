@@ -113,9 +113,9 @@ class PrintCircleCommand(ShapeCommand):
 
 
 class RemoveShapeCommand(Command):
-    def __init__(self, receiver, point_x: int, point_y: int):
+    def __init__(self, receiver, x: int, y: int):
         super().__init__(receiver)
-        self.point = Point(point_x, point_y)
+        self.point = Point(x, y)
         self._before_remove = []
 
     def execute(self):
@@ -127,6 +127,30 @@ class RemoveShapeCommand(Command):
 
     def __str__(self):
         return f'remove {self.point.x},{self.point.y}'
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.point == other.point
+
+
+class ListShapeCommand(Command):
+    def __init__(self, receiver, x: int = None, y: int = None):
+        super().__init__(receiver)
+        if x and y:
+            self.point = Point(x, y)
+        else:
+            self.point = None
+
+    def execute(self):
+        self.receiver.list_shapes(self.point)
+
+    def reverse(self):
+        pass
+
+    def __str__(self):
+        if self.point:
+            return f'ls {self.point.x},{self.point.y}'
+        else:
+            return 'ls'
 
     def __eq__(self, other):
         return super().__eq__(other) and self.point == other.point

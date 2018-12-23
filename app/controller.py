@@ -1,9 +1,10 @@
+import io
 from typing import List
 
 from app.command_engine import CommandEngine
 from app.commands import Command
 from app.gui import MainWindow
-from app.printers import CanvasPrinter
+from app.printers import CanvasPrinter, Printer, StreamTextPrinter
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
 from app.utils import Point
@@ -22,6 +23,8 @@ class Controller:
         self._printer = CanvasPrinter(self._gui.canvas)
 
     def add_shapes(self, *shapes: Shape):
+        for shape in shapes:
+            self._gui.print_newline_to_history(str(shape))
         self._shapes.add_shapes(*shapes)
 
     def replace_shapes_store(self, shapes: List[Shape]):
@@ -40,10 +43,17 @@ class Controller:
         self._shapes.set_preview(None)
 
     def execute_command(self, command: Command):
+        self._gui.print_newline_to_history(' > ' + str(command))
         self._command_engine.execute_command(command)
 
-    def print_all_shapes(self):
-        self._shapes.print_all(self._printer)
+    def list_shapes(self, point: Point):
+        stream = io.StringIO()
+        self.print_all_shapes(StreamTextPrinter(stream), point)
+        self._gui.print_newline_to_history(stream.getvalue())
+
+    def print_all_shapes(self, printer: Printer = None, point: Point = None):
+        printer = printer or self._printer
+        self._shapes.print_all(printer, point)
 
     def update_canvas(self):
         # Emitting the QEvent.Paint event

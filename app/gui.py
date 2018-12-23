@@ -88,3 +88,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def disable_redo(self):
         self._ui.actionRedo.setEnabled(False)
+
+    def print_newline_to_history(self, line: str):
+        history = self._ui.history.text()
+        self._ui.history.setText(history + line + '\n')
