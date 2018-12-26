@@ -6,7 +6,7 @@ class CliParser:
     """
     Command line input Parser.
     """
-    def parse_input(self, command_parsers, cli_input):
+    def parse_input(self, command_parsers: list, cli_input: str):
         """
         Parse given command line input.
         Parse a command using given CommandParsers. If successful, parse
@@ -26,7 +26,7 @@ class CliParser:
 
         return InvalidCommand()
 
-    def parse_params(self, command_parser, remainder):
+    def parse_params(self, command_parser: CommandParser, remainder: str):
         """
         Parse remaining input using given CommandParser into parameters
         if given parser requires any.
