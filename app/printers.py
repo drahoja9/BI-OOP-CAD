@@ -82,7 +82,6 @@ class CanvasPrinter(Printer):
     def update(self, controller):
         # Emitting the QEvent.Paint event to enable drawing
         self._canvas.update()
-        super().update(controller)
 
     def _prepare_painter(self, color: Color):
         painter = QPainter(self._canvas)

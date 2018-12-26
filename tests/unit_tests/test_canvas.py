@@ -77,6 +77,11 @@ def test_set_color(canvas: Canvas):
     assert canvas._brush.color == (100, 200, 100)
 
 
+def test_pain_event(canvas: Canvas):
+    canvas.paintEvent(EventMockup)
+    assert canvas._controller.all_shapes == 'printed all shapes'
+
+
 def test_mouse_move_event(canvas: Canvas):
     assert canvas._brush is None
 
