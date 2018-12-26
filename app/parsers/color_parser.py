@@ -1,5 +1,24 @@
 from app.parsers.low_level_parsers import *
-from PyQt5.QtGui import QColor
+#from PyQt5.QtGui import QColor
+
+
+class QColor:
+    """
+    Temporary (Vojta is not able to import QColor from QtGui :( )
+    """
+    def __init__(self, r: int, g: int, b: int):
+        self.r = r
+        self.g = g
+        self.b = b
+
+    def __eq__(self, other):
+        return self.r == other.r and self.g == other.g and self.b == other.b
+
+    def __repr__(self):
+        return "QColor(" + str(self.r) + ", " + str(self.g) + ", " + str(self.b) + ")"
+
+    def isValid(self):
+        return 0 <= self.r <= 255 and 0 <= self.g <= 255 and 0 <= self.b <= 255
 
 
 class ColorParser:
@@ -32,7 +51,7 @@ class ColorParser:
 
         blue = blue_parse_result.get_match()
 
-        color = QColor(red, blue, green)
+        color = QColor(red, green, blue)
         if color.isValid():
             return Success(color, blue_parse_result.get_remainder())
         else:

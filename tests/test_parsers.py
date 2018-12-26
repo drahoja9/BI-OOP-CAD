@@ -5,12 +5,12 @@ from app.parsers.cli_parser import *
 from app.parsers.point_parsers import *
 from app.parsers.color_parser import *
 
-from PyQt5.QtGui import QColor
+#from PyQt5.QtGui import QColor
 
 def test_cli_parser():
     cli_parser = CliParser()
     command_parsers = [ListParser(StringParser()),
-                       RectParser(StringParser(), PointParser(), NatParser(), IntParser()),
+                       RectParser(StringParser(), PointParser(), NatParser(), IntParser(), ColorParser()),
                        QuitParser(StringParser())
                        ]
     command = cli_parser.parse_input(command_parsers, "quit")
@@ -217,20 +217,18 @@ def test_rect_parser():
     :return:
     """
     cli_parser = CliParser()
-    parser = RectParser(StringParser(), PointParser(), NatParser(), IntParser())
-    command_parsers = [ListParser(StringParser()),
-                       RectParser(StringParser(), PointParser(), NatParser(), IntParser()),
-                       QuitParser(StringParser())
-                       ]
-    command = cli_parser.parse_input(command_parsers, "rect 10,20 30,40")
+    rect_parser = [RectParser(StringParser(), PointParser(), NatParser(), IntParser(), ColorParser())]
+    command = cli_parser.parse_input(rect_parser, "rect 10,20 30,40 rgb(0,1,2)")
     print(command)
-    command = cli_parser.parse_input(command_parsers, "rect 10,20 30 40")
+    command = cli_parser.parse_input(rect_parser, "rect 10,20 30 40")
+    print(command)
+    command = cli_parser.parse_input(rect_parser, "rect 10,20 30 40 rgb(0,10,20)")
     print(command)
 
 
 def test_points_conversion():
     """
-    Test Commandarser's conversion of RelativeParserPoints to AbsoluteParserPoints.
+    Test CommandParser's conversion of RelativeParserPoints to AbsoluteParserPoints.
     """
     parser = CommandParser(StringParser())
 

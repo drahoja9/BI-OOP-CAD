@@ -23,7 +23,7 @@ class StringParser:
             remainder = cli_input[match.end():]
             return Success(string, remainder)
         else:
-            return Failure(expected, cli_input[0])
+            return Failure(expected, cli_input)
 
 
 class NumberParser:
