@@ -91,7 +91,7 @@ class ListParser(CommandParser):
         super().__init__(string_parser)
 
     def parse_command(self, cli_input: str):
-        result = self.string_parser.parse_string("ls", cli_input)
+        result = self.string_parser.parse_string("ls", cli_input, ' ')
         return result
 
     def parse_params(self, cli_input: str):
@@ -114,7 +114,7 @@ class RectParser(CommandParser):
         self.int_parser = int_parser
 
     def parse_command(self, cli_input: str):
-        result = self.string_parser.parse_string("rect", cli_input)
+        result = self.string_parser.parse_string("rect", cli_input, ' ')
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
@@ -173,7 +173,7 @@ class QuitParser(CommandParser):
         super().__init__(string_parser)
 
     def parse_command(self, cli_input: str):
-        result = self.string_parser.parse_string("quit", cli_input)
+        result = self.string_parser.parse_string("quit", cli_input, '')
         if result.is_successful():
             return Success(QuitCommand, result.get_remainder())
         else:

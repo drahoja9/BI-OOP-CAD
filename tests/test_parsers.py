@@ -3,15 +3,18 @@ import re
 
 from app.parsers.cli_parser import *
 from app.parsers.point_parsers import *
+from app.parsers.color_parser import *
 
+from PyQt5.QtGui import QColor
 
 def test_cli_parser():
     cli_parser = CliParser()
     command_parsers = [ListParser(StringParser()),
-                       RectParser(StringParser(), RelPointParser(), AbsPointParser()),
+                       RectParser(StringParser(), PointParser(), NatParser(), IntParser()),
                        QuitParser(StringParser())
                        ]
     command = cli_parser.parse_input(command_parsers, "quit")
+    print(command)
     assert isinstance(command, QuitCommand.__class__)
 
 
@@ -23,19 +26,20 @@ def test_string_parser():
     Test StringParser's method "parse_string" used for parsing exact word from the beginning of a given string.
     """
 
-    "Test invalid inputs"
+    "Test invalid inputs with space delimiter"
     parser = StringParser()
     invalid_inputs = [('rect', 'recta'), ('rect', 'list rect'), ('rect', 'rect, '), ('rect', 'rect('),
-                      ('rect', 'RECT'), ('rect', 'circle'), ('rect', '   circle')]
+                      ('rect', 'RECT'), ('rect', 'circle'), ('rect', '   circle'),
+                      ('rect', 'rect10,20 30,40')]
     for expected, actual in invalid_inputs:
-        result = parser.parse_string(expected, actual)
+        result = parser.parse_string(expected, actual, ' ')
         assert isinstance(result, Failure)
 
-    "Test valid inputs"
-    valid_inputs = [('rect', 'rect +10 -10', '+10 -10'), ('rect', ' rect anything', 'anything'),
-                    ('rect', 'rect     +1002', '+1002'), ('rect', '   rect  +10     12', '+10 12')]
+    "Test valid inputs with space delimiter"
+    valid_inputs = [('rect', 'rect +10 -10', '+10 -10'), ('rect', 'rect anything', 'anything'),
+                    ('rect', 'rect +1002', '+1002'), ('rect', 'rect +10 12', '+10 12')]
     for expected, actual, remainder in valid_inputs:
-        result = parser.parse_string(expected, actual)
+        result = parser.parse_string(expected, actual, ' ')
         assert result == Success(expected, remainder)
 
 
@@ -102,6 +106,32 @@ def test_int_parser():
                     ('-10A delimiterA remainder', 'A delimiter', -10, 'A remainder')]
     for cli_input, delimiter, expected, remainder in valid_inputs:
         result = parser.parse_input(cli_input, delimiter)
+        assert result == Success(expected, remainder)
+
+
+"--------------- Point parser tests ---------------"
+
+
+def test_color_parser():
+    """
+    Test ColorParser's parsing of color in 'rgb(<0,255>,<0,255>,<0,255>)' format.
+    """
+    parser = ColorParser()
+
+    "Test invalid inputs"
+    invalid_inputs = ["rgb( 0,1,2)", " rgb(0,1,2)", "rgb (0,1,2)", "r gb(0,1,2)", "rgb(0, 1,2)",
+                      "rgb(0,1, 2)", "rgb(0,1,2 )", "rgb 0,1,2)", "rgb(0,1,2",
+                      "rgb(-5,1,2)", "rgb(-5,-1-2)", "rgb(256,1,2)", "rgb(0,256,2)", "rgb(0,1,256)", "rgb(260,300,600)"]
+    for cli_input in invalid_inputs:
+        result = parser.parse_color(cli_input, StringParser(), NatParser())
+        print(result.print())
+        assert result == Failure("rgb(<0,255>,<0,255>,<0,255>)", cli_input)
+
+    "Test valid inputs"
+    valid_inputs = [("rgb(0,1,2)", QColor(0, 1, 2), ""), ("rgb(255,255,255)", QColor(255, 255, 255), ""),
+                    ("rgb(20,30,40) something else", QColor(20, 30, 40), " something else")]
+    for cli_input, expected, remainder in valid_inputs:
+        result = parser.parse_color(cli_input, StringParser(), NatParser())
         assert result == Success(expected, remainder)
 
 

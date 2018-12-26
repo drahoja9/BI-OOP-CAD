@@ -3,19 +3,25 @@ from app.parsers.parse_results import *
 
 
 class StringParser:
-    def parse_string(self, expected: str, cli_input: str) -> ParseResult:
+    def parse_string(self, expected: str, cli_input: str, delimiter: str) -> ParseResult:
         """
-        Parse a word from the beginning of given input. Delimiter is always a space character (' ').
+        Parse a word from the beginning of given input with given delimiter.
+        If delimiter is empty, the given input needs to be equal to expected input.
         :param expected: expected word
         :param cli_input: string
+        :param delimiter: string
         :return: Success(matched string, remainder) if input contains expected word,
         Failure(expected string, actual string) otherwise
         """
-        cli_input = cli_input.split()  # split words separated by space to list
-        if expected == cli_input[0]:
-            cli_input.pop(0)
-            cli_input = ' '.join(cli_input)
-            return Success(expected, cli_input)
+        if delimiter == '':
+            match = re.match(r'^(' + re.escape(expected) + r')$', cli_input)
+        else:
+            match = re.match(r'^(' + re.escape(expected) + r')' + re.escape(delimiter), cli_input)
+
+        if match:
+            string = match.group(1)
+            remainder = cli_input[match.end():]
+            return Success(string, remainder)
         else:
             return Failure(expected, cli_input[0])
 

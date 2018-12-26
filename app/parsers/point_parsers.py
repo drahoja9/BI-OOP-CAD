@@ -6,9 +6,9 @@ class PointParser:
         """
         Parse either a relative point from input, e.g. '+10,-12' OR an absolute point
         from input, e.g. '10,20'.
-        :param cli_input string
-        :param nat_parser NatParser
-        :param int_parser IntParser
+        :param cli_input: string
+        :param nat_parser: NatParser
+        :param int_parser: IntParser
         :return Success(AbsoluteParserPoint or RelativeParserPoint, remainder) if input contains either valid
         absolute point or relative point, Failure(expected format, the given cli_input) otherwise
         """
