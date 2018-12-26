@@ -109,7 +109,7 @@ def test_int_parser():
         assert result == Success(expected, remainder)
 
 
-"--------------- Point parser tests ---------------"
+"--------------- ColorParser tests ---------------"
 
 
 def test_color_parser():
