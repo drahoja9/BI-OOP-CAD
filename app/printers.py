@@ -12,6 +12,9 @@ class Printer:
     """
     Represents a visitor in the visitor design patter. Is responsible for HOW to print different shapes.
     """
+    def update(self, controller):
+        controller.print_all_shapes(self)
+
     def print_dot(self, dot: Dot):
         raise NotImplementedError
 
@@ -75,6 +78,11 @@ class CanvasPrinter(Printer):
     def __init__(self, canvas: Canvas):
         super().__init__()
         self._canvas = canvas
+
+    def update(self, controller):
+        # Emitting the QEvent.Paint event to enable drawing
+        self._canvas.update()
+        super().update(controller)
 
     def _prepare_painter(self, color: Color):
         painter = QPainter(self._canvas)

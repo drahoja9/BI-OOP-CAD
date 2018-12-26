@@ -14,7 +14,7 @@ class ControllerMockup:
     def __init__(self):
         self.result = []
 
-    def update_canvas(self):
+    def update(self):
         self.result.append('canvas updated')
 
 
@@ -77,20 +77,20 @@ def test_set_preview(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store._preview is None
     shapes_store.set_preview(shapes['line'])
     assert shapes_store._preview == shapes['line']
-    assert len(shapes_store._controller.result) == 2
+    assert len(shapes_store._controller.result) == 1
 
 
 def test_add_shapes(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(shapes['dot'])
     assert shapes_store._shapes.index(shapes['dot']) == 0
-    assert len(shapes_store._controller.result) == 2
+    assert len(shapes_store._controller.result) == 1
     assert len(shapes_store._shapes) == 1
 
     shapes_store.add_shapes(shapes['line'], shapes['rectangle'], shapes['circle'])
     assert shapes_store._shapes.index(shapes['line']) == 1
     assert shapes_store._shapes.index(shapes['rectangle']) == 2
     assert shapes_store._shapes.index(shapes['circle']) == 3
-    assert len(shapes_store._controller.result) == 3
+    assert len(shapes_store._controller.result) == 2
     assert len(shapes_store._shapes) == 4
 
 
@@ -102,7 +102,7 @@ def test_remove_last_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.remove_last_shape()
     last_item = shapes['circle']
 
-    assert len(shapes_store._controller.result) == 3
+    assert len(shapes_store._controller.result) == 2
     assert len(shapes_store._shapes) == len(shapes) - 1
     assert last_item not in shapes_store._shapes
 
@@ -130,4 +130,4 @@ def test_restart(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
 
     assert shapes_store.is_empty() is True
     assert shapes_store._preview is None
-    assert len(shapes_store._controller.result) == 3
+    assert len(shapes_store._controller.result) == 2

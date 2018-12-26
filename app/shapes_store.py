@@ -18,10 +18,9 @@ class ShapesStore:
         self._shapes = shapes or []
         self._controller = controller
         self._preview = None
-        self._notify()
 
     def _notify(self):
-        self._controller.update_canvas()
+        self._controller.update()
 
     def is_empty(self) -> bool:
         return len(self._shapes) == 0

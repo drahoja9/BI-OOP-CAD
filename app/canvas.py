@@ -33,12 +33,6 @@ class Canvas(QtWidgets.QWidget):
 
     # -------------------------- QWidget overridden methods ----------------------------
 
-    # Overriding paintEvent method of QWidget to respond to QEvent.Paint.
-    # This method should be the only place from where we draw with QPainter. This means, that the print_* methods
-    # should never be called before executing this method!
-    def paintEvent(self, event: QEvent.Paint):
-        self._controller.print_all_shapes()
-
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         if self._brush is not None:

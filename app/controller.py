@@ -19,8 +19,8 @@ class Controller:
     def __init__(self):
         self._gui = MainWindow(self)
         self._command_engine = CommandEngine(self)
-        self._shapes = ShapesStore(self)
         self._printer = CanvasPrinter(self._gui.canvas)
+        self._shapes = ShapesStore(self)
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
@@ -29,6 +29,7 @@ class Controller:
 
     def replace_shapes_store(self, shapes: List[Shape]):
         self._shapes = ShapesStore(self, shapes)
+        self.update()
 
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
@@ -62,9 +63,8 @@ class Controller:
     def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
         return self._shapes.print_all(printer or self._printer, point)
 
-    def update_canvas(self):
-        # Emitting the QEvent.Paint event
-        self._gui.canvas.update()
+    def update(self):
+        self._printer.update(self)
 
     def undo(self):
         self._command_engine.undo()
