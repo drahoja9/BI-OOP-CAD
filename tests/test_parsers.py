@@ -4,21 +4,10 @@ import re
 from app.parsers.cli_parser import *
 from app.parsers.point_parsers import *
 from app.parsers.color_parser import *
-
-#from PyQt5.QtGui import QColor
-
-def test_cli_parser():
-    cli_parser = CliParser()
-    command_parsers = [ListParser(StringParser()),
-                       RectParser(StringParser(), PointParser(), NatParser(), IntParser(), ColorParser()),
-                       QuitParser(StringParser())
-                       ]
-    command = cli_parser.parse_input(command_parsers, "quit")
-    print(command)
-    assert isinstance(command, QuitCommand.__class__)
+from app.utils import *
 
 
-"--------------- Basic types parsers tests ---------------"
+"--------------- Low level parsers tests ---------------"
 
 
 def test_string_parser():
@@ -109,33 +98,33 @@ def test_int_parser():
         assert result == Success(expected, remainder)
 
 
-"--------------- ColorParser tests ---------------"
+"--------------- ColorParsers test ---------------"
 
 
-def test_color_parser():
+def test_rgb_color_parser():
     """
-    Test ColorParser's parsing of color in 'rgb(<0,255>,<0,255>,<0,255>)' format.
+    Test RgbColorParser's parsing of color in 'rgb([0,255],[0,255],[0,255])' format.
     """
-    parser = ColorParser()
+    parser = RgbColorParser(StringParser(), NatParser())
 
     "Test invalid inputs"
     invalid_inputs = ["rgb( 0,1,2)", " rgb(0,1,2)", "rgb (0,1,2)", "r gb(0,1,2)", "rgb(0, 1,2)",
                       "rgb(0,1, 2)", "rgb(0,1,2 )", "rgb 0,1,2)", "rgb(0,1,2",
                       "rgb(-5,1,2)", "rgb(-5,-1-2)", "rgb(256,1,2)", "rgb(0,256,2)", "rgb(0,1,256)", "rgb(260,300,600)"]
     for cli_input in invalid_inputs:
-        result = parser.parse_color(cli_input, StringParser(), NatParser())
+        result = parser.parse_color(cli_input)
         print(result.print())
-        assert result == Failure("rgb(<0,255>,<0,255>,<0,255>)", cli_input)
+        assert result == Failure("rgb([0,255],[0,255],[0,255])", cli_input)
 
     "Test valid inputs"
-    valid_inputs = [("rgb(0,1,2)", QColor(0, 1, 2), ""), ("rgb(255,255,255)", QColor(255, 255, 255), ""),
-                    ("rgb(20,30,40) something else", QColor(20, 30, 40), " something else")]
+    valid_inputs = [("rgb(0,1,2)", (0, 1, 2), ""), ("rgb(255,255,255)", (255, 255, 255), ""),
+                    ("rgb(20,30,40) something else", (20, 30, 40), " something else")]
     for cli_input, expected, remainder in valid_inputs:
-        result = parser.parse_color(cli_input, StringParser(), NatParser())
+        result = parser.parse_color(cli_input)
         assert result == Success(expected, remainder)
 
 
-"--------------- Point parser tests ---------------"
+"--------------- PointParser tests ---------------"
 
 
 def test_point_parser_absolute_points():
@@ -176,9 +165,12 @@ def test_point_parser_relative_points():
         assert result == Failure("x,y or (+-)x,(+-)y", cli_input)
 
     "Test valid inputs"
-    valid_inputs = [('+10,+20', RelativeParserPoint(10, 20), ''), ('+100,-250 something', RelativeParserPoint(100, -250), 'something'),
-                    ('-0,+0', RelativeParserPoint(0, 0), ''), ('-10,-20 ', RelativeParserPoint(-10, -20), ''),
-                    ('+10,+20  ', RelativeParserPoint(10, 20), ' '), ('+10,-20 -30,-40', RelativeParserPoint(10, -20), '-30,-40'),
+    valid_inputs = [('+10,+20', RelativeParserPoint(10, 20), ''),
+                    ('+100,-250 something', RelativeParserPoint(100, -250), 'something'),
+                    ('-0,+0', RelativeParserPoint(0, 0), ''),
+                    ('-10,-20 ', RelativeParserPoint(-10, -20), ''),
+                    ('+10,+20  ', RelativeParserPoint(10, 20), ' '),
+                    ('+10,-20 -30,-40', RelativeParserPoint(10, -20), '-30,-40'),
                     ('+10,-20 30,40', RelativeParserPoint(10, -20), '30,40')]
     for cli_input, expected, remainder in valid_inputs:
         result = parser.parse_point(cli_input, NatParser(), IntParser())
@@ -208,7 +200,38 @@ def test_absolute_parser_point_conversion():
         assert absolute_point.convert_to_absolute(predecessor_point) == result_point
 
 
-"--------------- CommandParser tests ---------------"
+"--------------- CommandParsers tests ---------------"
+
+
+def test_circle_parser():
+    cli_parser = CliParser()
+    command_parsers = [CircleParser(StringParser(), PointParser(), NatParser(), IntParser(), ColorParser())]
+
+    "Test invalid inputs, two points as parameters"
+    invalid_inputs = ["circle 10,-20 30,40", "circle 10,20 30,+40", "circle 10,20 30.40", "circle 10 20 30,40",
+                      "circle10,20 30,40", " circle 10,20 30,40", "circle 10,20  30,40", "circle 10,20",
+                      "circlee 10,20 30,40", "circle something",
+                      "circle 10,20 30,40 rgb(0,0,-1)", "circle 10,20 30,40 rgb(0,0,0", "circle 10,20 30,40 rgb 0,0,0",
+                      "circle 10,20 30,40 rgb(0,1)", "circle 10,20 30,40rgb(0,1,2)", "circle 10,20 30,40   rgb(0,0,0)",
+                      "circle 10,20 30,40 rgb(1a,2,3)", "circle 10,20 30,40,rgb(0,2,3)",
+                      "circle 10,20 30,40 rgb(256,0,1)", "circle 10,20 30,40 rgb(2, 0,1)",
+                      "circle 10,20 30,40 rgb(2.0.1)", "circle 10,20 30,40 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == InvalidCommand("reciever")
+
+    "Test valid inputs, two points as parameters"
+    valid_inputs = [("circle 10,20 30,40", PrintCircleCommand("receiver", 10, 20, 30, 40, (0, 0, 0))),
+                    ("circle 10,20 -10,-20", PrintCircleCommand("receiver", 10, 20, 0, 0, (0, 0, 0))),
+                    ("circle -5,-5 +5,+5", PrintCircleCommand("receiver", -5, -5, 0, 0, (0, 0, 0))),
+                    ("circle -5,-5 10,20", PrintCircleCommand("receiver", -5, -5, 10, 20, (0, 0, 0))),
+                    ("circle 10,20 30,40 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, 30, 40, (10, 20, 30))),
+                    ("circle 10,20 -10,-20 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, 0, 0, (0, 0, 0)))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == expected
 
 
 def test_rect_parser():
@@ -218,8 +241,8 @@ def test_rect_parser():
     """
     cli_parser = CliParser()
     rect_parser = [RectParser(StringParser(), PointParser(), NatParser(), IntParser(), ColorParser())]
-    command = cli_parser.parse_input(rect_parser, "rect 10,20 30,40 rgb(0,1,2)")
-    print(command)
+    #command = cli_parser.parse_input(rect_parser, "rect 10,20 30,40 rgb(0,1,2)")
+    #print(command)
     command = cli_parser.parse_input(rect_parser, "rect 10,20 30 40")
     print(command)
     command = cli_parser.parse_input(rect_parser, "rect 10,20 30 40 rgb(0,10,20)")

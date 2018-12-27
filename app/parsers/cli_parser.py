@@ -1,5 +1,4 @@
 from app.parsers.command_parsers import *
-from app.parsers.point_parsers import *
 
 
 class CliParser:
@@ -22,9 +21,10 @@ class CliParser:
                 if parser.has_parameters():
                     return self.parse_params(parser, command_result.get_remainder())
                 else:
+                    # TODO: kontrolovat, že command_result.get_remainder() == ''
                     return command_result.get_match()
 
-        return InvalidCommand()
+        return InvalidCommand("reciever")
 
     def parse_params(self, command_parser: CommandParser, remainder: str):
         """
@@ -39,4 +39,4 @@ class CliParser:
         if params_result.is_successful():
             return params_result.get_match()
         else:
-            return InvalidCommand()
+            return InvalidCommand("reciever")
