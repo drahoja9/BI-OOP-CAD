@@ -1,9 +1,11 @@
 from typing import TextIO
 
-from PyQt5.QtGui import QColor, QPainter
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QColor, QPainter, QPen
 
 from app.canvas import Canvas
-from app.shapes import Dot, Line, Rectangle, Circle, Shape
+from app.shapes import Dot, Line, Polyline, Rectangle, Circle, Shape
+from app.utils import Color
 
 
 class Printer:
@@ -14,6 +16,9 @@ class Printer:
         raise NotImplementedError
 
     def print_line(self, line: Line):
+        raise NotImplementedError
+
+    def print_polyline(self, polyline: Polyline):
         raise NotImplementedError
 
     def print_rectangle(self, rect: Rectangle):
@@ -35,6 +40,9 @@ class AbstractTextPrinter(Printer):
 
     def print_line(self, line: Line):
         self._print_shape(line)
+
+    def print_polyline(self, polyline: Polyline):
+        self._print_shape(polyline)
 
     def print_rectangle(self, rect: Rectangle):
         self._print_shape(rect)
@@ -68,18 +76,29 @@ class CanvasPrinter(Printer):
         super().__init__()
         self._canvas = canvas
 
-    def _prepare_painter(self, color: QColor):
+    def _prepare_painter(self, color: Color):
         painter = QPainter(self._canvas)
-        painter.setBrush(color)
+        # TODO: Do we want filled shapes or not???
+        painter.setPen(QColor(*color))
         return painter
 
     def print_dot(self, dot: Dot):
         painter = self._prepare_painter(dot.color)
+        pen = QPen(painter.brush(), 5)
+        pen.setColor(QColor(*dot.color))
+        painter.setPen(pen)
         painter.drawPoint(*dot.get_props())
 
     def print_line(self, line: Line):
         painter = self._prepare_painter(line.color)
         painter.drawLine(*line.get_props())
+
+    def print_polyline(self, polyline: Polyline):
+        painter = self._prepare_painter(polyline.color)
+        q_points = []
+        for point in polyline.get_props():
+            q_points.append(QPointF(point.x, point.y))
+        painter.drawPolyline(*q_points)
 
     def print_rectangle(self, rect: Rectangle):
         painter = self._prepare_painter(rect.color)
@@ -88,5 +107,8 @@ class CanvasPrinter(Printer):
     def print_circle(self, circle: Circle):
         painter = self._prepare_painter(circle.color)
         # There's no direct method for drawing circles in PyQt, so we have
-        # to draw ellipse with radii rx and ry, where rx == ry
-        painter.drawEllipse(*circle.get_props(), circle.radius)
+        # to draw ellipse outside a rectangle starting at [start_x, start_y],
+        # with height and width set to radius of circle
+        start_x = circle.start.x - circle.radius
+        start_y = circle.start.y - circle.radius
+        painter.drawEllipse(start_x, start_y, circle.radius * 2, circle.radius * 2)

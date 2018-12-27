@@ -1,10 +1,12 @@
-from PyQt5.QtGui import QColor
+from typing import List
 
-from app.canvas import Canvas
-from app.commands import CommandEngine
+from app.command_engine import CommandEngine
+from app.commands import Command
+from app.gui import MainWindow
 from app.printers import CanvasPrinter
-from app.shapes import Rectangle, Point, Dot, Line, Circle
+from app.shapes import Shape
 from app.shapes_store import ShapesStore
+from app.utils import Point
 
 
 class Controller:
@@ -12,27 +14,70 @@ class Controller:
     Main class of this application. Holds all crucial pieces together.
     It represents a subject in the observer design pattern.
     """
+
     def __init__(self):
-        self.canvas = Canvas(self)
-
-        self._command_engine = CommandEngine()
+        self._gui = MainWindow(self)
+        self._command_engine = CommandEngine(self)
         self._shapes = ShapesStore(self)
-        self._printer = CanvasPrinter(self.canvas)
+        self._printer = CanvasPrinter(self._gui.canvas)
 
-        r1 = Rectangle(Point(10, 10), 200, 100, QColor(200, 0, 0))
-        r2 = Rectangle(Point(100, 100), 20, 10, QColor(0, 200, 0))
-        r3 = Rectangle(Point(400, 100), 50, 250, QColor(0, 0, 200))
+    def add_shapes(self, *shapes: Shape):
+        self._shapes.add_shapes(*shapes)
 
-        dot = Dot(Point(400, 400), QColor(10, 10, 10))
+    def replace_shapes_store(self, shapes: List[Shape]):
+        self._shapes = ShapesStore(self, shapes)
 
-        line = Line(Point(0, 0), Point(953, 551), QColor(0, 0, 250))
+    def remove_last_shape(self):
+        self._shapes.remove_last_shape()
 
-        circle = Circle(Point(700, 50), 300, QColor(0, 250, 0))
+    def remove_shapes_at(self, point: Point) -> List[Shape]:
+        return self._shapes.remove_shapes_at(point)
 
-        self._shapes.add_shapes(r1, r2, r3, dot, line, circle)
+    def preview_shape(self, shape: Shape):
+        self._shapes.set_preview(shape)
+
+    def end_preview(self):
+        self._shapes.set_preview(None)
+
+    def execute_command(self, command: Command):
+        self._command_engine.execute_command(command)
 
     def print_all_shapes(self):
         self._shapes.print_all(self._printer)
 
     def update_canvas(self):
-        self.canvas.update()
+        # Emitting the QEvent.Paint event
+        self._gui.canvas.update()
+
+    def undo(self):
+        self._command_engine.undo()
+
+    def redo(self):
+        self._command_engine.redo()
+
+    def enable_undo(self):
+        self._gui.enable_undo()
+
+    def enable_redo(self):
+        self._gui.enable_redo()
+
+    def disable_undo(self):
+        self._gui.disable_undo()
+
+    def disable_redo(self):
+        self._gui.disable_redo()
+
+    def save(self, file: str):
+        commands = self._command_engine.get_all_commands()
+        with open(file, 'w+', encoding='utf-8') as f:
+            f.write(f'{len(commands["redos"])}\n')
+            [f.write(str(c) + '\n') for c in commands['undos']]
+            [f.write(str(c) + '\n') for c in commands['redos']]
+
+    def run_app(self):
+        # Run the whole app
+        self._gui.show()
+
+    def restart(self):
+        self._command_engine.restart()
+        self._shapes.restart()

@@ -1,15 +1,12 @@
 from typing import List, Tuple
 
-from PyQt5.QtGui import QColor
-
-from app.shapes_store import ShapesStore
-from app.shapes import Shape, Dot, Line, Rectangle, Circle
-from app.utils import Point
+from app.shapes import Dot, Line, Rectangle, Circle, Polyline
+from app.utils import Point, Color, distance
 
 
 class Command:
     def __init__(self, receiver):
-        self._receiver = receiver
+        self.receiver = receiver
 
     def execute(self):
         raise NotImplementedError
@@ -17,38 +14,119 @@ class Command:
     def reverse(self):
         raise NotImplementedError
 
+    def __str__(self):
+        return 'Abstract command, should not be instantiated!'
 
-class PrintDotCommand(Command):
-    def __init__(self, receiver: ShapesStore, x: int, y: int, color: Tuple[int, int, int]):
+    def __eq__(self, other):
+        return self.__class__ == other.__class__ and self.receiver == other.receiver
+
+
+class ShapeCommand(Command):
+    def __init__(self, receiver):
         super().__init__(receiver)
-        self._dot = Dot(Point(x, y), QColor(*color))
+        self.shape = None
 
     def execute(self):
-        self._receiver.add_shape(self._dot)
+        self.receiver.add_shapes(self.shape)
 
-    def reverse(self) -> Command:
-        pass
+    def reverse(self):
+        self.receiver.remove_last_shape()
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.shape == other.shape
 
-# class PrintRectCommand(Command):
-#     def __init__(self, receiver: ShapesStore, shape: Shape):
-#         super().__init__(receiver)
-#         self._shape = shape
-#
-#     def execute(self):
-#         self._receiver.add_shape(self._shape)
-#
-#     def reverse(self) -> Command:
-#         pass
+    def __str__(self):
+        return f' ({self.shape.color.r},{self.shape.color.g},{self.shape.color.b})'
 
 
-class CommandEngine:
-    def __init__(self, commands: List[Command] = None):
-        self._commands = commands or []
+class PrintDotCommand(ShapeCommand):
+    def __init__(self, receiver, x: int, y: int, color: tuple):
+        super().__init__(receiver)
+        self.shape = Dot(
+            Point(x, y),
+            Color(*color)
+        )
 
-    def store_command(self, command: Command):
-        self._commands.append(command)
+    def __str__(self):
+        return f'dot {self.shape.start.x},{self.shape.start.y}' + super().__str__()
 
-    def execute_all_commands(self):
-        for command in self._commands:
-            command.execute()
+
+class PrintLineCommand(ShapeCommand):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
+        super().__init__(receiver)
+        self.shape = Line(
+            Point(start_x, start_y),
+            Point(end_x, end_y),
+            Color(*color)
+        )
+
+    def __str__(self):
+        return (f'line {self.shape.start.x},{self.shape.start.y} {self.shape.end.x},{self.shape.end.y}' +
+                super().__str__())
+
+
+class PrintPolylineCommand(ShapeCommand):
+    def __init__(self, receiver, points: List[Tuple[int, int]], color: tuple):
+        super().__init__(receiver)
+        points_ = []
+        for point in points:
+            points_.append(Point(point[0], point[1]))
+        self.shape = Polyline(*points_, color=Color(*color))
+
+    def __str__(self):
+        res = f'line'
+        for point in self.shape.get_props():
+            res += f' {point.x},{point.y}'
+        return res + super().__str__()
+
+
+class PrintRectCommand(ShapeCommand):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
+        super().__init__(receiver)
+        width = abs(start_x - end_x)
+        height = abs(start_y - end_y)
+        self.shape = Rectangle(
+            Point(min(start_x, end_x), min(start_y, end_y)),
+            width,
+            height,
+            Color(*color)
+        )
+
+    def __str__(self):
+        return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
+                super().__str__())
+
+
+class PrintCircleCommand(ShapeCommand):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
+        super().__init__(receiver)
+        center = (start_x, start_y)
+        radius = distance(Point(start_x, start_y), Point(end_x, end_y))
+        self.shape = Circle(
+            Point(*center),
+            int(radius),
+            Color(*color)
+        )
+
+    def __str__(self):
+        return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()
+
+
+class RemoveShapeCommand(Command):
+    def __init__(self, receiver, point_x: int, point_y: int):
+        super().__init__(receiver)
+        self.point = Point(point_x, point_y)
+        self._before_remove = []
+
+    def execute(self):
+        self._before_remove = self.receiver.remove_shapes_at(self.point)
+
+    def reverse(self):
+        if self._before_remove:
+            self.receiver.replace_shapes_store(self._before_remove)
+
+    def __str__(self):
+        return f'remove {self.point.x},{self.point.y}'
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.point == other.point
