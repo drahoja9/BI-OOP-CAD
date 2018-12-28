@@ -1,8 +1,8 @@
 from typing import List, Tuple
 
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point, Color, distance
-from app.shape_factories import ShapeFactory
+from app.utils import Point, Color
+
 
 class Command:
     def __init__(self, receiver):
@@ -82,9 +82,9 @@ class PrintPolylineCommand(ShapeCommand):
 
 
 class PrintRectCommand(ShapeCommand):
-    def __init__(self, receiver, factory: ShapeFactory):
+    def __init__(self, receiver, rectangle: Rectangle):
         super().__init__(receiver)
-        self.shape = factory.get_shape()
+        self.shape = rectangle
 
     def __str__(self):
         return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
@@ -92,9 +92,9 @@ class PrintRectCommand(ShapeCommand):
 
 
 class PrintCircleCommand(ShapeCommand):
-    def __init__(self, receiver, factory: ShapeFactory):
+    def __init__(self, receiver, circle: Circle):
         super().__init__(receiver)
-        self.shape = factory.get_shape()
+        self.shape = circle
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()

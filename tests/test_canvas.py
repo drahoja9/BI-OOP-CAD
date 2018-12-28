@@ -112,8 +112,7 @@ def test_mouse_press_event(canvas: Canvas):
         ==
         PrintRectCommand(
             canvas._controller,
-            PointsRectFactory(start_point_x=EventMockup.x(), start_point_y=EventMockup.y(),
-                              end_point_x=EventMockup.x(), end_point_y=EventMockup.y(),
-                              color=(0, 0, 0))
+            PointsRectFactory().get_shape(EventMockup.x(), EventMockup.y(), (0, 0, 0),
+                                          end_point_x=EventMockup.x(), end_point_y=EventMockup.y())
         )
     )

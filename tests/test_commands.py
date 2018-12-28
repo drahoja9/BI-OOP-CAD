@@ -7,7 +7,7 @@ from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCo
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
-from app.shape_factories import *
+from app.shape_factories import PointsRectFactory, DimensionsRectFactory, PointsCircleFactory, DimensionsCircleFactory
 
 
 class ReceiverMockup:
@@ -122,16 +122,14 @@ def test_polyline_command(receiver: ReceiverMockup):
 
 
 def test_rect_command_with_points(receiver: ReceiverMockup):
-    command = PrintRectCommand(receiver, PointsRectFactory(start_point_x=50, start_point_y=50,
-                                                           end_point_x=100, end_point_y=100,
-                                                           color=(255, 255, 255)))
+    command = PrintRectCommand(receiver, PointsRectFactory().get_shape(50, 50, (255, 255, 255),
+                                                                       end_point_x=100, end_point_y=100))
     assert str(command) == 'rect 50,50 50 50 (255,255,255)'
     assert (
         command
         ==
-        PrintRectCommand(receiver, PointsRectFactory(start_point_x=50, start_point_y=50,
-                                                     end_point_x=100, end_point_y=100,
-                                                     color=(255, 255, 255)))
+        PrintRectCommand(receiver, PointsRectFactory().get_shape(50, 50, (255, 255, 255),
+                                                                 end_point_x=100, end_point_y=100))
     )
 
     command.execute()
@@ -143,16 +141,12 @@ def test_rect_command_with_points(receiver: ReceiverMockup):
 
 
 def test_rect_command_with_dimensions(receiver: ReceiverMockup):
-    command = PrintRectCommand(receiver, DimensionsRectFactory(start_point_x=50, start_point_y=50,
-                                                               width=50, height=50,
-                                                               color=(255, 255, 255)))
+    command = PrintRectCommand(receiver, DimensionsRectFactory().get_shape(50, 50, (255, 255, 255), width=50, height=50))
     assert str(command) == 'rect 50,50 50 50 (255,255,255)'
     assert (
         command
         ==
-        PrintRectCommand(receiver, DimensionsRectFactory(start_point_x=50, start_point_y=50,
-                                                         width=50, height=50,
-                                                         color=(255, 255, 255)))
+        PrintRectCommand(receiver, DimensionsRectFactory().get_shape(50, 50, (255, 255, 255), width=50, height=50))
     )
 
     command.execute()
@@ -164,16 +158,15 @@ def test_rect_command_with_dimensions(receiver: ReceiverMockup):
 
 
 def test_circle_command_with_points(receiver: ReceiverMockup):
-    command = PrintCircleCommand(receiver, PointsCircleFactory(start_point_x=0, start_point_y=0,
-                                                               end_point_x=100, end_point_y=100,
-                                                               color=(0, 0, 0)))
+    command = PrintCircleCommand(receiver, PointsCircleFactory().get_shape(0, 0, (0, 0, 0),
+                                                                           end_point_x=100, end_point_y=100))
+
     assert str(command) == 'circle 0,0 141 (0,0,0)'
     assert (
         command
         ==
-        PrintCircleCommand(receiver, PointsCircleFactory(start_point_x=0, start_point_y=0,
-                                                         end_point_x=100, end_point_y=100,
-                                                         color=(0, 0, 0)))
+        PrintCircleCommand(receiver, PointsCircleFactory().get_shape(0, 0, (0, 0, 0),
+                                                                     end_point_x=100, end_point_y=100))
     )
 
     command.execute()
@@ -185,14 +178,12 @@ def test_circle_command_with_points(receiver: ReceiverMockup):
 
 
 def test_circle_command_with_dimensions(receiver: ReceiverMockup):
-    command = PrintCircleCommand(receiver, DimensionsCircleFactory(center_x=0, center_y=0,
-                                                                   radius=141, color=(0, 0, 0)))
+    command = PrintCircleCommand(receiver, DimensionsCircleFactory().get_shape(0, 0, (0, 0, 0), radius=141))
     assert str(command) == 'circle 0,0 141 (0,0,0)'
     assert (
         command
         ==
-        PrintCircleCommand(receiver, DimensionsCircleFactory(center_x=0, center_y=0,
-                                                             radius=141, color=(0, 0, 0)))
+        PrintCircleCommand(receiver, DimensionsCircleFactory().get_shape(0, 0, (0, 0, 0), radius=141))
     )
 
     command.execute()
@@ -209,25 +200,18 @@ def test_not_equals(receiver: ReceiverMockup):
         !=
         PrintLineCommand(receiver, 0, 0, 0, 0, (0, 0, 0))
         !=
-        PrintRectCommand(receiver, PointsRectFactory(start_point_x=0, start_point_y=0,
-                                                     end_point_x=0, end_point_y=0,
-                                                     color=(0, 0, 0)))
+        PrintRectCommand(receiver, PointsRectFactory().get_shape(0, 0, (0, 0, 0), end_point_x=0, end_point_y=0))
         !=
-        PrintCircleCommand(receiver, PointsCircleFactory(start_point_x=0, start_point_y=0,
-                                                         end_point_x=0, end_point_y=0,
-                                                         color=(0, 0, 0)))
+        PrintCircleCommand(receiver, PointsCircleFactory().get_shape(0, 0, (0, 0, 0), end_point_x=0, end_point_y=0))
     )
     assert (
         PrintDotCommand(receiver, 0, 0, (0, 0, 0))
         !=
         PrintLineCommand(receiver, 0, 0, 0, 0, (0, 0, 0))
         !=
-        PrintRectCommand(receiver, DimensionsRectFactory(start_point_x=0, start_point_y=0,
-                                                         width=0, height=0,
-                                                         color=(0, 0, 0)))
+        PrintRectCommand(receiver, DimensionsRectFactory().get_shape(0, 0, (0, 0, 0), width=0, height=0))
         !=
-        PrintCircleCommand(receiver, DimensionsCircleFactory(center_x=0, center_y=0,
-                                                             radius=0, color=(0, 0, 0)))
+        PrintCircleCommand(receiver, DimensionsCircleFactory().get_shape(0, 0, (0, 0, 0), radius=0))
     )
     assert (
         PrintDotCommand(receiver, 0, 0, (0, 0, 0))
@@ -240,38 +224,24 @@ def test_not_equals(receiver: ReceiverMockup):
         PrintLineCommand(receiver, 0, 0, 1, 0, (0, 0, 0))
     )
     assert (
-        PrintRectCommand(receiver, PointsRectFactory(start_point_x=0, start_point_y=0,
-                                                     end_point_x=0, end_point_y=0,
-                                                     color=(0, 0, 0)))
+        PrintRectCommand(receiver, PointsRectFactory().get_shape(0, 0, (0, 0, 0), end_point_x=0, end_point_y=0))
         !=
-        PrintRectCommand(receiver, PointsRectFactory(start_point_x=0, start_point_y=1,
-                                                     end_point_x=0, end_point_y=0,
-                                                     color=(0, 0, 0)))
+        PrintRectCommand(receiver, PointsRectFactory().get_shape(0, 0, (0, 0, 0), end_point_x=0, end_point_y=1))
     )
     assert (
-        PrintRectCommand(receiver, DimensionsRectFactory(start_point_x=0, start_point_y=0,
-                                                         width=0, height=0,
-                                                         color=(0, 0, 0)))
+        PrintRectCommand(receiver, DimensionsRectFactory().get_shape(0, 0, (0, 0, 0), width=0, height=0))
         !=
-        PrintRectCommand(receiver, DimensionsRectFactory(start_point_x=0, start_point_y=1,
-                                                         width=0, height=0,
-                                                         color=(0, 0, 0)))
+        PrintRectCommand(receiver, DimensionsRectFactory().get_shape(0, 1, (0, 0, 0), width=0, height=0))
     )
     assert (
-        PrintCircleCommand(receiver, PointsCircleFactory(start_point_x=0, start_point_y=0,
-                                                         end_point_x=0, end_point_y=0,
-                                                         color=(0, 0, 0)))
+        PrintCircleCommand(receiver, PointsCircleFactory().get_shape(0, 0, (0, 0, 0), end_point_x=0, end_point_y=0))
         !=
-        PrintCircleCommand(receiver, PointsCircleFactory(start_point_x=0, start_point_y=1,
-                                                         end_point_x=0, end_point_y=0,
-                                                         color=(0, 0, 0)))
+        PrintCircleCommand(receiver, PointsCircleFactory().get_shape(0, 1, (0, 0, 0), end_point_x=0, end_point_y=0))
     )
     assert (
-        PrintCircleCommand(receiver, DimensionsCircleFactory(center_x=0, center_y=0,
-                                                             radius=0, color=(0, 0, 0)))
+        PrintCircleCommand(receiver, DimensionsCircleFactory().get_shape(0, 0, (0, 0, 0), radius=0))
         !=
-        PrintCircleCommand(receiver, DimensionsCircleFactory(center_x=0, center_y=1,
-                                                             radius=0, color=(0, 0, 0)))
+        PrintCircleCommand(receiver, DimensionsCircleFactory().get_shape(0, 1, (0, 0, 0), radius=0))
     )
 
 
