@@ -37,19 +37,19 @@ class NumberParser:
         natural number within range, Failure(expected format, the given cli_input) otherwise
         """
 
-        "Parse a number from the given input using the first given delimiter"
+        # Parse a number from the given input using the first given delimiter
         result1 = self.parse_input(cli_input, delimiter1)
         if result1.is_successful():
             return result1
 
         if delimiter1 != delimiter2:
-            "Parse a number from the given input using the second given delimiter"
+            # Parse a number from the given input using the second given delimiter
             result2 = self.parse_input(cli_input, delimiter2)
             if result2.is_successful():
                 return result2
 
-        "Parsing a number has failed for both delimiters (or for the first one if both delimiters are the same)," \
-        "return Failure result from the first parser"
+        # Parsing a number has failed for both delimiters (or for the first one if both delimiters are the same),
+        # return Failure result from the first parser
         return result1
 
     @abc.abstractmethod

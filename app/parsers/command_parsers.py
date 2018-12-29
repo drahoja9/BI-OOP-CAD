@@ -47,7 +47,7 @@ class CommandParser:
         :return: list List of AbsoluteParserPoints
         """
 
-        "Check if list of points is not empty"
+        # Check if list of points is not empty
         if not points:
             raise AttributeError
 
@@ -72,8 +72,15 @@ class CommandParser:
 
 
 class ShapeCommandParser(CommandParser):
-    def parse_color(self, cli_input: str, string_parser: StringParser, nat_parser: NatParser,
-                    color_parser: ColorParser) -> ParseResult:
+    def __init__(self, string_parser: StringParser, point_parser: PointParser,
+                 nat_parser: NatParser, int_parser: IntParser, color_parser: ColorParser):
+        super().__init__(string_parser)
+        self.point_parser = point_parser
+        self.nat_parser = nat_parser
+        self.int_parser = int_parser
+        self.color_parser = color_parser
+
+    def parse_color(self, cli_input: str, color_parser: ColorParser) -> ParseResult:
         """
         Parse a Color from given input
         """
@@ -92,7 +99,7 @@ class ShapeCommandParser(CommandParser):
         return Failure(color_result.get_expected(), cli_input)
 
 
-"------------- Command Parsers ------------"
+# ------------- Command Parsers ------------
 
 
 class RemoveShapeParser(CommandParser):
@@ -154,7 +161,7 @@ class QuitParser(CommandParser):
         return False
 
 
-"------------- Shape Command Parsers ------------"
+# ------------- Shape Command Parsers ------------
 
 
 class RectParser(ShapeCommandParser):
@@ -165,11 +172,7 @@ class RectParser(ShapeCommandParser):
     """
     def __init__(self, string_parser: StringParser, point_parser: PointParser,
                  nat_parser: NatParser, int_parser: IntParser, color_parser: ColorParser):
-        super().__init__(string_parser)
-        self.point_parser = point_parser
-        self.nat_parser = nat_parser
-        self.int_parser = int_parser
-        self.color_parser = color_parser
+        super().__init__(string_parser, point_parser, nat_parser, int_parser, color_parser)
 
     def parse_command(self, cli_input: str) -> ParseResult:
         result = self.string_parser.parse_string("rect", cli_input, ' ')
@@ -181,9 +184,8 @@ class RectParser(ShapeCommandParser):
             # TODO: parse Color a pak vytvořit Command pomocí CommandFactory
             abs_points = self.convert_points(points_result.get_match())
 
-            "Parse color"
-            color_result = self.parse_color(points_result.get_remainder(), self.string_parser,
-                                            self.nat_parser, self.color_parser)
+            # Parse color
+            color_result = self.parse_color(points_result.get_remainder(), self.color_parser)
             if color_result.is_successful():
                 start_x = abs_points[0].x
                 start_y = abs_points[0].y
@@ -199,9 +201,8 @@ class RectParser(ShapeCommandParser):
             # TODO: parse Color a pak vytvořit Command pomocí CommandFactory
             abs_points = self.convert_points([point_and_nats_result.get_match()[0]])
 
-            "Parse color"
-            color_result = self.parse_color(point_and_nats_result.get_remainder(), self.string_parser,
-                                            self.nat_parser, self.color_parser)
+            # Parse color
+            color_result = self.parse_color(point_and_nats_result.get_remainder(), self.color_parser)
             if color_result.is_successful():
                 return Success(PrintRectCommand("receiver", abs_points, color_result.get_match()), '')
             else:
@@ -248,11 +249,7 @@ class CircleParser(ShapeCommandParser):
     """
     def __init__(self, string_parser: StringParser, point_parser: PointParser,
                  nat_parser: NatParser, int_parser: IntParser, color_parser: ColorParser):
-        super().__init__(string_parser)
-        self.point_parser = point_parser
-        self.nat_parser = nat_parser
-        self.int_parser = int_parser
-        self.color_parser = color_parser
+        super().__init__(string_parser, point_parser, nat_parser, int_parser, color_parser)
 
     def parse_command(self, cli_input: str) -> ParseResult:
         result = self.string_parser.parse_string("circle", cli_input, ' ')
@@ -265,8 +262,7 @@ class CircleParser(ShapeCommandParser):
             abs_points = self.convert_points(points_result.get_match())
 
             "Parse color"
-            color_result = self.parse_color(points_result.get_remainder(), self.string_parser,
-                                            self.nat_parser, self.color_parser)
+            color_result = self.parse_color(points_result.get_remainder(), self.color_parser)
             if color_result.is_successful():
                 start_x = abs_points[0].x
                 start_y = abs_points[0].y
@@ -280,13 +276,12 @@ class CircleParser(ShapeCommandParser):
         point_and_nat_result = self.parse_point_and_nat(cli_input)
         if point_and_nat_result.is_successful():
             # TODO: parse Color a pak vytvořit Command pomocí CommandFactory
-            abs_points = self.convert_points([point_and_nat_result.get_match()[0]])
+            abs_point = self.convert_points([point_and_nat_result.get_match()[0]])
 
-            "Parse color"
-            color_result = self.parse_color(point_and_nat_result.get_remainder(), self.string_parser,
-                                            self.nat_parser, self.color_parser)
+            # Parse color
+            color_result = self.parse_color(point_and_nat_result.get_remainder(), self.color_parser)
             if color_result.is_successful():
-                return Success(PrintCircleCommand("receiver", abs_points, color_result.get_match()), '')
+                return Success(PrintCircleCommand("receiver", abs_point, color_result.get_match()), '')
             else:
                 return Failure(color_result.get_expected(), point_and_nat_result.get_remainder())
 
@@ -321,15 +316,35 @@ class CircleParser(ShapeCommandParser):
 
 
 class DotParser(ShapeCommandParser):
+    """
+    Parser for "dot" (Dot) Command.
+    Definition: dot <POINT> <COLOR>
+    COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
+    """
+    def __init__(self, string_parser: StringParser, point_parser: PointParser,
+                 nat_parser: NatParser, int_parser: IntParser, color_parser: ColorParser):
+        super().__init__(string_parser, point_parser, nat_parser, int_parser, color_parser)
+
     def parse_command(self, cli_input: str) -> ParseResult:
         result = self.string_parser.parse_string("dot", cli_input, ' ')
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        pass
+        point_result = self.point_parser.parse_point(cli_input, self.nat_parser, self.int_parser)
+        if point_result.is_successful():
+            abs_point = self.convert_points([point_result.get_match()[0]])
+
+            # Parse color
+            color_result = self.parse_color(point_result.get_remainder(), self.color_parser)
+            if color_result.is_successful():
+                return Success(PrintDotCommand("receiver", abs_point[0].x, abs_point[0].y, color_result.get_match()), '')
+            else:
+                return Failure(color_result.get_expected(), point_result.get_remainder())
+
+        return Failure("dot <POINT>", cli_input)
 
     def has_parameters(self) -> bool:
-        pass
+        return True
 
 
 class LineParser(ShapeCommandParser):

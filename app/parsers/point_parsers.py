@@ -13,19 +13,19 @@ class PointParser:
         absolute point or relative point, Failure(expected format, the given cli_input) otherwise
         """
 
-        "Parse absolute point from given input"
+        # Parse absolute point from given input
         abs_point_parse = self.parse_input(nat_parser, cli_input)
         if abs_point_parse.is_successful():
             abs_point = AbsoluteParserPoint(abs_point_parse.get_match()[0], abs_point_parse.get_match()[1])
             return Success(abs_point, abs_point_parse.get_remainder())
 
-        "Parse relative point from given input"
+        # Parse relative point from given input
         rel_point_parse = self.parse_input(int_parser, cli_input)
         if rel_point_parse.is_successful():
             rel_point = RelativeParserPoint(rel_point_parse.get_match()[0], rel_point_parse.get_match()[1])
             return Success(rel_point, rel_point_parse.get_remainder())
 
-        "Both parsers has failed to parse a point, return the last result (a Failure object)"
+        # Both parsers has failed to parse a point, return the last result (a Failure object)
         return rel_point_parse
 
     def parse_input(self, parser: NumberParser, cli_input: str) -> ParseResult:
@@ -37,10 +37,10 @@ class PointParser:
         range, Failure(string, string) otherwise
         """
 
-        "Parse a number using comma and only comma as a delimiter"
+        # Parse a number using comma and only comma as a delimiter"
         result1 = parser.parse_number(cli_input, ',', ',')
         if result1.is_successful():
-            "Parse a number using space or end of string as a delimiter"
+            # Parse a number using space or end of string as a delimiter"
             result2 = parser.parse_number(result1.get_remainder(), ' ', '')
             if result2.is_successful():
                 x = result1.get_match()
