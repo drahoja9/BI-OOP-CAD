@@ -5,8 +5,8 @@ from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush, CircleShapeBrush
 from app.commands import Command, PrintDotCommand, PrintRectCommand
 from app.gui import MainWindow
+from app.shape_factory import PointsRectFactory
 
-from app.shape_factories import *
 
 class ControllerMockup:
     def __init__(self):
@@ -111,8 +111,10 @@ def test_mouse_press_event(canvas: Canvas):
         canvas._controller.command
         ==
         PrintRectCommand(
-            canvas._controller,
-            PointsRectFactory().get_shape(EventMockup.x(), EventMockup.y(), (0, 0, 0),
-                                          end_point_x=EventMockup.x(), end_point_y=EventMockup.y())
+            receiver=canvas._controller,
+            start_x=EventMockup.x(), start_y=EventMockup.y(),
+            color=(0, 0, 0),
+            rect_factory=PointsRectFactory,
+            end_x=EventMockup.x(), end_y=EventMockup.y()
         )
     )

@@ -1,16 +1,12 @@
-from typing import List, Tuple
-
-import pytest
-
 from app.shapes import Rectangle, Circle
 from app.utils import Point, Color
-from app.shape_factories import PointsRectFactory, DimensionsRectFactory, PointsCircleFactory, DimensionsCircleFactory
+from app.shape_factory import PointsRectFactory, DimensionsRectFactory, PointsCircleFactory, DimensionsCircleFactory
 
 # --------------- Rectangle factories tests ---------------
 
 
 def test_points_rect_factory():
-    rectangle = PointsRectFactory().get_shape(0, 0, (0, 20, 40), end_point_x=10, end_point_y=20)
+    rectangle = PointsRectFactory().get_shape(0, 0, (0, 20, 40), end_x=10, end_y=20)
     assert rectangle == Rectangle(Point(0, 0), 10, 20, Color(0, 20, 40))
 
 
@@ -20,7 +16,7 @@ def test_dimensions_rect_factory():
 
 
 def test_rect_factories_equal():
-    points_rectangle = PointsRectFactory().get_shape(0, 0, (0, 20, 40), end_point_x=10,end_point_y=20)
+    points_rectangle = PointsRectFactory().get_shape(0, 0, (0, 20, 40), end_x=10,end_y=20)
     dimensions_rectangle = DimensionsRectFactory().get_shape(0, 0, (0, 20, 40), width=10, height=20)
     assert points_rectangle == dimensions_rectangle
 
@@ -29,7 +25,7 @@ def test_rect_factories_equal():
 
 
 def test_points_circle_factory():
-    circle = PointsCircleFactory().get_shape(0, 0, (0, 20, 40), end_point_x=100, end_point_y=100)
+    circle = PointsCircleFactory().get_shape(0, 0, (0, 20, 40), end_x=100, end_y=100)
     assert circle == Circle(Point(0, 0), 141, Color(0, 20, 40))
 
 
@@ -39,6 +35,6 @@ def test_dimensions_circle_factory():
 
 
 def test_circle_factories_equal():
-    points_circle = PointsCircleFactory().get_shape(0, 0, (0, 20, 40), end_point_x=100, end_point_y=100)
+    points_circle = PointsCircleFactory().get_shape(0, 0, (0, 20, 40), end_x=100, end_y=100)
     dimensions_circle = DimensionsCircleFactory().get_shape(0, 0, (0, 20, 40), radius=141)
     assert points_circle == dimensions_circle

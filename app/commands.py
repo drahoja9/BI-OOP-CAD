@@ -1,5 +1,6 @@
-from typing import List, Tuple
+from typing import List, Tuple, Type
 
+from app.shape_factory import ShapeFactory, PointsRectFactory, PointsCircleFactory
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -82,9 +83,10 @@ class PrintPolylineCommand(ShapeCommand):
 
 
 class PrintRectCommand(ShapeCommand):
-    def __init__(self, receiver, rectangle: Rectangle):
+    def __init__(self, receiver, start_x: int, start_y: int, color: Tuple[int, int, int],
+                 rect_factory: Type[ShapeFactory] = PointsRectFactory, **kwargs):
         super().__init__(receiver)
-        self.shape = rectangle
+        self.shape: Rectangle = rect_factory.get_shape(start_x, start_y, color, **kwargs)
 
     def __str__(self):
         return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
@@ -92,9 +94,10 @@ class PrintRectCommand(ShapeCommand):
 
 
 class PrintCircleCommand(ShapeCommand):
-    def __init__(self, receiver, circle: Circle):
+    def __init__(self, receiver, start_x: int, start_y: int, color: Tuple[int, int, int],
+                 circle_factory: Type[ShapeFactory] = PointsCircleFactory, **kwargs):
         super().__init__(receiver)
-        self.shape = circle
+        self.shape: Circle = circle_factory.get_shape(start_x, start_y, color, **kwargs)
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()
