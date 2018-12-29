@@ -38,6 +38,10 @@ class CommandEngine:
             self._controller.disable_redo()
         command.execute()
 
+    def remove_last_command(self):
+        if self._undos:
+            self._undos.pop()
+
     def undo(self):
         command = self._pop_undo()
         command.reverse()
@@ -45,7 +49,7 @@ class CommandEngine:
 
     def redo(self):
         command = self._pop_redo()
-        self.execute_command(command, from_redo=True)
+        self._controller.execute_command(command, from_redo=True)
 
     def get_all_commands(self) -> Dict[str, List[Command]]:
         return {'undos': self._undos, 'redos': self._redos}

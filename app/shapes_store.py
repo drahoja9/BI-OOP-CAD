@@ -1,5 +1,5 @@
 import copy
-from typing import List
+from typing import List, Dict
 
 from app.shapes import Shape
 from app.printers import Printer
@@ -26,12 +26,20 @@ class ShapesStore:
     def is_empty(self) -> bool:
         return len(self._shapes) == 0
 
-    def print_all(self, printer: Printer):
+    def print_all(self, printer: Printer, point: Point = None) -> List[Shape]:
+        printed = []
         # Order is important - first we want to print all stored shapes and after that the shape preview
         for shape in self._shapes:
-            shape.print_to(printer)
+            if point and shape.contains(point):
+                shape.print_to(printer)
+                printed.append(shape)
+            elif not point:
+                shape.print_to(printer)
+                printed.append(shape)
         if self._preview is not None:
             self._preview.print_to(printer)
+
+        return printed
 
     def set_preview(self, shape: Shape = None):
         self._preview = shape
@@ -57,14 +65,14 @@ class ShapesStore:
         except ValueError:
             pass
 
-    def remove_shapes_at(self, point: Point) -> List[Shape]:
+    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
         before_remove = copy.deepcopy(self._shapes)
         to_remove = []
         for shape in self._shapes:
             if shape.contains(point):
                 to_remove.append(shape)
         self._remove_shapes(*to_remove)
-        return before_remove
+        return {'removed': to_remove, 'before_remove': before_remove}
 
     def restart(self):
         self._shapes = []

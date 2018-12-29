@@ -65,8 +65,12 @@ def test_print_all(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
 
     assert printer.dot == 'printed'
     assert printer.line == 'printed'
+    assert printer.polyline == 'printed'
     assert printer.rect == 'printedprinted'
     assert printer.circle == 'printed'
+
+    shapes_store.print_all(printer, Point(10, 10))
+    assert printer.polyline == 'printedprinted'
 
 
 def test_set_preview(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
@@ -112,9 +116,10 @@ def test_remove_shapes_at(shapes_store: ShapesStore):
     d = Dot(Point(0, 0), QColor(0, 0, 0))
 
     shapes_store.add_shapes(r1, r2, c, l1, l2, d)
-    before_remove = shapes_store.remove_shapes_at(Point(0, 0))
+    res = shapes_store.remove_shapes_at(Point(0, 0))
 
-    assert before_remove == [r1, r2, c, l1, l2, d]
+    assert res['before_remove'] == [r1, r2, c, l1, l2, d]
+    assert res['removed'] == [r1, c, l1, d]
     assert shapes_store._shapes == [r2, l2]
 
 

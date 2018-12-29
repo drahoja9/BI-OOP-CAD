@@ -8,6 +8,7 @@ class ControllerMockup:
     def __init__(self):
         self.undo = False
         self.redo = False
+        self.command_engine = None
 
     def enable_undo(self):
         self.undo = True
@@ -20,6 +21,9 @@ class ControllerMockup:
 
     def disable_redo(self):
         self.redo = False
+
+    def execute_command(self, command: Command, from_redo: bool = False):
+        self.command_engine.execute_command(command, from_redo=from_redo)
 
 
 class CommandMockup(Command):
@@ -37,7 +41,10 @@ class CommandMockup(Command):
 
 @pytest.fixture
 def command_engine() -> CommandEngine:
-    return CommandEngine(ControllerMockup())
+    controller = ControllerMockup()
+    command_engine = CommandEngine(controller)
+    controller.command_engine = command_engine
+    return command_engine
 
 
 def test_execute_command(command_engine: CommandEngine):
@@ -51,6 +58,19 @@ def test_execute_command(command_engine: CommandEngine):
     assert command_engine._controller.redo is False
     assert command_engine._redos == []
     assert command.executed == 1
+
+
+def test_remove_last_command(command_engine: CommandEngine):
+    c1 = CommandMockup('receiver')
+    c2 = CommandMockup(123)
+    command_engine.execute_command(c1)
+    command_engine.execute_command(c2)
+
+    command_engine.remove_last_command()
+    assert command_engine._undos == [c1]
+
+    command_engine.remove_last_command()
+    assert command_engine._undos == []
 
 
 def test_undo(command_engine: CommandEngine):
@@ -91,6 +111,20 @@ def test_redo(command_engine: CommandEngine):
     assert command_engine._redos == []
     assert command_engine._controller.redo is False
     assert c2.executed == 2
+
+
+def test_get_all_commands(command_engine: CommandEngine):
+    c1 = CommandMockup('receiver')
+    c2 = CommandMockup(123)
+    command_engine.execute_command(c1)
+    command_engine.execute_command(c2)
+    command_engine.undo()
+    command_engine.undo()
+    command_engine.redo()
+
+    res = command_engine.get_all_commands()
+    assert res['undos'] == [c1]
+    assert res['redos'] == [c2]
 
 
 def test_restart(command_engine: CommandEngine):
