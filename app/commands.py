@@ -1,7 +1,8 @@
-from typing import List, Tuple
+from typing import List, Tuple, Type
 
+from app.shape_factory import ShapeFactory, PointsRectFactory, PointsCircleFactory
 from app.shapes import Dot, Line, Rectangle, Circle, Polyline
-from app.utils import Point, Color, distance
+from app.utils import Point, Color
 
 
 class Command:
@@ -82,16 +83,10 @@ class PrintPolylineCommand(ShapeCommand):
 
 
 class PrintRectCommand(ShapeCommand):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
+    def __init__(self, receiver, start_x: int, start_y: int, color: Tuple[int, int, int],
+                 rect_factory: Type[ShapeFactory] = PointsRectFactory, **kwargs):
         super().__init__(receiver)
-        width = abs(start_x - end_x)
-        height = abs(start_y - end_y)
-        self.shape = Rectangle(
-            Point(min(start_x, end_x), min(start_y, end_y)),
-            width,
-            height,
-            Color(*color)
-        )
+        self.shape: Rectangle = rect_factory.get_shape(start_x, start_y, color, **kwargs)
 
     def __str__(self):
         return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
@@ -99,15 +94,10 @@ class PrintRectCommand(ShapeCommand):
 
 
 class PrintCircleCommand(ShapeCommand):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, color: tuple):
+    def __init__(self, receiver, start_x: int, start_y: int, color: Tuple[int, int, int],
+                 circle_factory: Type[ShapeFactory] = PointsCircleFactory, **kwargs):
         super().__init__(receiver)
-        center = (start_x, start_y)
-        radius = distance(Point(start_x, start_y), Point(end_x, end_y))
-        self.shape = Circle(
-            Point(*center),
-            int(radius),
-            Color(*color)
-        )
+        self.shape: Circle = circle_factory.get_shape(start_x, start_y, color, **kwargs)
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()

@@ -60,10 +60,10 @@ def test_dot_brush(controller: ControllerMockup):
     assert b1 == b2
 
     b1.mouse_move(controller, 10, 20, Qt.LeftButton)
-    assert controller.command == PrintDotCommand(controller, 10, 20, (0, 0, 0))
+    assert controller.command == PrintDotCommand(receiver=controller, x=10, y=20, color=(0, 0, 0))
 
     b1.mouse_press(controller, 123, 321, Qt.LeftButton)
-    assert controller.command == PrintDotCommand(controller, 123, 321, (0, 0, 0))
+    assert controller.command == PrintDotCommand(receiver=controller, x=123, y=321, color=(0, 0, 0))
 
 
 def test_polyline_brush(controller: ControllerMockup):
@@ -78,7 +78,11 @@ def test_polyline_brush(controller: ControllerMockup):
     points = []
     for x in range(0, 1000, 100):
         points.append((x, x))
-        shape_command = PrintPolylineCommand(controller, [*points, (x * x, x + x)], (0, 0, 0, 200))
+        shape_command = PrintPolylineCommand(
+            receiver=controller,
+            points=[*points, (x * x, x + x)],
+            color=(0, 0, 0, 200)
+        )
         preview_shape = copy.deepcopy(shape_command.shape)
 
         b1.mouse_press(controller, x, x, Qt.LeftButton)
@@ -87,7 +91,11 @@ def test_polyline_brush(controller: ControllerMockup):
         assert controller.preview == preview_shape
 
     b1.mouse_press(controller, -999, 100, Qt.RightButton)
-    assert controller.command == PrintPolylineCommand(controller, [*points, (-999, 100)], (0, 0, 0))
+    assert controller.command == PrintPolylineCommand(
+        receiver=controller,
+        points=[*points, (-999, 100)],
+        color=(0, 0, 0)
+    )
     assert controller.preview is None
 
 
@@ -106,7 +114,12 @@ def test_shape_brush(
     assert b1 == b2
     assert b1._shape_command_class == b2._shape_command_class == shape_command_class
 
-    shape_command = shape_command_class(controller, -999, 0, -999, 100, (0, 0, 0))
+    shape_command = shape_command_class(
+        receiver=controller,
+        start_x=-999, start_y=0,
+        end_x=-999, end_y=100,
+        color=(0, 0, 0)
+    )
     preview_shape = copy.deepcopy(shape_command.shape)
     preview_shape.color = Color(0, 0, 0, 200)
 
@@ -128,4 +141,4 @@ def test_remove_shape_brush(controller: ControllerMockup):
     brush = RemoveShapeBrush()
 
     brush.mouse_press(controller, 10, 10, None)
-    assert controller.command == RemoveShapeCommand(controller, 10, 10)
+    assert controller.command == RemoveShapeCommand(receiver=controller, x=10, y=10)
