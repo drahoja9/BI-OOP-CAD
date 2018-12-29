@@ -28,12 +28,10 @@ class ShapeBrush(Brush):
 
         if self._start is not None:
             shape_command = self._shape_command_class(
-                controller,
-                self._start[0],
-                self._start[1],
-                x,
-                y,
-                (*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
+                receiver=controller,
+                start_x=self._start[0], start_y=self._start[1],
+                end_x=x, end_y=y,
+                color=(*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
             )
             controller.preview_shape(shape_command.shape)
 
@@ -45,12 +43,10 @@ class ShapeBrush(Brush):
             self._start = (x, y)
         else:
             shape_command = self._shape_command_class(
-                controller,
-                self._start[0],
-                self._start[1],
-                x,
-                y,
-                self.color
+                receiver=controller,
+                start_x=self._start[0], start_y=self._start[1],
+                end_x=x, end_y=y,
+                color=self.color
             )
             controller.end_preview()
             controller.execute_command(shape_command)
@@ -112,12 +108,12 @@ class PolylineShapeBrush(ShapeBrush):
     def mouse_move(self, controller, x: int, y: int, button):
         if len(self._points) > 0:
             shape_command = self._shape_command_class(
-                controller,
-                [
+                receiver=controller,
+                points=[
                     *self._points,
                     (x, y)
                 ],
-                (*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
+                color=(*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
             )
             controller.preview_shape(shape_command.shape)
 
@@ -125,9 +121,9 @@ class PolylineShapeBrush(ShapeBrush):
         self._points.append((x, y))
         if button == Qt.RightButton and len(self._points) > 1:
             shape_command = self._shape_command_class(
-                controller,
-                self._points,
-                self.color
+                receiver=controller,
+                points=self._points,
+                color=self.color
             )
             controller.end_preview()
             controller.execute_command(shape_command)
