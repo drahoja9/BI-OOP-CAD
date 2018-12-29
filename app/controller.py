@@ -98,3 +98,4 @@ class Controller:
     def restart(self):
         self._command_engine.restart()
         self._shapes.restart()
+        self._gui.clear_history()

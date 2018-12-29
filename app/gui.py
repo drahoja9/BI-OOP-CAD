@@ -101,3 +101,6 @@ class MainWindow(QtWidgets.QMainWindow):
         if history:
             history += '\n'
         self._ui.history.setText(history)
+
+    def clear_history(self):
+        self._ui.history.setText('')
