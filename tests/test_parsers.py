@@ -1,10 +1,17 @@
 import pytest
 import re
 
-from app.parsers.cli_parser import *
-from app.parsers.point_parsers import *
-from app.parsers.color_parser import *
-from app.utils import *
+from app.parsers.cli_parser import CliParser
+from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
+from app.parsers.point_parsers import ParserPoint
+from app.parsers.parse_results import Success, Failure
+from app.parsers.point_parsers import PointParser, AbsoluteParserPoint, RelativeParserPoint
+from app.parsers.color_parser import RgbColorParser
+from app.parsers.command_parsers import InvalidCommand, CommandParser
+from app.controller import Controller
+from app.commands import PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, PrintPolylineCommand, \
+    RemoveShapeCommand, ListShapeCommand
+from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
 
 
 # --------------- Low level parsers tests ---------------
@@ -105,7 +112,7 @@ def test_rgb_color_parser():
     """
     Test RgbColorParser's parsing of color in 'rgb([0,255],[0,255],[0,255])' format.
     """
-    parser = RgbColorParser(StringParser(), NatParser())
+    parser = RgbColorParser(NatParser())
 
     # Test invalid inputs
     invalid_inputs = ["rgb( 0,1,2)", " rgb(0,1,2)", "rgb (0,1,2)", "r gb(0,1,2)", "rgb(0, 1,2)",
@@ -113,7 +120,6 @@ def test_rgb_color_parser():
                       "rgb(-5,1,2)", "rgb(-5,-1-2)", "rgb(256,1,2)", "rgb(0,256,2)", "rgb(0,1,256)", "rgb(260,300,600)"]
     for cli_input in invalid_inputs:
         result = parser.parse_color(cli_input)
-        print(result.print())
         assert result == Failure("rgb([0,255],[0,255],[0,255])", cli_input)
 
     # Test valid inputs
@@ -137,8 +143,7 @@ def test_point_parser_absolute_points():
     invalid_inputs = ['10, 20', '10 ,20', '10 , 20', '10 20', '10.20', ' 10,20', '10',
                       '10,', 'x,20', '10,y', 'x,y']
     for cli_input in invalid_inputs:
-        result = parser.parse_point(cli_input, NatParser(), IntParser())
-        print(result.print())
+        result = parser.parse_point(cli_input)
         assert result == Failure("x,y or (+-)x,(+-)y", cli_input)
 
     # Test valid inputs
@@ -148,7 +153,7 @@ def test_point_parser_absolute_points():
                     ('10,20  ', AbsoluteParserPoint(10, 20), ' '),
                     ('10,20 30,40', AbsoluteParserPoint(10, 20), '30,40')]
     for cli_input, expected, remainder in valid_inputs:
-        result = parser.parse_point(cli_input, NatParser(), IntParser())
+        result = parser.parse_point(cli_input)
         assert result == Success(expected, remainder)
 
 
@@ -162,8 +167,7 @@ def test_point_parser_relative_points():
     invalid_inputs = ['+10, -20', '-10 ,+20', '+10 , -20', '-10 -20', '-10.-20', ' +10,+20', '+10',
                       '-10,', '+x,-20', '-10,+y', '-x,-y']
     for cli_input in invalid_inputs:
-        result = parser.parse_point(cli_input, NatParser(), IntParser())
-        print(result.print())
+        result = parser.parse_point(cli_input)
         assert result == Failure("x,y or (+-)x,(+-)y", cli_input)
 
     # Test valid inputs
@@ -175,7 +179,7 @@ def test_point_parser_relative_points():
                     ('+10,-20 -30,-40', RelativeParserPoint(10, -20), '-30,-40'),
                     ('+10,-20 30,40', RelativeParserPoint(10, -20), '30,40')]
     for cli_input, expected, remainder in valid_inputs:
-        result = parser.parse_point(cli_input, NatParser(), IntParser())
+        result = parser.parse_point(cli_input)
         assert result == Success(expected, remainder)
 
 
@@ -206,10 +210,8 @@ def test_absolute_parser_point_conversion():
 
 
 def test_circle_parser():
-    cli_parser = CliParser()
-    command_parsers = [CircleParser(StringParser(), PointParser(), NatParser(), IntParser(),
-                                    RgbColorParser(StringParser(), NatParser()))
-                       ]
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
 
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["circle 10,-20 30,40", "circle 10,20 30,+40", "circle 10,20 30.40", "circle 10 20 30,40",
@@ -222,21 +224,21 @@ def test_circle_parser():
                       "circle 10,20 30,40 rgb(2.0.1)", "circle 10,20 30,40 rgb(123)"
                       ]
     for cli_input in invalid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("receiver")
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
 
     # Test valid inputs, two points as parameters
-    valid_inputs = [("circle 10,20 30,40", PrintCircleCommand("receiver", 10, 20, (0, 0, 0), end_x=30, end_y=40)),
-                    ("circle 10,20 -10,-20", PrintCircleCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0)),
-                    ("circle -5,-5 +5,+5", PrintCircleCommand("receiver", -5, -5, (0, 0, 0), end_x=0, end_y=0)),
-                    ("circle -5,-5 10,20", PrintCircleCommand("receiver", -5, -5, (0, 0, 0), end_x=10, end_y=20)),
-                    ("circle 10,20 30,40 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, (10, 20, 30),
+    valid_inputs = [("circle 10,20 30,40", PrintCircleCommand(controller, 10, 20, (0, 0, 0), end_x=30, end_y=40)),
+                    ("circle 10,20 -10,-20", PrintCircleCommand(controller, 10, 20, (0, 0, 0), end_x=0, end_y=0)),
+                    ("circle -5,-5 +5,+5", PrintCircleCommand(controller, -5, -5, (0, 0, 0), end_x=0, end_y=0)),
+                    ("circle -5,-5 10,20", PrintCircleCommand(controller, -5, -5, (0, 0, 0), end_x=10, end_y=20)),
+                    ("circle 10,20 30,40 rgb(10,20,30)", PrintCircleCommand(controller, 10, 20, (10, 20, 30),
                                                                             end_x=30, end_y=40)),
-                    ("circle 10,20 -10,-20 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+                    ("circle 10,20 -10,-20 rgb(0,0,0)", PrintCircleCommand(controller, 10, 20, (0, 0, 0),
                                                                            end_x=0, end_y=0))
                     ]
     for cli_input, expected in valid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
+        command = cli_parser.parse_input(cli_input)
         assert command == expected
 
     # Test invalid inputs, one point and one natural number (radius) as parameters
@@ -252,21 +254,21 @@ def test_circle_parser():
                       "circle 10,20 30 rgb(2.0.1)", "circle 10,20 30 rgb(123)"
                       ]
     for cli_input in invalid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("receiver")
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
 
     # Test valid inputs, one point and one natural number (radius) as parameters
-    valid_inputs = [("circle 10,20 30", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+    valid_inputs = [("circle 10,20 30", PrintCircleCommand(controller, 10, 20, (0, 0, 0),
                                                            DimensionsCircleFactory, radius=30)),
-                    ("circle -5,-5 30", PrintCircleCommand("receiver", -5, -5, (0, 0, 0),
+                    ("circle -5,-5 30", PrintCircleCommand(controller, -5, -5, (0, 0, 0),
                                                            DimensionsCircleFactory, radius=30)),
-                    ("circle 10,20 30 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, (10, 20, 30),
+                    ("circle 10,20 30 rgb(10,20,30)", PrintCircleCommand(controller, 10, 20, (10, 20, 30),
                                                                          DimensionsCircleFactory, radius=30)),
-                    ("circle 10,20 30 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+                    ("circle 10,20 30 rgb(0,0,0)", PrintCircleCommand(controller, 10, 20, (0, 0, 0),
                                                                       DimensionsCircleFactory, radius=30))
                     ]
     for cli_input, expected in valid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
+        command = cli_parser.parse_input(cli_input)
         assert command == expected
 
 
@@ -275,9 +277,8 @@ def test_rect_parser():
 
     :return:
     """
-    cli_parser = CliParser()
-    command_parsers = [RectParser(StringParser(), PointParser(), NatParser(), IntParser(),
-                                  RgbColorParser(StringParser(), NatParser()))]
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
 
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["rect 10,-20 30,40", "rect 10,20 30,+40", "rect 10,20 30.40", "rect 10 20 30,40",
@@ -290,20 +291,20 @@ def test_rect_parser():
                       "rect 10,20 30,40 rgb(2.0.1)", "rect 10,20 30,40 rgb(123)"
                       ]
     for cli_input in invalid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("receiver")
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
 
     # Test valid inputs, two points as parameters
-    valid_inputs = [("rect 10,20 30,40", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=30, end_y=40)),
-                    ("rect 10,20 -10,-20", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0)),
-                    ("rect -5,-5 +5,+5", PrintRectCommand("receiver", -5, -5, (0, 0, 0), end_x=0, end_y=0)),
-                    ("rect -5,-5 10,20", PrintRectCommand("receiver", -5, -5, (0, 0, 0), end_x=10, end_y=20)),
-                    ("rect 10,20 30,40 rgb(10,20,30)", PrintRectCommand("receiver", 10, 20, (10, 20, 30),
+    valid_inputs = [("rect 10,20 30,40", PrintRectCommand(controller, 10, 20, (0, 0, 0), end_x=30, end_y=40)),
+                    ("rect 10,20 -10,-20", PrintRectCommand(controller, 10, 20, (0, 0, 0), end_x=0, end_y=0)),
+                    ("rect -5,-5 +5,+5", PrintRectCommand(controller, -5, -5, (0, 0, 0), end_x=0, end_y=0)),
+                    ("rect -5,-5 10,20", PrintRectCommand(controller, -5, -5, (0, 0, 0), end_x=10, end_y=20)),
+                    ("rect 10,20 30,40 rgb(10,20,30)", PrintRectCommand(controller, 10, 20, (10, 20, 30),
                                                                         end_x=30, end_y=40)),
-                    ("rect 10,20 -10,-20 rgb(0,0,0)", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0))
+                    ("rect 10,20 -10,-20 rgb(0,0,0)", PrintRectCommand(controller, 10, 20, (0, 0, 0), end_x=0, end_y=0))
                     ]
     for cli_input, expected in valid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
+        command = cli_parser.parse_input(cli_input)
         assert command == expected
 
     # Test invalid inputs, one point and two natural numbers (width and height) as parameters
@@ -317,23 +318,23 @@ def test_rect_parser():
                       "rect 10,20 30 40 rgb(2.0.1)", "rect 10,20 30 40 rgb(123)"
                       ]
     for cli_input in invalid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("receiver")
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
 
     # Test valid inputs, one point and two natural numbers (width and height) as parameters
-    valid_inputs = [("rect 10,20 20 20", PrintRectCommand("receiver", 10, 20, (0, 0, 0),
+    valid_inputs = [("rect 10,20 20 20", PrintRectCommand(controller, 10, 20, (0, 0, 0),
                                                           DimensionsRectFactory, width=20, height=20)),
-                    ("rect -10,-20 10 20", PrintRectCommand("receiver", -10, -20, (0, 0, 0),
+                    ("rect -10,-20 10 20", PrintRectCommand(controller, -10, -20, (0, 0, 0),
                                                             DimensionsRectFactory, width=10, height=20)),
-                    ("rect +10,+20 0 5", PrintRectCommand("receiver", 10, 20, (0, 0, 0),
+                    ("rect +10,+20 0 5", PrintRectCommand(controller, 10, 20, (0, 0, 0),
                                                           DimensionsRectFactory, width=0, height=5)),
-                    ("rect +10,-20 20 20 rgb(10,20,30)", PrintRectCommand("receiver", 10, -20, (10, 20, 30),
+                    ("rect +10,-20 20 20 rgb(10,20,30)", PrintRectCommand(controller, 10, -20, (10, 20, 30),
                                                                           DimensionsRectFactory, width=20, height=20)),
-                    ("rect -10,+20 1000 2 rgb(0,0,0)", PrintRectCommand("receiver", -10, 20, (0, 0, 0),
+                    ("rect -10,+20 1000 2 rgb(0,0,0)", PrintRectCommand(controller, -10, 20, (0, 0, 0),
                                                                         DimensionsRectFactory, width=1000, height=2)),
                     ]
     for cli_input, expected in valid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
+        command = cli_parser.parse_input(cli_input)
         assert command == expected
 
 
@@ -342,9 +343,8 @@ def test_dot_parser():
 
     :return:
     """
-    cli_parser = CliParser()
-    command_parsers = [DotParser(StringParser(), PointParser(), NatParser(), IntParser(),
-                                 RgbColorParser(StringParser(), NatParser()))]
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
 
     # Test invalid inputs
     invalid_inputs = ["dot 10,-20", "dot +10,20", "dot 10.20", "dot 10 20",
@@ -357,18 +357,18 @@ def test_dot_parser():
                       "dot 10,20 rgb(2.0.1)", "dot 10,20 rgb(123)"
                       ]
     for cli_input in invalid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("receiver")
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
 
     # Test valid inputs
-    valid_inputs = [("dot 10,20", PrintDotCommand("receiver", 10, 20, (0, 0, 0))),
-                    ("dot -10,+20", PrintDotCommand("receiver", -10, +20, (0, 0, 0))),
-                    ("dot -5,-5", PrintDotCommand("receiver", -5, -5, (0, 0, 0))),
-                    ("dot 10,20 rgb(10,20,30)", PrintDotCommand("receiver", 10, 20, (10, 20, 30))),
-                    ("dot -10,-20 rgb(0,0,0)", PrintDotCommand("receiver", -10, -20, (0, 0, 0)))
+    valid_inputs = [("dot 10,20", PrintDotCommand(controller, 10, 20, (0, 0, 0))),
+                    ("dot -10,+20", PrintDotCommand(controller, -10, +20, (0, 0, 0))),
+                    ("dot -5,-5", PrintDotCommand(controller, -5, -5, (0, 0, 0))),
+                    ("dot 10,20 rgb(10,20,30)", PrintDotCommand(controller, 10, 20, (10, 20, 30))),
+                    ("dot -10,-20 rgb(0,0,0)", PrintDotCommand(controller, -10, -20, (0, 0, 0)))
                     ]
     for cli_input, expected in valid_inputs:
-        command = cli_parser.parse_input(command_parsers, cli_input)
+        command = cli_parser.parse_input(cli_input)
         assert command == expected
 
 
@@ -376,7 +376,8 @@ def test_points_conversion():
     """
     Test CommandParser's conversion of RelativeParserPoints to AbsoluteParserPoints.
     """
-    parser = CommandParser(StringParser())
+    controller: Controller = "receiver"
+    parser = CommandParser(controller)
 
     # Convert only RelativeParserPoints
     points_before_conversion = [RelativeParserPoint(-10, 20), RelativeParserPoint(10, -20), RelativeParserPoint(-5, -5)]
@@ -408,3 +409,7 @@ def test_points_conversion():
         assert False
     except AttributeError:
         assert True
+
+
+class ControllerMock(Controller):
+    ...

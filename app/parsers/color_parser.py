@@ -1,10 +1,10 @@
-from app.parsers.low_level_parsers import *
+import abc
+
+from app.parsers.low_level_parsers import StringParser, NatParser
+from app.parsers.parse_results import ParseResult, Success, Failure
 
 
 class ColorParser:
-    def __init__(self, string_parser: StringParser):
-        self.string_parser = string_parser
-
     @abc.abstractmethod
     def parse_color(self, cli_input: str) -> ParseResult:
         """
@@ -20,15 +20,14 @@ class RgbColorParser(ColorParser):
     """
     Parser for color in "rgb([0,255],[0,255],[0,255])" (RGB) format.
     """
-    def __init__(self, string_parser: StringParser, nat_parser: NatParser):
-        super().__init__(string_parser)
+    def __init__(self, nat_parser: NatParser):
         self.nat_parser = nat_parser
 
     def parse_color(self, cli_input: str) -> ParseResult:
         failure = Failure("rgb([0,255],[0,255],[0,255])", cli_input)
 
         # Parse prefix \"rgb(\"
-        prefix_parse_result = self.string_parser.parse_string("rgb", cli_input, "(")
+        prefix_parse_result = StringParser().parse_string("rgb", cli_input, "(")
         if not prefix_parse_result.is_successful():
             return failure
 

@@ -1,9 +1,12 @@
 import re
-from app.parsers.parse_results import *
+import abc
+
+from app.parsers.parse_results import ParseResult, Success, Failure
 
 
 class StringParser:
-    def parse_string(self, expected: str, cli_input: str, delimiter: str) -> ParseResult:
+    @staticmethod
+    def parse_string(expected: str, cli_input: str, delimiter: str) -> ParseResult:
         """
         Parse a word from the beginning of given input with given delimiter.
         If delimiter is empty, the given input needs to be equal to expected input.

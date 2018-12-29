@@ -1,21 +1,44 @@
-from app.parsers.command_parsers import *
+from app.parsers.command_parsers import CommandParser, RemoveShapeParser, ListParser, QuitParser, \
+    RectParser, CircleParser, DotParser, LineParser, InvalidCommand
+from app.controller import Controller
+from app.parsers.color_parser import ColorParser
+from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
+from app.parsers.point_parsers import PointParser
 
 
 class CliParser:
     """
     Command line input Parser.
     """
-    def parse_input(self, command_parsers: list, cli_input: str):
+    def __init__(self, controller: Controller, color_parser: ColorParser):
+        self.controller = controller
+        self.color_parser = color_parser
+        self.string_parser = StringParser()
+        self.point_parser = PointParser()
+        self.int_parser = IntParser()
+        self.nat_parser = NatParser()
+
+        # Command Parsers
+        self.command_parsers = [
+            RemoveShapeParser(controller),
+            ListParser(controller),
+            QuitParser(controller),
+            RectParser(controller, self.nat_parser, self.int_parser, self.color_parser),
+            CircleParser(controller, self.nat_parser, self.int_parser, self.color_parser),
+            DotParser(controller, self.nat_parser, self.int_parser, self.color_parser),
+            LineParser(controller, self.nat_parser, self.int_parser, self.color_parser)
+        ]
+
+    def parse_input(self, cli_input: str):
         """
         Parse given command line input.
         Parse a command using given CommandParsers. If successful, parse
         parameters from the rest of the input.
-        :param command_parsers: list of CommandParsers
         :param cli_input: the input from CLI
         :return: corresponding Command if parsing is successful,
         InvalidCommand otherwise
         """
-        for parser in command_parsers:
+        for parser in self.command_parsers:
             command_result = parser.parse_command(cli_input)
             if command_result.is_successful():
                 if parser.has_parameters():
@@ -24,7 +47,7 @@ class CliParser:
                     # TODO: kontrolovat, že command_result.get_remainder() == ''
                     return command_result.get_match()
 
-        return InvalidCommand("receiver")
+        return InvalidCommand(self.controller)
 
     def parse_params(self, command_parser: CommandParser, remainder: str):
         """
@@ -39,4 +62,4 @@ class CliParser:
         if params_result.is_successful():
             return params_result.get_match()
         else:
-            return InvalidCommand("receiver")
+            return InvalidCommand(self.controller)

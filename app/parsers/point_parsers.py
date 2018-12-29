@@ -1,26 +1,30 @@
-from app.parsers.low_level_parsers import *
+import abc
+
+from app.parsers.low_level_parsers import NatParser, IntParser, NumberParser
+from app.parsers.parse_results import ParseResult, Success, Failure
 
 
 class PointParser:
-    def parse_point(self, cli_input: str, nat_parser: NatParser, int_parser: IntParser):
+    @staticmethod
+    def parse_point(cli_input: str):
         """
         Parse either a relative point from input, e.g. '+10,-12' OR an absolute point
         from input, e.g. '10,20'.
         :param cli_input: string
-        :param nat_parser: NatParser
-        :param int_parser: IntParser
         :return Success(AbsoluteParserPoint or RelativeParserPoint, remainder) if input contains either valid
         absolute point or relative point, Failure(expected format, the given cli_input) otherwise
         """
+        nat_parser = NatParser()
+        int_parser = IntParser()
 
         # Parse absolute point from given input
-        abs_point_parse = self.parse_input(nat_parser, cli_input)
+        abs_point_parse = PointParser().parse_input(nat_parser, cli_input)
         if abs_point_parse.is_successful():
             abs_point = AbsoluteParserPoint(abs_point_parse.get_match()[0], abs_point_parse.get_match()[1])
             return Success(abs_point, abs_point_parse.get_remainder())
 
         # Parse relative point from given input
-        rel_point_parse = self.parse_input(int_parser, cli_input)
+        rel_point_parse = PointParser().parse_input(int_parser, cli_input)
         if rel_point_parse.is_successful():
             rel_point = RelativeParserPoint(rel_point_parse.get_match()[0], rel_point_parse.get_match()[1])
             return Success(rel_point, rel_point_parse.get_remainder())
@@ -28,7 +32,8 @@ class PointParser:
         # Both parsers has failed to parse a point, return the last result (a Failure object)
         return rel_point_parse
 
-    def parse_input(self, parser: NumberParser, cli_input: str) -> ParseResult:
+    @staticmethod
+    def parse_input(parser: NumberParser, cli_input: str) -> ParseResult:
         """ 
         Parse point from input using given NumberParser.
         :param parser: NumberParser
