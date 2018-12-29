@@ -143,8 +143,8 @@ class Rectangle(Shape):
 
 
 class Circle(Shape):
-    def __init__(self, middle: Point, radius: int, color: Color):
-        super().__init__(middle, color)
+    def __init__(self, center: Point, radius: int, color: Color):
+        super().__init__(center, color)
         self.radius = radius
 
     def print_to(self, printer):
