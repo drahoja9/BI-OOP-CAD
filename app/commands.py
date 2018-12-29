@@ -92,6 +92,9 @@ class PrintRectCommand(ShapeCommand):
         return (f'rect {self.shape.start.x},{self.shape.start.y} {self.shape.width} {self.shape.height}' +
                 super().__str__())
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class PrintCircleCommand(ShapeCommand):
     def __init__(self, receiver, start_x: int, start_y: int, color: Tuple[int, int, int],
@@ -101,6 +104,9 @@ class PrintCircleCommand(ShapeCommand):
 
     def __str__(self):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class RemoveShapeCommand(Command):

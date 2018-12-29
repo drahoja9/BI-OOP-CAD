@@ -24,7 +24,7 @@ class CliParser:
                     # TODO: kontrolovat, že command_result.get_remainder() == ''
                     return command_result.get_match()
 
-        return InvalidCommand("reciever")
+        return InvalidCommand("receiver")
 
     def parse_params(self, command_parser: CommandParser, remainder: str):
         """
@@ -39,4 +39,4 @@ class CliParser:
         if params_result.is_successful():
             return params_result.get_match()
         else:
-            return InvalidCommand("reciever")
+            return InvalidCommand("receiver")

@@ -223,15 +223,47 @@ def test_circle_parser():
                       ]
     for cli_input in invalid_inputs:
         command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("reciever")
+        assert command == InvalidCommand("receiver")
 
     # Test valid inputs, two points as parameters
-    valid_inputs = [("circle 10,20 30,40", PrintCircleCommand("receiver", 10, 20, 30, 40, (0, 0, 0))),
-                    ("circle 10,20 -10,-20", PrintCircleCommand("receiver", 10, 20, 0, 0, (0, 0, 0))),
-                    ("circle -5,-5 +5,+5", PrintCircleCommand("receiver", -5, -5, 0, 0, (0, 0, 0))),
-                    ("circle -5,-5 10,20", PrintCircleCommand("receiver", -5, -5, 10, 20, (0, 0, 0))),
-                    ("circle 10,20 30,40 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, 30, 40, (10, 20, 30))),
-                    ("circle 10,20 -10,-20 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, 0, 0, (0, 0, 0)))
+    valid_inputs = [("circle 10,20 30,40", PrintCircleCommand("receiver", 10, 20, (0, 0, 0), end_x=30, end_y=40)),
+                    ("circle 10,20 -10,-20", PrintCircleCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0)),
+                    ("circle -5,-5 +5,+5", PrintCircleCommand("receiver", -5, -5, (0, 0, 0), end_x=0, end_y=0)),
+                    ("circle -5,-5 10,20", PrintCircleCommand("receiver", -5, -5, (0, 0, 0), end_x=10, end_y=20)),
+                    ("circle 10,20 30,40 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, (10, 20, 30),
+                                                                            end_x=30, end_y=40)),
+                    ("circle 10,20 -10,-20 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+                                                                           end_x=0, end_y=0))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == expected
+
+    # Test invalid inputs, one point and one natural number (radius) as parameters
+    invalid_inputs = ["circle 10,20 30 40", "circle 10,20 +30", "circle 10,20 -30", "circle 10,20",
+                      "circle10,20 30", " circle 10,20 30", "circle 10,20  30", "circle 10,20   30",
+                      "circlee 10,20 30", "circle 10,20 something",
+                      "circle 10,20 30 rgb(0,0,-1)", "circle 10,20 30 rgb(0,0,0",
+                      "circle 10,20 30 rgb 0,0,0",
+                      "circle 10,20 30 rgb(0,1)", "circle 10,20 30rgb(0,1,2)",
+                      "circle 10,20 30   rgb(0,0,0)",
+                      "circle 10,20 30 rgb(1a,2,3)", "circle 10,20 30,rgb(0,2,3)",
+                      "circle 10,20 30 rgb(256,0,1)", "circle 10,20 30 rgb(2, 0,1)",
+                      "circle 10,20 30 rgb(2.0.1)", "circle 10,20 30 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == InvalidCommand("receiver")
+
+    # Test valid inputs, one point and one natural number (radius) as parameters
+    valid_inputs = [("circle 10,20 30", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+                                                           DimensionsCircleFactory, radius=30)),
+                    ("circle -5,-5 30", PrintCircleCommand("receiver", -5, -5, (0, 0, 0),
+                                                           DimensionsCircleFactory, radius=30)),
+                    ("circle 10,20 30 rgb(10,20,30)", PrintCircleCommand("receiver", 10, 20, (10, 20, 30),
+                                                                         DimensionsCircleFactory, radius=30)),
+                    ("circle 10,20 30 rgb(0,0,0)", PrintCircleCommand("receiver", 10, 20, (0, 0, 0),
+                                                                      DimensionsCircleFactory, radius=30))
                     ]
     for cli_input, expected in valid_inputs:
         command = cli_parser.parse_input(command_parsers, cli_input)
@@ -259,15 +291,46 @@ def test_rect_parser():
                       ]
     for cli_input in invalid_inputs:
         command = cli_parser.parse_input(command_parsers, cli_input)
-        assert command == InvalidCommand("reciever")
+        assert command == InvalidCommand("receiver")
 
     # Test valid inputs, two points as parameters
-    valid_inputs = [("rect 10,20 30,40", PrintRectCommand("receiver", 10, 20, 30, 40, (0, 0, 0))),
-                    ("rect 10,20 -10,-20", PrintRectCommand("receiver", 10, 20, 0, 0, (0, 0, 0))),
-                    ("rect -5,-5 +5,+5", PrintRectCommand("receiver", -5, -5, 0, 0, (0, 0, 0))),
-                    ("rect -5,-5 10,20", PrintRectCommand("receiver", -5, -5, 10, 20, (0, 0, 0))),
-                    ("rect 10,20 30,40 rgb(10,20,30)", PrintRectCommand("receiver", 10, 20, 30, 40, (10, 20, 30))),
-                    ("rect 10,20 -10,-20 rgb(0,0,0)", PrintRectCommand("receiver", 10, 20, 0, 0, (0, 0, 0)))
+    valid_inputs = [("rect 10,20 30,40", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=30, end_y=40)),
+                    ("rect 10,20 -10,-20", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0)),
+                    ("rect -5,-5 +5,+5", PrintRectCommand("receiver", -5, -5, (0, 0, 0), end_x=0, end_y=0)),
+                    ("rect -5,-5 10,20", PrintRectCommand("receiver", -5, -5, (0, 0, 0), end_x=10, end_y=20)),
+                    ("rect 10,20 30,40 rgb(10,20,30)", PrintRectCommand("receiver", 10, 20, (10, 20, 30),
+                                                                        end_x=30, end_y=40)),
+                    ("rect 10,20 -10,-20 rgb(0,0,0)", PrintRectCommand("receiver", 10, 20, (0, 0, 0), end_x=0, end_y=0))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == expected
+
+    # Test invalid inputs, one point and two natural numbers (width and height) as parameters
+    invalid_inputs = ["rect 10,-20 30 40", "rect 10,20 30 +40", "rect 10,20 -30 40", "rect 10 20 30 40",
+                      "rect10,20 30 40", " rect 10,20 30 40", "rect 10,20  30 40", "rect 10,20", "rect 10,20 30",
+                      "rectt 10,20 30 40", "rect 10,20 something", "rect 10,20 30 something",
+                      "rect 10,20 30 40 rgb(0,0,-1)", "rect 10,20 30 40 rgb(0,0,0", "rect 10,20 30 40 rgb 0,0,0",
+                      "rect 10,20 30 40 rgb(0,1)", "rect 10,20 30 40rgb(0,1,2)", "rect 10,20 30 40   rgb(0,0,0)",
+                      "rect 10,20 30 40 rgb(1a,2,3)", "rect 10,20 30 40,rgb(0,2,3)",
+                      "rect 10,20 30 40 rgb(256,0,1)", "rect 10,20 30 40 rgb(2, 0,1)",
+                      "rect 10,20 30 40 rgb(2.0.1)", "rect 10,20 30 40 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(command_parsers, cli_input)
+        assert command == InvalidCommand("receiver")
+
+    # Test valid inputs, one point and two natural numbers (width and height) as parameters
+    valid_inputs = [("rect 10,20 20 20", PrintRectCommand("receiver", 10, 20, (0, 0, 0),
+                                                          DimensionsRectFactory, width=20, height=20)),
+                    ("rect -10,-20 10 20", PrintRectCommand("receiver", -10, -20, (0, 0, 0),
+                                                            DimensionsRectFactory, width=10, height=20)),
+                    ("rect +10,+20 0 5", PrintRectCommand("receiver", 10, 20, (0, 0, 0),
+                                                          DimensionsRectFactory, width=0, height=5)),
+                    ("rect +10,-20 20 20 rgb(10,20,30)", PrintRectCommand("receiver", 10, -20, (10, 20, 30),
+                                                                          DimensionsRectFactory, width=20, height=20)),
+                    ("rect -10,+20 1000 2 rgb(0,0,0)", PrintRectCommand("receiver", -10, 20, (0, 0, 0),
+                                                                        DimensionsRectFactory, width=1000, height=2)),
                     ]
     for cli_input, expected in valid_inputs:
         command = cli_parser.parse_input(command_parsers, cli_input)
