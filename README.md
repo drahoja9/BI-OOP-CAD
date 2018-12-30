@@ -43,6 +43,16 @@ Run the app:
 ./run.py
 ```
 
+### Generating UI and/or resources
+
+#### Resources
+
+run `pyrcc5 .\app\ui\resources.qrc -o .\app\ui\resources.py` from root folder
+
+#### UI
+
+run `pyuic5 .\app\ui\main_window.ui -o .\app\ui\main_window.py` from root folder and change `import resources_rc` (at the bottom of the file) to `import app.ui.resources`
+
 ## Tests
 
 To run tests, just make sure you are inside the application's root directory and 
