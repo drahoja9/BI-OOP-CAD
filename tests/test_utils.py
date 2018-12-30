@@ -1,4 +1,8 @@
-from app.utils import Point, Singleton
+import math
+
+import pytest
+
+from app.utils import Point, Singleton, Color, distance
 
 
 class TestSingletonClass(metaclass=Singleton):
@@ -27,6 +31,42 @@ def test_point():
     assert str(p2) == '[-40, 0]'
 
 
+def test_color():
+    c1 = Color(255, 123, 0)
+    c2 = Color(255, 123, 0, 255)
+    c3 = Color(123, 255, 0)
+
+    assert c1.r == 255
+    assert c1.g == 123
+    assert c1.b == 0
+    assert c1.alpha == 255
+
+    def unpacking(r, g, b, alpha):
+        assert r == 255
+        assert g == 123
+        assert b == 0
+        assert alpha == 255
+
+    unpacking(*c1)
+    unpacking(*c2)
+
+    assert c1 == c2
+    assert c1 != c3
+    assert c2 != c3
+
+    assert str(c1) == str(c2) == 'Color(255, 123, 0, alpha=255)'
+    assert str(c3) == 'Color(123, 255, 0, alpha=255)'
+
+    with pytest.raises(ValueError):
+        c4 = Color(255, 255, 256)
+
+    with pytest.raises(ValueError):
+        c5 = Color(0, -1, 0)
+
+    with pytest.raises(ValueError):
+        c6 = Color(255, 255, 255, 256)
+
+
 def test_singleton():
     a = TestSingletonClass()
     b = TestSingletonClass()
@@ -39,3 +79,10 @@ def test_singleton():
     assert a.b == b.b == c.b == 123
 
     assert a == b == c
+
+
+def test_distance():
+    assert distance(Point(0, 0), Point(0, 0)) == 0
+    assert distance(Point(0, 0), Point(10, 0)) == 10
+    assert distance(Point(0, 0), Point(0, -100)) == 100
+    assert math.isclose(distance(Point(0, 0), Point(20, 20)), 28.284271247461902) is True

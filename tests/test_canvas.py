@@ -2,9 +2,10 @@ import pytest
 from PyQt5.QtCore import Qt
 
 from app.canvas import Canvas
-from app.brushes import LineBrush, RectBrush, DotBrush
+from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush, CircleShapeBrush
 from app.commands import Command, PrintDotCommand, PrintRectCommand
 from app.gui import MainWindow
+from app.shape_factory import PointsRectFactory
 
 
 class ControllerMockup:
@@ -51,11 +52,23 @@ def canvas(qtbot) -> Canvas:
 def test_set_brush(canvas: Canvas):
     assert canvas.brush is None
 
-    canvas.set_brush(LineBrush())
-    assert canvas.brush == LineBrush()
+    canvas.set_brush(LineShapeBrush())
+    assert canvas.brush.color == (0, 0, 0)
+    assert canvas.brush == LineShapeBrush()
 
-    canvas.set_brush(RectBrush())
-    assert canvas.brush == RectBrush()
+    canvas.set_color((10, 20, 30))
+    canvas.set_brush(RectShapeBrush())
+    assert canvas.brush.color == (10, 20, 30)
+    assert canvas.brush == RectShapeBrush()
+
+
+def test_set_color(canvas: Canvas):
+    assert canvas.color == (0, 0, 0)
+
+    canvas.set_brush(CircleShapeBrush())
+    canvas.set_color((100, 200, 100))
+    assert canvas.color == (100, 200, 100)
+    assert canvas.brush.color == (100, 200, 100)
 
 
 def test_pain_event(canvas: Canvas):
@@ -69,7 +82,7 @@ def test_mouse_move_event(canvas: Canvas):
     canvas.mouseMoveEvent(EventMockup)
     assert canvas._controller.command is None
 
-    canvas.set_brush(DotBrush())
+    canvas.set_brush(DotShapeBrush())
     canvas.mouseMoveEvent(EventMockup)
     assert (
         canvas._controller.command
@@ -84,16 +97,17 @@ def test_mouse_press_event(canvas: Canvas):
     canvas.mousePressEvent(EventMockup)
     assert canvas._controller.command is None
 
-    canvas.set_brush(RectBrush())
+    canvas.set_brush(RectShapeBrush())
     canvas.mousePressEvent(EventMockup)
     canvas.mousePressEvent(EventMockup)
     assert (
         canvas._controller.command
         ==
         PrintRectCommand(
-            canvas._controller,
-            EventMockup.x(), EventMockup.y(),
-            EventMockup.x(), EventMockup.y(),
-            (255, 255, 255)
+            receiver=canvas._controller,
+            start_x=EventMockup.x(), start_y=EventMockup.y(),
+            color=(0, 0, 0),
+            rect_factory=PointsRectFactory,
+            end_x=EventMockup.x(), end_y=EventMockup.y()
         )
     )

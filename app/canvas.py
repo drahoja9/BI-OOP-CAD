@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent
 
@@ -13,6 +15,7 @@ class Canvas(QtWidgets.QWidget):
         super().__init__()
         self._controller = controller
         self.brush = None
+        self.color = (0, 0, 0)
 
     def set_brush(self, brush: Brush = None):
         self.brush = brush
@@ -20,6 +23,12 @@ class Canvas(QtWidgets.QWidget):
             self.setMouseTracking(False)
         else:
             self.setMouseTracking(True)
+            self.brush.color = self.color
+
+    def set_color(self, color: Tuple[int, int, int]):
+        self.color = color
+        if self.brush is not None:
+            self.brush.color = color
 
     # -------------------------- QWidget overridden methods ----------------------------
 
