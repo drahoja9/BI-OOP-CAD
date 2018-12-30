@@ -49,14 +49,14 @@ Run the app:
 
 Run (from root folder):
 ```
-pyrcc5 .\app\ui\resources.qrc -o .\app\ui\resources.py
+pyrcc5 ./app/ui/resources.qrc -o ./app/ui/resources.py
 ```
 
 #### UI
 
 Run (from root folder):
 ```
-pyuic5 .\app\ui\main_window.ui -o .\app\ui\main_window.py
+pyuic5 ./app/ui/main_window.ui -o ./app/ui/main_window.py
 ``` 
 and change `import resources_rc` (at the bottom of the file) to `import app.ui.resources`.
 
