@@ -42,11 +42,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.dotButton.clicked.connect(
             lambda: self._toggle_brush(DotShapeBrush())
         )
-        self._ui.polylineButton.clicked.connect(
-            lambda: self._toggle_brush(PolylineShapeBrush())
-        )
         self._ui.lineButton.clicked.connect(
             lambda: self._toggle_brush(LineShapeBrush())
+        )
+        self._ui.polylineButton.clicked.connect(
+            lambda: self._toggle_brush(PolylineShapeBrush())
         )
         self._ui.rectagleButton.clicked.connect(
             lambda: self._toggle_brush(RectShapeBrush())
@@ -60,9 +60,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.colorButton.clicked.connect(
             lambda: self._handle_color_pick()
         )
+        self.brush_buttons = [
+            (self._ui.dotButton, DotShapeBrush()),
+            (self._ui.lineButton, LineShapeBrush()),
+            (self._ui.polylineButton, PolylineShapeBrush()),
+            (self._ui.rectagleButton, RectShapeBrush()),
+            (self._ui.circleButton, CircleShapeBrush()),
+            (self._ui.removeButton, RemoveShapeBrush())
+        ]
 
         self._ui.manualInput.returnPressed.connect(
-            lambda: self._manual_input_pressed()
+            lambda: self._handle_user_input()
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
@@ -74,6 +82,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
 
     def _toggle_brush(self, brush: Brush):
+        # Un-checking the previous brush button
+        [button.setChecked(False) for button, button_name in self.brush_buttons if self.canvas.brush == button_name]
+
         if self.canvas.brush != brush:
             self.canvas.set_brush(brush)
             self._set_status(str(brush))
@@ -95,7 +106,7 @@ class MainWindow(QtWidgets.QMainWindow):
         name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
         self._controller.save(name[0])
 
-    def _manual_input_pressed(self):
+    def _handle_user_input(self):
         command = self._ui.manualInput.text()
         self._ui.manualInput.setText('')
         print(command)

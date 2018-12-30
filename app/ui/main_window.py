@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\app\ui\main_window.ui'
+# Form implementation generated from reading ui file './app/ui/main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
@@ -34,6 +34,7 @@ class Ui_MainWindow(object):
         icon.addPixmap(QtGui.QPixmap(":/assets/dot.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.dotButton.setIcon(icon)
         self.dotButton.setIconSize(QtCore.QSize(32, 32))
+        self.dotButton.setCheckable(True)
         self.dotButton.setDefault(False)
         self.dotButton.setFlat(True)
         self.dotButton.setObjectName("dotButton")
@@ -51,6 +52,7 @@ class Ui_MainWindow(object):
         icon1.addPixmap(QtGui.QPixmap(":/assets/line.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.lineButton.setIcon(icon1)
         self.lineButton.setIconSize(QtCore.QSize(32, 32))
+        self.lineButton.setCheckable(True)
         self.lineButton.setDefault(False)
         self.lineButton.setFlat(True)
         self.lineButton.setObjectName("lineButton")
@@ -68,6 +70,7 @@ class Ui_MainWindow(object):
         icon2.addPixmap(QtGui.QPixmap(":/assets/polyline.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.polylineButton.setIcon(icon2)
         self.polylineButton.setIconSize(QtCore.QSize(32, 32))
+        self.polylineButton.setCheckable(True)
         self.polylineButton.setDefault(False)
         self.polylineButton.setFlat(True)
         self.polylineButton.setObjectName("polylineButton")
@@ -85,6 +88,7 @@ class Ui_MainWindow(object):
         icon3.addPixmap(QtGui.QPixmap(":/assets/circle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.circleButton.setIcon(icon3)
         self.circleButton.setIconSize(QtCore.QSize(32, 32))
+        self.circleButton.setCheckable(True)
         self.circleButton.setDefault(False)
         self.circleButton.setFlat(True)
         self.circleButton.setObjectName("circleButton")
@@ -103,6 +107,7 @@ class Ui_MainWindow(object):
         icon4.addPixmap(QtGui.QPixmap(":/assets/rectangle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.rectagleButton.setIcon(icon4)
         self.rectagleButton.setIconSize(QtCore.QSize(32, 32))
+        self.rectagleButton.setCheckable(True)
         self.rectagleButton.setDefault(False)
         self.rectagleButton.setFlat(True)
         self.rectagleButton.setObjectName("rectagleButton")
@@ -115,6 +120,7 @@ class Ui_MainWindow(object):
         icon5.addPixmap(QtGui.QPixmap(":/assets/remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.removeButton.setIcon(icon5)
         self.removeButton.setIconSize(QtCore.QSize(32, 32))
+        self.removeButton.setCheckable(True)
         self.removeButton.setFlat(True)
         self.removeButton.setObjectName("removeButton")
         self.brushes.addWidget(self.removeButton)
@@ -157,7 +163,7 @@ class Ui_MainWindow(object):
         self.canvasHolder.setWidgetResizable(True)
         self.canvasHolder.setObjectName("canvasHolder")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1042, 338))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1044, 336))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.canvasHolder.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayoutWidget = QtWidgets.QWidget(self.splitter)
@@ -177,7 +183,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.canvasAndInput)
         MainWindow.setCentralWidget(self.mainArea)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 28))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
