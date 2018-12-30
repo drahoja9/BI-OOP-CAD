@@ -5,5 +5,7 @@
     <file>assets/polyline.png</file>
     <file>assets/circle.png</file>
     <file>assets/rectangle.png</file>
+    <file>assets/remove.png</file>
+    <file>assets/color.png</file>
 </qresource>
 </RCC>

@@ -57,9 +57,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.removeButton.clicked.connect(
             lambda: self._toggle_brush(RemoveShapeBrush())
         )
-
         self._ui.colorButton.clicked.connect(
             lambda: self._handle_color_pick()
+        )
+
+        self._ui.manualInput.returnPressed.connect(
+            lambda: self._manual_input_pressed()
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
@@ -91,6 +94,11 @@ class MainWindow(QtWidgets.QMainWindow):
         user = getpass.getuser()
         name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
         self._controller.save(name[0])
+
+    def _manual_input_pressed(self):
+        command = self._ui.manualInput.text()
+        self._ui.manualInput.setText('')
+        print(command)
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)

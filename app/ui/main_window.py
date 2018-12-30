@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_window.ui'
+# Form implementation generated from reading ui file '.\app\ui\main_window.ui'
 #
 # Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-import app.ui.resources
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -33,7 +31,7 @@ class Ui_MainWindow(object):
         self.dotButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.dotButton.setStyleSheet("margin: 2px; padding: 10px")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("assets/dot.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/assets/dot.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.dotButton.setIcon(icon)
         self.dotButton.setIconSize(QtCore.QSize(32, 32))
         self.dotButton.setDefault(False)
@@ -50,7 +48,7 @@ class Ui_MainWindow(object):
         self.lineButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.lineButton.setStyleSheet("margin: 2px; padding: 10px")
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap("assets/line.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(":/assets/line.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.lineButton.setIcon(icon1)
         self.lineButton.setIconSize(QtCore.QSize(32, 32))
         self.lineButton.setDefault(False)
@@ -67,7 +65,7 @@ class Ui_MainWindow(object):
         self.polylineButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.polylineButton.setStyleSheet("margin: 2px; padding: 10px")
         icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap("assets/polyline.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon2.addPixmap(QtGui.QPixmap(":/assets/polyline.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.polylineButton.setIcon(icon2)
         self.polylineButton.setIconSize(QtCore.QSize(32, 32))
         self.polylineButton.setDefault(False)
@@ -84,7 +82,7 @@ class Ui_MainWindow(object):
         self.circleButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.circleButton.setStyleSheet("margin: 2px; padding: 10px")
         icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap("assets/circle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon3.addPixmap(QtGui.QPixmap(":/assets/circle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.circleButton.setIcon(icon3)
         self.circleButton.setIconSize(QtCore.QSize(32, 32))
         self.circleButton.setDefault(False)
@@ -102,7 +100,7 @@ class Ui_MainWindow(object):
         self.rectagleButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.rectagleButton.setStyleSheet("margin: 2px; padding: 10px")
         icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap("assets/rectangle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon4.addPixmap(QtGui.QPixmap(":/assets/rectangle.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.rectagleButton.setIcon(icon4)
         self.rectagleButton.setIconSize(QtCore.QSize(32, 32))
         self.rectagleButton.setDefault(False)
@@ -110,12 +108,23 @@ class Ui_MainWindow(object):
         self.rectagleButton.setObjectName("rectagleButton")
         self.brushes.addWidget(self.rectagleButton)
         self.removeButton = QtWidgets.QPushButton(self.mainArea)
+        self.removeButton.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.removeButton.setStyleSheet("margin: 2px; padding: 10px")
+        self.removeButton.setText("")
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/assets/remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.removeButton.setIcon(icon5)
+        self.removeButton.setIconSize(QtCore.QSize(32, 32))
+        self.removeButton.setFlat(True)
         self.removeButton.setObjectName("removeButton")
         self.brushes.addWidget(self.removeButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.brushes.addItem(spacerItem)
         self.colorButton = QtWidgets.QPushButton(self.mainArea)
         self.colorButton.setStyleSheet("background-color: rgb(0, 0, 0);")
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/assets/color.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.colorButton.setIcon(icon6)
         self.colorButton.setFlat(False)
         self.colorButton.setObjectName("colorButton")
         self.brushes.addWidget(self.colorButton)
@@ -134,7 +143,7 @@ class Ui_MainWindow(object):
         self.splitter.setMinimumSize(QtCore.QSize(0, 0))
         self.splitter.setOrientation(QtCore.Qt.Vertical)
         self.splitter.setOpaqueResize(True)
-        self.splitter.setHandleWidth(2)
+        self.splitter.setHandleWidth(3)
         self.splitter.setChildrenCollapsible(False)
         self.splitter.setObjectName("splitter")
         self.canvasHolder = QtWidgets.QScrollArea(self.splitter)
@@ -159,7 +168,7 @@ class Ui_MainWindow(object):
         self.historyHolder.setWidgetResizable(True)
         self.historyHolder.setObjectName("historyHolder")
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 1023, 131))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 1042, 112))
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -174,7 +183,7 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.history.sizePolicy().hasHeightForWidth())
         self.history.setSizePolicy(sizePolicy)
         self.history.setMinimumSize(QtCore.QSize(0, 0))
-        self.history.setAutoFillBackground(True)
+        self.history.setAutoFillBackground(False)
         self.history.setStyleSheet("background-color: white;")
         self.history.setText("")
         self.history.setTextFormat(QtCore.Qt.PlainText)
@@ -182,11 +191,30 @@ class Ui_MainWindow(object):
         self.history.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.history.setObjectName("history")
         self.historyHolder.setWidget(self.scrollAreaWidgetContents_2)
+        self.scrollArea = QtWidgets.QScrollArea(self.splitter)
+        self.scrollArea.setMinimumSize(QtCore.QSize(0, 20))
+        self.scrollArea.setMaximumSize(QtCore.QSize(1044, 20))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollAreaWidgetContents_3 = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents_3.setGeometry(QtCore.QRect(0, 0, 1042, 18))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.scrollAreaWidgetContents_3.sizePolicy().hasHeightForWidth())
+        self.scrollAreaWidgetContents_3.setSizePolicy(sizePolicy)
+        self.scrollAreaWidgetContents_3.setObjectName("scrollAreaWidgetContents_3")
+        self.manualInput = QtWidgets.QLineEdit(self.scrollAreaWidgetContents_3)
+        self.manualInput.setGeometry(QtCore.QRect(0, 0, 1042, 20))
+        self.manualInput.setMinimumSize(QtCore.QSize(0, 20))
+        self.manualInput.setMaximumSize(QtCore.QSize(16777215, 20))
+        self.manualInput.setObjectName("manualInput")
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents_3)
         self.canvasAndInput.addWidget(self.splitter)
         self.horizontalLayout.addLayout(self.canvasAndInput)
         MainWindow.setCentralWidget(self.mainArea)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 28))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1134, 21))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -231,7 +259,6 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "OOP CAD"))
         self.rectagleButton.setWhatsThis(_translate("MainWindow", "Rectangle"))
-        self.removeButton.setText(_translate("MainWindow", "Remove"))
         self.menuFile.setTitle(_translate("MainWindow", "Fi&le"))
         self.menuHelp.setTitle(_translate("MainWindow", "Help"))
         self.menuEdit.setTitle(_translate("MainWindow", "E&dit"))
@@ -248,3 +275,5 @@ class Ui_MainWindow(object):
         self.actionRedo.setShortcut(_translate("MainWindow", "Ctrl+Shift+Z"))
         self.actionSave.setText(_translate("MainWindow", "&Save"))
         self.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
+
+import app.ui.resources

@@ -589,6 +589,14 @@
     <string>Ctrl+S</string>
    </property>
   </action>
+  <action name="actionManualInput">
+   <property name="text">
+    <string>ManualInput</string>
+   </property>
+   <property name="toolTip">
+    <string>Manual Input</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resources.qrc"/>
