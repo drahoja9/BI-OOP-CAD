@@ -349,6 +349,9 @@
          <property name="cursor" stdset="0">
           <cursorShape>CrossCursor</cursorShape>
          </property>
+         <property name="styleSheet">
+          <string notr="true">margin: 10px;</string>
+         </property>
          <property name="widgetResizable">
           <bool>true</bool>
          </property>
@@ -357,8 +360,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1042</width>
-            <height>398</height>
+            <width>1022</width>
+            <height>378</height>
            </rect>
           </property>
          </widget>
@@ -373,6 +376,9 @@
          <property name="autoFillBackground">
           <bool>true</bool>
          </property>
+         <property name="styleSheet">
+          <string notr="true">border: none;</string>
+         </property>
          <property name="verticalScrollBarPolicy">
           <enum>Qt::ScrollBarAsNeeded</enum>
          </property>
@@ -384,8 +390,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1042</width>
-            <height>112</height>
+            <width>1044</width>
+            <height>137</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -394,104 +400,22 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <widget class="QLabel" name="history">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>10000</width>
-             <height>5000</height>
-            </rect>
-           </property>
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: white;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::PlainText</enum>
-           </property>
-           <property name="scaledContents">
-            <bool>false</bool>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-           </property>
-           <property name="margin">
-            <number>10</number>
-           </property>
-          </widget>
-         </widget>
-        </widget>
-        <widget class="QScrollArea" name="scrollArea">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>1044</width>
-           <height>20</height>
-          </size>
-         </property>
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="QWidget" name="scrollAreaWidgetContents_3">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>1042</width>
-            <height>18</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <widget class="QLineEdit" name="manualInput">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>1042</width>
-             <height>20</height>
-            </rect>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>20</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>20</height>
-            </size>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QTextBrowser" name="history">
+             <property name="styleSheet">
+              <string notr="true">border: 1px solid black;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="manualInput">
+             <property name="styleSheet">
+              <string notr="true">border: 1px solid black;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
        </widget>
@@ -587,6 +511,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionManualInput">
+   <property name="text">
+    <string>ManualInput</string>
+   </property>
+   <property name="toolTip">
+    <string>Manual Input</string>
    </property>
   </action>
  </widget>

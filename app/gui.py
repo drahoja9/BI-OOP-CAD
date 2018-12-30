@@ -1,7 +1,7 @@
 import getpass
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QTextCursor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
 from app.ui.main_window import Ui_MainWindow
@@ -113,14 +113,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.actionRedo.setEnabled(False)
 
     def print_newline_to_history(self, line: str):
-        history = self._ui.history.text()
-        self._ui.history.setText(history + line + '\n')
+        self._ui.history.append(line)
 
     def delete_from_history(self, number_of_lines: int = 1):
-        history = self._ui.history.text()
-        # Subtracting 1 from `number of lines` as the last line is always empty (there's always `\n` at the end)
-        history = history.split('\n')[:(-number_of_lines - 1)]
+        history = self._ui.history.toPlainText()
+        history = history.split('\n')[:(-number_of_lines)]
         history = '\n'.join(history)
-        if history:
-            history += '\n'
         self._ui.history.setText(history)
+        self._ui.history.moveCursor(QTextCursor.End)
+        self._ui.history.ensureCursorVisible()
