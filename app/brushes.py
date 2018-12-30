@@ -92,11 +92,17 @@ class DotShapeBrush(ShapeBrush):
     #     self._dot_command(controller, x, y)
     #     self._start = None
 
+    def __str__(self) -> str:
+        return 'Dot'
+
 
 class LineShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintLineCommand
+
+    def __str__(self) -> str:
+        return 'Line'
 
 
 class PolylineShapeBrush(ShapeBrush):
@@ -129,17 +135,26 @@ class PolylineShapeBrush(ShapeBrush):
             controller.execute_command(shape_command)
             self._points = []
 
+    def __str__(self) -> str:
+        return 'Polyline'
+
 
 class RectShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintRectCommand
 
+    def __str__(self) -> str:
+        return 'Rectangle'
+
 
 class CircleShapeBrush(ShapeBrush):
     def __init__(self):
         super().__init__()
         self._shape_command_class = PrintCircleCommand
+
+    def __str__(self) -> str:
+        return 'Circle'
 
 
 class RemoveShapeBrush(Brush):
@@ -149,3 +164,6 @@ class RemoveShapeBrush(Brush):
     def mouse_press(self, controller, x: int, y: int, button):
         command = RemoveShapeCommand(controller, x, y)
         controller.execute_command(command)
+
+    def __str__(self) -> str:
+        return 'Remove'

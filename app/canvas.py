@@ -14,22 +14,21 @@ class Canvas(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
         self._controller = controller
-        self._brush = None
+        self.brush = None
         self.color = (0, 0, 0)
 
-    def set_brush(self, brush: Brush):
-        if self._brush != brush:
-            self._brush = brush
-            self._brush.color = self.color
-            self.setMouseTracking(True)
-        else:
-            self._brush = None
+    def set_brush(self, brush: Brush = None):
+        self.brush = brush
+        if brush is None:
             self.setMouseTracking(False)
+        else:
+            self.setMouseTracking(True)
+            self.brush.color = self.color
 
     def set_color(self, color: Tuple[int, int, int]):
         self.color = color
-        if self._brush is not None:
-            self._brush.color = color
+        if self.brush is not None:
+            self.brush.color = color
 
     # -------------------------- QWidget overridden methods ----------------------------
 
@@ -41,9 +40,9 @@ class Canvas(QtWidgets.QWidget):
 
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
-        if self._brush is not None:
-            self._brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
+        if self.brush is not None:
+            self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
-        if self._brush is not None:
-            self._brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
+        if self.brush is not None:
+            self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
