@@ -68,9 +68,11 @@ def test_remove_last_command(command_engine: CommandEngine):
 
     command_engine.remove_last_command()
     assert command_engine._undos == [c1]
+    assert command_engine._controller.undo is True
 
     command_engine.remove_last_command()
     assert command_engine._undos == []
+    assert command_engine._controller.undo is False
 
 
 def test_undo(command_engine: CommandEngine):
