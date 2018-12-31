@@ -1,13 +1,13 @@
 import getpass
 
 from PyQt5 import QtWidgets
-from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QColor, QTextCursor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
-    RemoveShapeBrush
+    RemoveShapeBrush, Brush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -18,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initializing the whole UI
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
+        self._set_status()
 
         self.canvas = Canvas(controller)
 
@@ -39,29 +40,57 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Setting specific brush for canvas after clicking on one of the tool buttons
         self._ui.dotButton.clicked.connect(
-            lambda: self.canvas.set_brush(DotShapeBrush())
-        )
-        self._ui.polylineButton.clicked.connect(
-            lambda: self.canvas.set_brush(PolylineShapeBrush())
+            lambda: self._toggle_brush(DotShapeBrush())
         )
         self._ui.lineButton.clicked.connect(
-            lambda: self.canvas.set_brush(LineShapeBrush())
+            lambda: self._toggle_brush(LineShapeBrush())
+        )
+        self._ui.polylineButton.clicked.connect(
+            lambda: self._toggle_brush(PolylineShapeBrush())
         )
         self._ui.rectagleButton.clicked.connect(
-            lambda: self.canvas.set_brush(RectShapeBrush())
+            lambda: self._toggle_brush(RectShapeBrush())
         )
         self._ui.circleButton.clicked.connect(
-            lambda: self.canvas.set_brush(CircleShapeBrush())
+            lambda: self._toggle_brush(CircleShapeBrush())
         )
         self._ui.removeButton.clicked.connect(
-            lambda: self.canvas.set_brush(RemoveShapeBrush())
+            lambda: self._toggle_brush(RemoveShapeBrush())
         )
-
         self._ui.colorButton.clicked.connect(
             lambda: self._handle_color_pick()
         )
+        self.brush_buttons = [
+            (self._ui.dotButton, DotShapeBrush()),
+            (self._ui.lineButton, LineShapeBrush()),
+            (self._ui.polylineButton, PolylineShapeBrush()),
+            (self._ui.rectagleButton, RectShapeBrush()),
+            (self._ui.circleButton, CircleShapeBrush()),
+            (self._ui.removeButton, RemoveShapeBrush())
+        ]
+
+        self._ui.manualInput.returnPressed.connect(
+            lambda: self._handle_user_input()
+        )
 
         self._ui.canvasHolder.setWidget(self.canvas)
+
+    def _handle_new_action(self):
+        self._controller.restart()
+
+    def _set_status(self, message: str = 'No tool'):
+        self.statusBar().showMessage(message)
+
+    def _toggle_brush(self, brush: Brush):
+        # Un-checking the previous brush button
+        [button.setChecked(False) for button, button_name in self.brush_buttons if self.canvas.brush == button_name]
+
+        if self.canvas.brush != brush:
+            self.canvas.set_brush(brush)
+            self._set_status(str(brush))
+        else:
+            self.canvas.set_brush()
+            self._set_status()
 
     def _handle_color_pick(self):
         # Color picker will popup and returns chosen color
@@ -77,6 +106,11 @@ class MainWindow(QtWidgets.QMainWindow):
         name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
         self._controller.save(name[0])
 
+    def _handle_user_input(self):
+        command = self._ui.manualInput.text()
+        self._ui.manualInput.setText('')
+        print(command)
+
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)
 
@@ -90,17 +124,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.actionRedo.setEnabled(False)
 
     def print_newline_to_history(self, line: str):
-        history = self._ui.history.text()
-        self._ui.history.setText(history + line + '\n')
+        self._ui.history.append(line)
 
     def delete_from_history(self, number_of_lines: int = 1):
-        history = self._ui.history.text()
-        # Subtracting 1 from `number of lines` as the last line is always empty (there's always `\n` at the end)
-        history = history.split('\n')[:(-number_of_lines - 1)]
+        history = self._ui.history.toPlainText()
+        history = history.split('\n')[:(-number_of_lines)]
         history = '\n'.join(history)
-        if history:
-            history += '\n'
         self._ui.history.setText(history)
+        self._ui.history.moveCursor(QTextCursor.End)
+        self._ui.history.ensureCursorVisible()
 
     def clear_history(self):
         self._ui.history.setText('')
