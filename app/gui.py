@@ -60,14 +60,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.colorButton.clicked.connect(
             lambda: self._handle_color_pick()
         )
-        self.brush_buttons = [
-            (self._ui.dotButton, DotShapeBrush()),
-            (self._ui.lineButton, LineShapeBrush()),
-            (self._ui.polylineButton, PolylineShapeBrush()),
-            (self._ui.rectagleButton, RectShapeBrush()),
-            (self._ui.circleButton, CircleShapeBrush()),
-            (self._ui.removeButton, RemoveShapeBrush())
-        ]
+        self.brush_buttons = {
+            DotShapeBrush(): self._ui.dotButton,
+            LineShapeBrush(): self._ui.lineButton,
+            PolylineShapeBrush(): self._ui.polylineButton,
+            RectShapeBrush(): self._ui.rectagleButton,
+            CircleShapeBrush(): self._ui.circleButton,
+            RemoveShapeBrush(): self._ui.removeButton
+        }
 
         self._ui.manualInput.returnPressed.connect(
             lambda: self._handle_user_input()
@@ -82,8 +82,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.statusBar().showMessage(message)
 
     def _toggle_brush(self, brush: Brush):
-        # Un-checking the previous brush button
-        [button.setChecked(False) for button, button_name in self.brush_buttons if self.canvas.brush == button_name]
+        if self.canvas.brush:
+            # Un-checking the previous brush button
+            previous_brush_button = self.brush_buttons[self.canvas.brush]
+            previous_brush_button.setChecked(False)
 
         if self.canvas.brush != brush:
             self.canvas.set_brush(brush)
@@ -103,13 +105,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def _handle_file_save(self):
         # Save file dialog will open and returns tuple (name of the saved file, type)
         user = getpass.getuser()
-        name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
-        self._controller.save(name[0])
+        name, _ = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
+        self._controller.save(name)
 
-    def _handle_user_input(self):
+    def _handle_user_input(self) -> str:
         command = self._ui.manualInput.text()
         self._ui.manualInput.setText('')
         print(command)
+        return command
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)
@@ -128,7 +131,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def delete_from_history(self, number_of_lines: int = 1):
         history = self._ui.history.toPlainText()
-        history = history.split('\n')[:(-number_of_lines)]
+        history = history.split('\n')
+
+        if number_of_lines > len(history):
+            raise ValueError
+
+        history = history[:(-number_of_lines)]
         history = '\n'.join(history)
         self._ui.history.setText(history)
         self._ui.history.moveCursor(QTextCursor.End)

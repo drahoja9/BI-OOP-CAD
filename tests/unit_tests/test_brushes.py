@@ -58,6 +58,7 @@ def test_dot_brush(controller: ControllerMockup):
     b1 = DotShapeBrush()
     b2 = DotShapeBrush()
     assert b1 == b2
+    assert str(b1) == str(b2) == 'Dot'
 
     b1.mouse_move(controller, 10, 20, Qt.LeftButton)
     assert controller.command == PrintDotCommand(receiver=controller, x=10, y=20, color=(0, 0, 0))
@@ -70,6 +71,7 @@ def test_polyline_brush(controller: ControllerMockup):
     b1 = PolylineShapeBrush()
     b2 = PolylineShapeBrush()
     assert b1 == b2
+    assert str(b1) == str(b2) == 'Polyline'
 
     b1.mouse_move(controller, 10, 20, None)
     assert controller.command is None
@@ -99,20 +101,22 @@ def test_polyline_brush(controller: ControllerMockup):
     assert controller.preview is None
 
 
-@pytest.mark.parametrize('brush_class, shape_command_class', [
-    (LineShapeBrush, PrintLineCommand),
-    (RectShapeBrush, PrintRectCommand),
-    (CircleShapeBrush, PrintCircleCommand)
+@pytest.mark.parametrize('brush_class, shape_command_class, shape_name', [
+    (LineShapeBrush, PrintLineCommand, 'Line'),
+    (RectShapeBrush, PrintRectCommand, 'Rectangle'),
+    (CircleShapeBrush, PrintCircleCommand, 'Circle')
 ])
 def test_shape_brush(
     controller: ControllerMockup,
     brush_class: Type[ShapeBrush],
-    shape_command_class: Type[ShapeCommand]
+    shape_command_class: Type[ShapeCommand],
+    shape_name: str
 ):
     b1 = brush_class()
     b2 = brush_class()
     assert b1 == b2
     assert b1._shape_command_class == b2._shape_command_class == shape_command_class
+    assert str(b1) == str(b2) == shape_name
 
     shape_command = shape_command_class(
         receiver=controller,
@@ -138,7 +142,10 @@ def test_shape_brush(
 
 
 def test_remove_shape_brush(controller: ControllerMockup):
-    brush = RemoveShapeBrush()
+    b1 = RemoveShapeBrush()
+    b2 = RemoveShapeBrush()
+    assert b1 == b2
+    assert str(b1) == str(b2) == 'Remove'
 
-    brush.mouse_press(controller, 10, 10, None)
+    b1.mouse_press(controller, 10, 10, None)
     assert controller.command == RemoveShapeCommand(receiver=controller, x=10, y=10)

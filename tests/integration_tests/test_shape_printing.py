@@ -69,12 +69,12 @@ def test_shape_printing(controller: Controller, shape_commands, stream: io.Strin
     for command in shape_commands:
         controller.execute_command(command)
 
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
         f' > {shape_commands[1]}\n{shapes["line"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
         f' > {shape_commands[3]}\n{shapes["rectangle"]}\n'
-        f' > {shape_commands[4]}\n{shapes["circle"]}\n'
+        f' > {shape_commands[4]}\n{shapes["circle"]}'
     )
     assert controller._command_engine._undos == [
         shape_commands[0],
@@ -115,7 +115,7 @@ def test_undo_redo(controller: Controller, shape_commands, stream: io.StringIO, 
     assert controller._shapes._shapes == []
     assert controller._gui._ui.actionUndo.isEnabled() is False
     assert controller._gui._ui.actionRedo.isEnabled() is True
-    assert controller._gui._ui.history.text() == ''
+    assert controller._gui._ui.history.toPlainText() == ''
     res = (
         f'{shapes["dot"]}\n'
         f'{shapes["dot"]}\n{shapes["line"]}\n'
@@ -146,9 +146,9 @@ def test_undo_redo(controller: Controller, shape_commands, stream: io.StringIO, 
     ]
     assert controller._gui._ui.actionUndo.isEnabled() is True
     assert controller._gui._ui.actionRedo.isEnabled() is True
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
-        f' > {shape_commands[1]}\n{shapes["line"]}\n'
+        f' > {shape_commands[1]}\n{shapes["line"]}'
     )
     res = (
         f'{shapes["dot"]}\n'
@@ -179,10 +179,10 @@ def test_undo_redo(controller: Controller, shape_commands, stream: io.StringIO, 
     ]
     assert controller._gui._ui.actionUndo.isEnabled() is True
     assert controller._gui._ui.actionRedo.isEnabled() is False
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
         f' > {shape_commands[1]}\n{shapes["line"]}\n'
-        f' > {shape_commands[0]}\n{shapes["dot"]}\n'
+        f' > {shape_commands[0]}\n{shapes["dot"]}'
     )
     res = (
         f'{shapes["dot"]}\n'
@@ -218,14 +218,14 @@ def test_remove_shapes(controller: Controller, shape_commands, commands, stream:
         shape_commands[2],
         commands[0]
     ]
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
         f' > {shape_commands[1]}\n{shapes["line"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
         f' > {shape_commands[3]}\n{shapes["rectangle"]}\n'
         f' > {shape_commands[4]}\n{shapes["circle"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
-        f' > {commands[0]}\n'
+        f' > {commands[0]}'
     )
     res = (
         f'{shapes["dot"]}\n'
@@ -250,14 +250,14 @@ def test_remove_shapes(controller: Controller, shape_commands, commands, stream:
         shape_commands[2],
         commands[0]
     ]
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
         f' > {shape_commands[1]}\n{shapes["line"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
         f' > {shape_commands[3]}\n{shapes["rectangle"]}\n'
         f' > {shape_commands[4]}\n{shapes["circle"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
-        f' > {commands[0]}\n'
+        f' > {commands[0]}'
     )
     res = (
         f'{shapes["dot"]}\n'
@@ -273,13 +273,13 @@ def test_remove_shapes(controller: Controller, shape_commands, commands, stream:
 
     controller.undo()
     assert controller._shapes._shapes == [*shapes.values(), shapes['polyline']]
-    assert controller._gui._ui.history.text() == (
+    assert controller._gui._ui.history.toPlainText() == (
         f' > {shape_commands[0]}\n{shapes["dot"]}\n'
         f' > {shape_commands[1]}\n{shapes["line"]}\n'
         f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
         f' > {shape_commands[3]}\n{shapes["rectangle"]}\n'
         f' > {shape_commands[4]}\n{shapes["circle"]}\n'
-        f' > {shape_commands[2]}\n{shapes["polyline"]}\n'
+        f' > {shape_commands[2]}\n{shapes["polyline"]}'
     )
     res = (
         f'{shapes["dot"]}\n'
