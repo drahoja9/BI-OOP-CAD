@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QEvent, Qt
 
 from app.brushes import Brush
 
@@ -21,8 +21,10 @@ class Canvas(QtWidgets.QWidget):
         self.brush = brush
         if brush is None:
             self.setMouseTracking(False)
+            self.setCursor(Qt.ArrowCursor)
         else:
             self.setMouseTracking(True)
+            self.setCursor(Qt.CrossCursor)
             self.brush.color = self.color
 
     def set_color(self, color: Tuple[int, int, int]):

@@ -51,15 +51,26 @@ def canvas(qtbot) -> Canvas:
 
 def test_set_brush(canvas: Canvas):
     assert canvas.brush is None
+    assert canvas.hasMouseTracking() is False
+    assert canvas.cursor() == Qt.ArrowCursor
 
     canvas.set_brush(LineShapeBrush())
     assert canvas.brush.color == (0, 0, 0)
     assert canvas.brush == LineShapeBrush()
+    assert canvas.hasMouseTracking() is True
+    assert canvas.cursor() == Qt.CrossCursor
 
     canvas.set_color((10, 20, 30))
     canvas.set_brush(RectShapeBrush())
     assert canvas.brush.color == (10, 20, 30)
     assert canvas.brush == RectShapeBrush()
+    assert canvas.hasMouseTracking() is True
+    assert canvas.cursor() == Qt.CrossCursor
+
+    canvas.set_brush(None)
+    assert canvas.brush is None
+    assert canvas.hasMouseTracking() is False
+    assert canvas.cursor() == Qt.ArrowCursor
 
 
 def test_set_color(canvas: Canvas):
