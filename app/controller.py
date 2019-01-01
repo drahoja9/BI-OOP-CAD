@@ -56,12 +56,12 @@ class Controller:
     def delete_from_history(self, number_of_lines: int = 1):
         self._gui.delete_from_history(number_of_lines)
 
-    def list_shapes(self, point: Point = None) -> List[Shape]:
-        stream = io.StringIO()
-        printed = self.print_all_shapes(StreamTextPrinter(stream), point)
-        # Ignoring the last newline `\n`
-        self._gui.print_newline_to_history(stream.getvalue()[:-1])
-        return printed
+    def shapes_at(self, point: Point) -> List[Shape]:
+        return self._shapes.shapes_at(point)
+
+    def print_shapes_to_history(self, point: Point):
+        for shape in self.shapes_at(point):
+            self._gui.print_newline_to_history(str(shape))
 
     def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
         return self._shapes.print_all(printer or self._printer, point)

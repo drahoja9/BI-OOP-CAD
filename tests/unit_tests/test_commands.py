@@ -37,7 +37,7 @@ class ReceiverMockup:
         self.moved = res['moved']
         return res
 
-    def list_shapes(self, point: Point = None):
+    def print_shapes_to_history(self, point: Point = None):
         to_list = []
         for shape in self.shapes:
             if point and shape.contains(point):

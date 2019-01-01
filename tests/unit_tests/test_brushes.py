@@ -1,5 +1,5 @@
 import copy
-from typing import Type
+from typing import Type, List
 
 import pytest
 from PyQt5.QtCore import Qt
@@ -8,8 +8,8 @@ from app.brushes import ShapeBrush, DotShapeBrush, LineShapeBrush, RectShapeBrus
     Brush, RemoveShapeBrush, MoveShapeBrush
 from app.commands import PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, Command, ShapeCommand, \
     PrintPolylineCommand, RemoveShapeCommand, MoveShapeCommand
-from app.shapes import Shape
-from app.utils import Color
+from app.shapes import Shape, Line, Rectangle
+from app.utils import Color, Point
 
 
 class ControllerMockup:
@@ -25,6 +25,10 @@ class ControllerMockup:
 
     def end_preview(self):
         self.preview = None
+
+    def shapes_at(self, point: Point) -> List[Shape]:
+        shapes = [Line(Point(0, 0), Point(0, 10), Color(10, 20, 30)), Rectangle(Point(0, 5), 10, 10, Color(0, 0, 0))]
+        return [shape for shape in shapes if shape.contains(point)]
 
 
 @pytest.fixture
@@ -150,8 +154,15 @@ def test_move_shape_brush(controller: ControllerMockup):
     assert b1 == b2
     assert str(b1) == str(b2) == 'Move'
 
+    b1.mouse_move(controller, -1, 0, None)
+    assert b1.cursor == Qt.ArrowCursor
+
+    b1.mouse_move(controller, 0, 5, None)
+    assert b1.cursor == Qt.OpenHandCursor
+
     b1.mouse_press(controller, 0, 0, Qt.LeftButton)
     assert controller.command is None
+    assert b1.cursor == Qt.ClosedHandCursor
 
     b1.mouse_press(controller, 10, 10, Qt.LeftButton)
     assert controller.command == MoveShapeCommand(
@@ -160,6 +171,7 @@ def test_move_shape_brush(controller: ControllerMockup):
         end_x=10, end_y=10
     )
     assert b1._start is None
+    assert b1.cursor == Qt.OpenHandCursor
 
 
 def test_remove_shape_brush(controller: ControllerMockup):
@@ -167,6 +179,12 @@ def test_remove_shape_brush(controller: ControllerMockup):
     b2 = RemoveShapeBrush()
     assert b1 == b2
     assert str(b1) == str(b2) == 'Remove'
+
+    b1.mouse_move(controller, 1, 0, None)
+    assert b1.cursor == Qt.ArrowCursor
+
+    b1.mouse_move(controller, 0, 5, None)
+    assert b1.cursor == Qt.PointingHandCursor
 
     b1.mouse_press(controller, 10, 10, Qt.LeftButton)
     assert controller.command == RemoveShapeCommand(receiver=controller, x=10, y=10)

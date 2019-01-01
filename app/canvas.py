@@ -39,6 +39,7 @@ class Canvas(QtWidgets.QWidget):
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
+        self.setCursor(self.brush.cursor)
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
         self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())

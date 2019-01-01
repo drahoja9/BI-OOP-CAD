@@ -58,6 +58,14 @@ def test_is_empty(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store.is_empty() is False
 
 
+def test_shapes_at(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
+    assert shapes_store.shapes_at() == []
+
+    shapes_store.add_shapes(*shapes.values())
+    assert shapes_store.shapes_at(Point(0, 0)) == [shapes['rectangle']]
+    assert shapes_store.shapes_at() == [*shapes.values()]
+
+
 def test_print_all(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     shapes_store.add_shapes(*shapes.values())
     shapes_store.set_preview(shapes['rectangle'])

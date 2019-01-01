@@ -166,7 +166,7 @@ class ListShapeCommand(Command):
             self.point = None
 
     def execute(self):
-        self.listed = self.receiver.list_shapes(self.point)
+        self.listed = self.receiver.print_shapes_to_history(self.point)
 
     def reverse(self):
         if self.listed:

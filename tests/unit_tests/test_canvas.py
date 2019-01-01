@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 from PyQt5.QtCore import Qt
 
@@ -6,6 +8,8 @@ from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush, CircleSha
 from app.commands import Command, PrintDotCommand, PrintRectCommand
 from app.gui import MainWindow
 from app.shape_factory import PointsRectFactory
+from app.shapes import Shape, Line, Rectangle
+from app.utils import Point, Color
 
 
 class ControllerMockup:
@@ -21,6 +25,9 @@ class ControllerMockup:
 
     def end_preview(self):
         pass
+
+    def shapes_at(self, point: Point) -> List[Shape]:
+        return [Line(Point(0, 0), Point(0, 10), Color(10, 20, 30)), Rectangle(Point(0, 5), 10, 10, Color(0, 0, 0))]
 
 
 class EventMockup:
@@ -52,7 +59,7 @@ def canvas(qtbot) -> Canvas:
 
 def test_set_brush(canvas: Canvas):
     assert canvas.brush == MoveShapeBrush()
-    assert canvas.cursor() == Qt.OpenHandCursor
+    assert canvas.cursor() == Qt.ArrowCursor
 
     canvas.set_brush(LineShapeBrush())
     assert canvas.brush.color == (255, 255, 255)
@@ -67,7 +74,7 @@ def test_set_brush(canvas: Canvas):
 
     canvas.set_brush()
     assert canvas.brush == MoveShapeBrush()
-    assert canvas.cursor() == Qt.OpenHandCursor
+    assert canvas.cursor() == Qt.ArrowCursor
 
 
 def test_set_color(canvas: Canvas):
@@ -86,6 +93,7 @@ def test_pain_event(canvas: Canvas):
 
 def test_mouse_move_event(canvas: Canvas):
     assert canvas.brush == MoveShapeBrush()
+    assert canvas.cursor() == Qt.ArrowCursor
 
     canvas.mouseMoveEvent(EventMockup)
     assert (
@@ -100,10 +108,12 @@ def test_mouse_move_event(canvas: Canvas):
         ==
         PrintDotCommand(canvas._controller, EventMockup.x(), EventMockup.y(), (255, 255, 255))
     )
+    assert canvas.cursor() == Qt.CrossCursor
 
 
 def test_mouse_press_event(canvas: Canvas):
     assert canvas.brush == MoveShapeBrush()
+    assert canvas.cursor() == Qt.ArrowCursor
 
     canvas.mousePressEvent(EventMockup)
     assert canvas._controller.command is None
