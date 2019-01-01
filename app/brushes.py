@@ -3,8 +3,8 @@ import math
 from PyQt5.QtCore import Qt
 
 from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand, \
-    RemoveShapeCommand
-from app.utils import Singleton
+    RemoveShapeCommand, MoveShapeCommand
+from app.utils import Singleton, Point
 
 
 class Brush(metaclass=Singleton):
@@ -92,7 +92,7 @@ class DotShapeBrush(ShapeBrush):
     #     self._dot_command(controller, x, y)
     #     self._start = None
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Dot'
 
 
@@ -101,7 +101,7 @@ class LineShapeBrush(ShapeBrush):
         super().__init__()
         self._shape_command_class = PrintLineCommand
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Line'
 
 
@@ -135,7 +135,7 @@ class PolylineShapeBrush(ShapeBrush):
             controller.execute_command(shape_command)
             self._points = []
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Polyline'
 
 
@@ -144,7 +144,7 @@ class RectShapeBrush(ShapeBrush):
         super().__init__()
         self._shape_command_class = PrintRectCommand
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Rectangle'
 
 
@@ -153,8 +153,33 @@ class CircleShapeBrush(ShapeBrush):
         super().__init__()
         self._shape_command_class = PrintCircleCommand
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Circle'
+
+
+class MoveShapeBrush(Brush):
+    def __init__(self):
+        super().__init__()
+        self._start = None
+
+    def mouse_move(self, controller, x: int, y: int, button):
+        pass
+
+    def mouse_press(self, controller, x: int, y: int, button):
+        if self._start is None:
+            self._start = (x, y)
+        else:
+            command = MoveShapeCommand(
+                controller,
+                start_x=self._start[0], start_y=self._start[1],
+                end_x=x, end_y=y
+            )
+            controller.end_preview()
+            controller.execute_command(command)
+            self._start = None
+
+    def __str__(self):
+        return 'Move'
 
 
 class RemoveShapeBrush(Brush):
@@ -165,5 +190,5 @@ class RemoveShapeBrush(Brush):
         command = RemoveShapeCommand(controller, x, y)
         controller.execute_command(command)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return 'Remove'

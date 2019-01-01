@@ -3,7 +3,7 @@ from typing import Tuple
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QEvent
 
-from app.brushes import Brush
+from app.brushes import Brush, MoveShapeBrush, RemoveShapeBrush
 
 
 class Canvas(QtWidgets.QWidget):
@@ -14,21 +14,17 @@ class Canvas(QtWidgets.QWidget):
     def __init__(self, controller):
         super().__init__()
         self._controller = controller
-        self.brush = None
-        self.color = (0, 0, 0)
+        self.brush = MoveShapeBrush()
+        self.color = (255, 255, 255)
 
-    def set_brush(self, brush: Brush = None):
+    def set_brush(self, brush: Brush = MoveShapeBrush()):
         self.brush = brush
-        if brush is None:
-            self.setMouseTracking(False)
-        else:
-            self.setMouseTracking(True)
-            self.brush.color = self.color
+        self.brush.color = self.color
+        self.setMouseTracking(brush != RemoveShapeBrush())
 
     def set_color(self, color: Tuple[int, int, int]):
         self.color = color
-        if self.brush is not None:
-            self.brush.color = color
+        self.brush.color = color
 
     # -------------------------- QWidget overridden methods ----------------------------
 
@@ -40,9 +36,7 @@ class Canvas(QtWidgets.QWidget):
 
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
-        if self.brush is not None:
-            self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
+        self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
-        if self.brush is not None:
-            self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
+        self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
