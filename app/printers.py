@@ -85,8 +85,7 @@ class CanvasPrinter(Printer):
 
     def _prepare_painter(self, color: Color):
         painter = QPainter(self._canvas)
-        # TODO: Do we want filled shapes or not???
-        painter.setPen(QColor(*color))
+        painter.setBrush(QColor(*color))
         return painter
 
     def print_dot(self, dot: Dot):

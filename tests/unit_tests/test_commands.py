@@ -1,9 +1,10 @@
-from typing import List
+import copy
+from typing import List, Dict
 
 import pytest
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
-    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand
+    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -12,8 +13,10 @@ from app.shape_factory import PointsRectFactory, DimensionsRectFactory, PointsCi
 
 class ReceiverMockup:
     def __init__(self):
-        self.shapes = [Dot(Point(10, 10), Color(0, 0, 0)), Line(Point(123, 321), Point(11, 11), Color(0, 0, 0))]
+        self.shapes = [Dot(Point(10, 10), Color(0, 0, 0)), Line(Point(123, 321), Point(10, 10), Color(0, 0, 0))]
         self.received = None
+        self.moved = []
+        self.removed = []
         self.listed_shapes = None
         self.last_command_removed = None
         self.deleted_lines = 0
@@ -23,6 +26,16 @@ class ReceiverMockup:
             self.received = shapes[0]
         else:
             self.received = shapes
+
+    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
+        self.received = (move_from, move_to)
+        res = {'before_move': copy.deepcopy(self.shapes), 'moved': []}
+        for shape in self.shapes:
+            if shape.contains(move_from):
+                new_shape = shape.move(move_from, move_to)
+                res['moved'].append(new_shape)
+        self.moved = res['moved']
+        return res
 
     def list_shapes(self, point: Point = None):
         to_list = []
@@ -43,12 +56,13 @@ class ReceiverMockup:
     def remove_last_command(self):
         self.last_command_removed = True
 
-    def remove_shapes_at(self, point: Point):
+    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
         self.received = point
-        res = {'before_remove': self.shapes, 'removed': []}
+        res = {'before_remove': copy.deepcopy(self.shapes), 'removed': []}
         for shape in self.shapes:
             if shape.contains(point):
                 res['removed'].append(shape)
+        self.removed = res['removed']
         return res
 
     def delete_from_history(self, number_of_lines: int = 1):
@@ -315,6 +329,41 @@ def test_not_equals(receiver: ReceiverMockup):
     )
 
 
+def test_move_shape_command(receiver: ReceiverMockup):
+    command = MoveShapeCommand(receiver=receiver, start_x=0, start_y=0, end_x=10, end_y=10)
+    assert str(command) == 'move 0,0 10,10'
+    assert command == MoveShapeCommand(receiver=receiver, start_x=0, start_y=0, end_x=10, end_y=10)
+
+    command.execute()
+    assert receiver.received == (Point(0, 0), Point(10, 10))
+    assert command._before_move == [
+        Dot(start=Point(10, 10), color=Color(0, 0, 0)),
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
+    ]
+    assert receiver.moved == []
+    assert receiver.deleted_lines == 1
+    assert receiver.last_command_removed is True
+
+    command = MoveShapeCommand(receiver=receiver, start_x=10, start_y=10, end_x=0, end_y=0)
+    command.execute()
+    assert receiver.received == (Point(10, 10), Point(0, 0))
+    assert command._before_move == [
+        Dot(start=Point(10, 10), color=Color(0, 0, 0)),
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
+    ]
+    assert receiver.moved == [
+        Dot(start=Point(0, 0), color=Color(0, 0, 0)),
+        Line(start=Point(113, 311), end=Point(0, 0), color=Color(0, 0, 0))
+    ]
+
+    command.reverse()
+    assert receiver.received == [
+        Dot(start=Point(10, 10), color=Color(0, 0, 0)),
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
+    ]
+    assert receiver.deleted_lines == 1
+
+
 def test_remove_shape_command(receiver: ReceiverMockup):
     command = RemoveShapeCommand(receiver=receiver, x=123, y=321)
     assert str(command) == 'remove 123,321'
@@ -324,19 +373,21 @@ def test_remove_shape_command(receiver: ReceiverMockup):
     assert receiver.received == Point(123, 321)
     assert command._before_remove == [
         Dot(start=Point(10, 10), color=Color(0, 0, 0)),
-        Line(start=Point(123, 321), end=Point(11, 11), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
+    assert receiver.removed == [Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))]
     assert receiver.deleted_lines == 0
 
     command.reverse()
     assert receiver.received == [
         Dot(start=Point(10, 10), color=Color(0, 0, 0)),
-        Line(start=Point(123, 321), end=Point(11, 11), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
     assert receiver.deleted_lines == 1
 
     command = RemoveShapeCommand(receiver=receiver, x=-1, y=-1)
     command.execute()
+    assert receiver.removed == []
     assert receiver.deleted_lines == 1
     assert receiver.last_command_removed is True
 
@@ -349,25 +400,25 @@ def test_list_shape_command(receiver: ReceiverMockup):
     command.execute()
     assert receiver.listed_shapes == [
         Dot(start=Point(10, 10), color=Color(0, 0, 0)),
-        Line(start=Point(123, 321), end=Point(11, 11), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
     assert command.listed == [
         Dot(start=Point(10, 10), color=Color(0, 0, 0)),
-        Line(start=Point(123, 321), end=Point(11, 11), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
     command.reverse()
     assert receiver.deleted_lines == len(command.listed) + 1
 
-    command = ListShapeCommand(receiver=receiver, x=10, y=10)
-    assert str(command) == 'ls 10,10'
-    assert command == ListShapeCommand(receiver=receiver, x=10, y=10)
+    command = ListShapeCommand(receiver=receiver, x=123, y=321)
+    assert str(command) == 'ls 123,321'
+    assert command == ListShapeCommand(receiver=receiver, x=123, y=321)
 
     command.execute()
     assert receiver.listed_shapes == [
-        Dot(start=Point(10, 10), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
     assert command.listed == [
-        Dot(start=Point(10, 10), color=Color(0, 0, 0))
+        Line(start=Point(123, 321), end=Point(10, 10), color=Color(0, 0, 0))
     ]
     command.reverse()
     assert receiver.deleted_lines == len(command.listed) + 1

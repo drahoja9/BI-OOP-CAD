@@ -30,6 +30,17 @@ def test_point():
     assert p1.__repr__() == '[123, 321]'
     assert str(p2) == '[-40, 0]'
 
+    assert p1 + p2 == Point(83, 321)
+    assert p4 + p3 + p2 + p1 == Point(527, 765)
+    assert p1 - p2 == Point(163, 321)
+    assert p4 - p3 - p2 - p1 == Point(-281, -123)
+
+    p4 += p3
+    assert p4 == Point(444, 444)
+
+    p4 -= p2
+    assert p4 == Point(484, 444)
+
 
 def test_color():
     c1 = Color(255, 123, 0)
@@ -71,14 +82,14 @@ def test_singleton():
     a = TestSingletonClass()
     b = TestSingletonClass()
     c = TestSingletonClass()
-    assert a == b == c
+    assert a is b is c
 
     a.a = 2
     assert a.a == b.a == c.a == 2
     b.b = 123
     assert a.b == b.b == c.b == 123
 
-    assert a == b == c
+    assert a is b is c
 
 
 def test_distance():

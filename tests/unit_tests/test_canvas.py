@@ -2,7 +2,7 @@ import pytest
 from PyQt5.QtCore import Qt
 
 from app.canvas import Canvas
-from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush, CircleShapeBrush
+from app.brushes import LineShapeBrush, RectShapeBrush, DotShapeBrush, CircleShapeBrush, MoveShapeBrush
 from app.commands import Command, PrintDotCommand, PrintRectCommand
 from app.gui import MainWindow
 from app.shape_factory import PointsRectFactory
@@ -46,35 +46,32 @@ def canvas(qtbot) -> Canvas:
     qtbot.addWidget(gui)
 
     canvas = Canvas(controller)
+    assert canvas.hasMouseTracking() is True
     return canvas
 
 
 def test_set_brush(canvas: Canvas):
-    assert canvas.brush is None
-    assert canvas.hasMouseTracking() is False
-    assert canvas.cursor() == Qt.ArrowCursor
+    assert canvas.brush == MoveShapeBrush()
+    assert canvas.cursor() == Qt.OpenHandCursor
 
     canvas.set_brush(LineShapeBrush())
-    assert canvas.brush.color == (0, 0, 0)
+    assert canvas.brush.color == (255, 255, 255)
     assert canvas.brush == LineShapeBrush()
-    assert canvas.hasMouseTracking() is True
     assert canvas.cursor() == Qt.CrossCursor
 
     canvas.set_color((10, 20, 30))
     canvas.set_brush(RectShapeBrush())
     assert canvas.brush.color == (10, 20, 30)
     assert canvas.brush == RectShapeBrush()
-    assert canvas.hasMouseTracking() is True
     assert canvas.cursor() == Qt.CrossCursor
 
-    canvas.set_brush(None)
-    assert canvas.brush is None
-    assert canvas.hasMouseTracking() is False
-    assert canvas.cursor() == Qt.ArrowCursor
+    canvas.set_brush()
+    assert canvas.brush == MoveShapeBrush()
+    assert canvas.cursor() == Qt.OpenHandCursor
 
 
 def test_set_color(canvas: Canvas):
-    assert canvas.color == (0, 0, 0)
+    assert canvas.color == (255, 255, 255)
 
     canvas.set_brush(CircleShapeBrush())
     canvas.set_color((100, 200, 100))
@@ -88,22 +85,25 @@ def test_pain_event(canvas: Canvas):
 
 
 def test_mouse_move_event(canvas: Canvas):
-    assert canvas.brush is None
+    assert canvas.brush == MoveShapeBrush()
 
     canvas.mouseMoveEvent(EventMockup)
-    assert canvas._controller.command is None
+    assert (
+        canvas._controller.command
+        is None
+    )
 
     canvas.set_brush(DotShapeBrush())
     canvas.mouseMoveEvent(EventMockup)
     assert (
         canvas._controller.command
         ==
-        PrintDotCommand(canvas._controller, EventMockup.x(), EventMockup.y(), (0, 0, 0))
+        PrintDotCommand(canvas._controller, EventMockup.x(), EventMockup.y(), (255, 255, 255))
     )
 
 
 def test_mouse_press_event(canvas: Canvas):
-    assert canvas.brush is None
+    assert canvas.brush == MoveShapeBrush()
 
     canvas.mousePressEvent(EventMockup)
     assert canvas._controller.command is None
@@ -117,7 +117,7 @@ def test_mouse_press_event(canvas: Canvas):
         PrintRectCommand(
             receiver=canvas._controller,
             start_x=EventMockup.x(), start_y=EventMockup.y(),
-            color=(0, 0, 0),
+            color=(255, 255, 255),
             rect_factory=PointsRectFactory,
             end_x=EventMockup.x(), end_y=EventMockup.y()
         )

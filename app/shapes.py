@@ -22,6 +22,9 @@ class Shape:
     def contains(self, point: Point) -> bool:
         raise NotImplementedError
 
+    def move(self, move_from: Point, move_to: Point):
+        return Shape(self.start - (move_from - move_to), self.color)
+
     def __repr__(self):
         return f' with {self.color}'
 
@@ -49,6 +52,9 @@ class Dot(Shape):
     def contains(self, point: Point) -> bool:
         return self.start == point
 
+    def move(self, move_from: Point, move_to: Point):
+        return Dot(move_to, self.color)
+
     def __repr__(self):
         return f'Dot at {self.start}' + super().__repr__()
 
@@ -69,6 +75,11 @@ class Line(Shape):
             distance(self.start, point) + distance(self.end, point),
             distance(self.start, self.end)
         )
+
+    def move(self, move_from: Point, move_to: Point):
+        new_start = super().move(move_from, move_to).start
+        new_end = self.end - (self.start - new_start)
+        return Line(new_start, new_end, self.color)
 
     def __repr__(self):
         return f'Line from {self.start} to {self.end}' + super().__repr__()
@@ -102,6 +113,13 @@ class Polyline(Shape):
                 return True
         return False
 
+    def move(self, move_from: Point, move_to: Point):
+        new_start = super().move(move_from, move_to).start
+        new_points = []
+        for point in self.points:
+            new_points.append(point - (self.start - new_start))
+        return Polyline(*new_points, color=self.color)
+
     def __repr__(self):
         return f'Polyline with points at {self.points}' + super().__repr__()
 
@@ -131,6 +149,10 @@ class Rectangle(Shape):
             self.start.y <= point.y <= self.start.y + self.height
         )
 
+    def move(self, move_from: Point, move_to: Point):
+        new_start = super().move(move_from, move_to).start
+        return Rectangle(new_start, self.width, self.height, self.color)
+
     def __repr__(self):
         return f'{self.width}x{self.height} rectangle with top-left corner at {self.start}' + super().__repr__()
 
@@ -155,6 +177,10 @@ class Circle(Shape):
 
     def contains(self, point: Point) -> bool:
         return distance(self.start, point) <= self.radius
+
+    def move(self, move_from: Point, move_to: Point):
+        new_start = super().move(move_from, move_to).start
+        return Circle(new_start, self.radius, self.color)
 
     def __repr__(self):
         return f'Circle centered at {self.start} with radius {self.radius}' + super().__repr__()

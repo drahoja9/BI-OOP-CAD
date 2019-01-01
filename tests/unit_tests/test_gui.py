@@ -1,7 +1,7 @@
 import pytest
 from pytestqt.qtbot import QtBot
 
-from app.brushes import LineShapeBrush, CircleShapeBrush
+from app.brushes import LineShapeBrush, CircleShapeBrush, MoveShapeBrush
 from app.gui import MainWindow
 
 
@@ -28,16 +28,16 @@ def test_handle_new_action(gui: MainWindow):
 
 
 def test_set_status(gui: MainWindow):
-    assert gui.statusBar().currentMessage() == 'No tool'
+    assert gui.statusBar().currentMessage() == 'Move'
     gui._set_status('Rectangle')
     assert gui.statusBar().currentMessage() == 'Rectangle'
     gui._set_status()
-    assert gui.statusBar().currentMessage() == 'No tool'
+    assert gui.statusBar().currentMessage() == 'Move'
 
 
 def test_toggle_brush(gui: MainWindow):
-    assert gui.canvas.brush is None
-    assert gui.statusBar().currentMessage() == 'No tool'
+    assert gui.canvas.brush == MoveShapeBrush()
+    assert gui.statusBar().currentMessage() == 'Move'
     for brush_button in gui.brush_buttons.values():
         assert brush_button.isChecked() is False
 
@@ -55,8 +55,8 @@ def test_toggle_brush(gui: MainWindow):
     assert button.isChecked() is True
 
     button.click()
-    assert gui.canvas.brush is None
-    assert gui.statusBar().currentMessage() == 'No tool'
+    assert gui.canvas.brush == MoveShapeBrush()
+    assert gui.statusBar().currentMessage() == 'Move'
     assert button.isChecked() is False
 
 

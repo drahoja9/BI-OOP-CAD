@@ -33,7 +33,7 @@ def shape_commands(controller: Controller) -> Tuple[Command, Command, Command, C
     c2 = PrintLineCommand(
         receiver=controller,
         start_x=1000, start_y=-1000,
-        end_x=-123, end_y=321,
+        end_x=0, end_y=-1000,
         color=(0, 0, 0)
     )
     c3 = PrintPolylineCommand(

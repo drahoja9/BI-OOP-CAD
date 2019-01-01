@@ -46,8 +46,21 @@ class ShapesStore:
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
-            self._shapes.append(shape)
+            self._shapes.append(copy.deepcopy(shape))
         self._notify()
+
+    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
+        before_move = copy.deepcopy(self._shapes)
+        moved = []
+        to_remove = []
+        for shape in self._shapes:
+            if shape.contains(move_from):
+                new_shape = shape.move(move_from, move_to)
+                moved.append(new_shape)
+                to_remove.append(shape)
+        self._remove_shapes(*to_remove)
+        self.add_shapes(*moved)
+        return {'moved': moved, 'before_move': before_move}
 
     def remove_last_shape(self):
         try:

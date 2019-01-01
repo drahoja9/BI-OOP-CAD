@@ -27,6 +27,9 @@ class Controller:
             self._gui.print_newline_to_history(str(shape))
         self._shapes.add_shapes(*shapes)
 
+    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
+        return self._shapes.move_shapes(move_from, move_to)
+
     def replace_shapes_store(self, shapes: List[Shape]):
         self._shapes = ShapesStore(self, shapes)
         self.update()

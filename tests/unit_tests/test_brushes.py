@@ -5,9 +5,9 @@ import pytest
 from PyQt5.QtCore import Qt
 
 from app.brushes import ShapeBrush, DotShapeBrush, LineShapeBrush, RectShapeBrush, CircleShapeBrush, PolylineShapeBrush, \
-    Brush, RemoveShapeBrush
+    Brush, RemoveShapeBrush, MoveShapeBrush
 from app.commands import PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, Command, ShapeCommand, \
-    PrintPolylineCommand, RemoveShapeCommand
+    PrintPolylineCommand, RemoveShapeCommand, MoveShapeCommand
 from app.shapes import Shape
 from app.utils import Color
 
@@ -99,6 +99,7 @@ def test_polyline_brush(controller: ControllerMockup):
         color=(0, 0, 0)
     )
     assert controller.preview is None
+    assert b1._points == []
 
 
 @pytest.mark.parametrize('brush_class, shape_command_class, shape_name', [
@@ -135,10 +136,30 @@ def test_shape_brush(
     b1.mouse_move(controller, -999, 100, None)
     assert controller.command is None
     assert controller.preview == preview_shape
+    assert b1._start == (-999, 0)
 
     b1.mouse_press(controller, -999, 100, Qt.LeftButton)
     assert controller.command == shape_command
     assert controller.preview is None
+    assert b1._start is None
+
+
+def test_move_shape_brush(controller: ControllerMockup):
+    b1 = MoveShapeBrush()
+    b2 = MoveShapeBrush()
+    assert b1 == b2
+    assert str(b1) == str(b2) == 'Move'
+
+    b1.mouse_press(controller, 0, 0, Qt.LeftButton)
+    assert controller.command is None
+
+    b1.mouse_press(controller, 10, 10, Qt.LeftButton)
+    assert controller.command == MoveShapeCommand(
+        receiver=controller,
+        start_x=0, start_y=0,
+        end_x=10, end_y=10
+    )
+    assert b1._start is None
 
 
 def test_remove_shape_brush(controller: ControllerMockup):
@@ -147,5 +168,5 @@ def test_remove_shape_brush(controller: ControllerMockup):
     assert b1 == b2
     assert str(b1) == str(b2) == 'Remove'
 
-    b1.mouse_press(controller, 10, 10, None)
+    b1.mouse_press(controller, 10, 10, Qt.LeftButton)
     assert controller.command == RemoveShapeCommand(receiver=controller, x=10, y=10)
