@@ -1,3 +1,4 @@
+import copy
 from typing import Dict
 
 import pytest
@@ -7,7 +8,7 @@ from app.shapes import Circle, Rectangle, Line, Dot, Polyline
 from app.printers import Printer
 from app.shapes_store import ShapesStore
 from app.shapes import Shape
-from app.utils import Point
+from app.utils import Point, Color
 
 
 class ControllerMockup:
@@ -85,6 +86,7 @@ def test_add_shapes(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store._shapes.index(shapes['dot']) == 0
     assert len(shapes_store._controller.result) == 2
     assert len(shapes_store._shapes) == 1
+    assert shapes_store._shapes[0] is not shapes['dot']
 
     shapes_store.add_shapes(shapes['line'], shapes['rectangle'], shapes['circle'])
     assert shapes_store._shapes.index(shapes['line']) == 1
@@ -92,6 +94,36 @@ def test_add_shapes(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
     assert shapes_store._shapes.index(shapes['circle']) == 3
     assert len(shapes_store._controller.result) == 3
     assert len(shapes_store._shapes) == 4
+    assert shapes_store._shapes[1] is not shapes['line']
+    assert shapes_store._shapes[2] is not shapes['rectangle']
+    assert shapes_store._shapes[3] is not shapes['circle']
+
+
+def test_move_shapes(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
+    shapes_store.add_shapes(*shapes.values())
+
+    res = shapes_store.move_shapes(Point(10, 10), Point(-100, 100))
+    assert res['moved'] == [Polyline(Point(-100, 100), Point(-90, 110), Point(-80, 100), color=Color(48, 210, 111))]
+    assert res['before_move'] == [*shapes.values()]
+    assert len(shapes_store._controller.result) == 4
+
+    shapes_store.add_shapes(Rectangle(Point(-10, 3490), 20, 20, Color(255, 255, 255)))
+    # Getting the previously moved polyline back
+    shapes_store.move_shapes(Point(-100, 100), Point(10, 10))
+    res = shapes_store.move_shapes(Point(0, 3500), Point(-1000, -1000))
+    assert res['moved'] == [
+        Rectangle(Point(-1000, -4500), 1, 50000, Color(255, 255, 255)),
+        Rectangle(Point(-1010, -1010), 20, 20, Color(255, 255, 255))
+    ]
+    assert res['before_move'] == [
+        shapes['dot'],
+        shapes['line'],
+        shapes['rectangle'],
+        shapes['circle'],
+        Rectangle(Point(-10, 3490), 20, 20, Color(255, 255, 255)),
+        shapes['polyline']
+    ]
+    assert len(shapes_store._controller.result) == 9
 
 
 def test_remove_last_shape(shapes_store: ShapesStore, shapes: Dict[str, Shape]):
@@ -121,6 +153,7 @@ def test_remove_shapes_at(shapes_store: ShapesStore):
     assert res['before_remove'] == [r1, r2, c, l1, l2, d]
     assert res['removed'] == [r1, c, l1, d]
     assert shapes_store._shapes == [r2, l2]
+    assert len(shapes_store._controller.result) == 3
 
 
 def test_restart(shapes_store: ShapesStore, shapes: Dict[str, Shape]):

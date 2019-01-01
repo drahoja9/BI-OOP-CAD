@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QColorDialog, QFileDialog
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
-    RemoveShapeBrush, Brush
+    RemoveShapeBrush, Brush, MoveShapeBrush
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -78,7 +78,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _handle_new_action(self):
         self._controller.restart()
 
-    def _set_status(self, message: str = 'No tool'):
+    def _set_status(self, message: str = str(MoveShapeBrush())):
         self.statusBar().showMessage(message)
 
     def _toggle_brush(self, brush: Brush):

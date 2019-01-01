@@ -103,6 +103,33 @@ class PrintCircleCommand(ShapeCommand):
         return f'circle {self.shape.start.x},{self.shape.start.y} {self.shape.radius}' + super().__str__()
 
 
+class MoveShapeCommand(Command):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int):
+        super().__init__(receiver)
+        self.start = Point(start_x, start_y)
+        self.end = Point(end_x, end_y)
+        self._before_move = []
+
+    def execute(self):
+        res = self.receiver.move_shapes(self.start, self.end)
+        self._before_move = res['before_move']
+        # If nothing was moved, there's no need to keep empty move command in command engine
+        if not res['moved']:
+            self.receiver.remove_last_command()
+            self.receiver.delete_from_history(1)
+
+    def reverse(self):
+        if self._before_move:
+            self.receiver.replace_shapes_store(self._before_move)
+            self.receiver.delete_from_history(1)
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.start == other.start and self.end == other.end
+
+    def __str__(self):
+        return f'move {self.start.x},{self.start.y} {self.end.x},{self.end.y}'
+
+
 class RemoveShapeCommand(Command):
     def __init__(self, receiver, x: int, y: int):
         super().__init__(receiver)
@@ -122,11 +149,11 @@ class RemoveShapeCommand(Command):
             self.receiver.replace_shapes_store(self._before_remove)
             self.receiver.delete_from_history(1)
 
-    def __str__(self):
-        return f'remove {self.point.x},{self.point.y}'
-
     def __eq__(self, other):
         return super().__eq__(other) and self.point == other.point
+
+    def __str__(self):
+        return f'remove {self.point.x},{self.point.y}'
 
 
 class ListShapeCommand(Command):
@@ -145,11 +172,11 @@ class ListShapeCommand(Command):
         if self.listed:
             self.receiver.delete_from_history(len(self.listed) + 1)
 
+    def __eq__(self, other):
+        return super().__eq__(other) and self.point == other.point
+
     def __str__(self):
         if self.point:
             return f'ls {self.point.x},{self.point.y}'
         else:
             return 'ls'
-
-    def __eq__(self, other):
-        return super().__eq__(other) and self.point == other.point
