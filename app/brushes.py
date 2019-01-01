@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 
 from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand, \
     RemoveShapeCommand, MoveShapeCommand
-from app.utils import Singleton
+from app.utils import Singleton, Point
 
 
 class Brush(metaclass=Singleton):
@@ -174,6 +174,7 @@ class MoveShapeBrush(Brush):
                 start_x=self._start[0], start_y=self._start[1],
                 end_x=x, end_y=y
             )
+            controller.end_preview()
             controller.execute_command(command)
             self._start = None
 
