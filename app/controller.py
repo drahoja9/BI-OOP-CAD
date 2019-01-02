@@ -24,7 +24,7 @@ class Controller:
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
-            self._gui.print_newline_to_history(str(shape))
+            self.print_to_history(str(shape))
         self._shapes.add_shapes(*shapes)
 
     def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
@@ -45,12 +45,23 @@ class Controller:
     def end_preview(self):
         self._shapes.set_preview(None)
 
-    def execute_command(self, command: Command, from_redo: bool = False):
-        self._gui.print_newline_to_history(' > ' + str(command))
+    def parse_command(self, command_text: str):
+        # Something like:
+        # parser = Parser()
+        # command = parser.parse(command_text)
+        # self.execute_command(command, command_text=command_text)
+        ...
+
+    def execute_command(self, command: Command, from_redo: bool = False, command_text: str = None):
+        history_line = ' > ' + (command_text or str(command))
+        self._gui.print_lines_to_history(history_line)
         self._command_engine.execute_command(command, from_redo=from_redo)
 
     def remove_last_command(self):
         self._command_engine.remove_last_command()
+
+    def print_to_history(self, lines: str):
+        self._gui.print_lines_to_history(lines)
 
     def delete_from_history(self, number_of_lines: int = 1):
         self._gui.delete_from_history(number_of_lines)
@@ -59,7 +70,7 @@ class Controller:
         stream = io.StringIO()
         printed = self.print_all_shapes(StreamTextPrinter(stream), point)
         # Ignoring the last newline `\n`
-        self._gui.print_newline_to_history(stream.getvalue()[:-1])
+        self._gui.print_lines_to_history(stream.getvalue()[:-1])
         return printed
 
     def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
