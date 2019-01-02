@@ -2,15 +2,20 @@ import pytest
 from pytestqt.qtbot import QtBot
 
 from app.brushes import LineShapeBrush, CircleShapeBrush, MoveShapeBrush
+from app.commands import Command, ClearCommand
 from app.gui import MainWindow
 
 
 class ControllerMockup:
     def __init__(self):
-        self.restarted = False
+        self.parsed = ''
+        self.command = None
 
-    def restart(self):
-        self.restarted = True
+    def parse_command(self, command_text: str):
+        self.parsed = command_text
+
+    def execute_command(self, command: Command):
+        self.command = command
 
 
 @pytest.fixture
@@ -21,17 +26,16 @@ def gui(qtbot: QtBot) -> MainWindow:
     return gui
 
 
-def test_handle_new_action(gui: MainWindow):
-    assert gui._controller.restarted is False
-    gui._handle_new_action()
-    assert gui._controller.restarted is True
+def test_handle_action_new(gui: MainWindow):
+    gui._handle_action_new()
+    assert gui._controller.command == ClearCommand(gui._controller)
 
 
 def test_set_status(gui: MainWindow):
     assert gui.statusBar().currentMessage() == 'Move'
-    gui._set_status('Rectangle')
+    gui.set_status('Rectangle')
     assert gui.statusBar().currentMessage() == 'Rectangle'
-    gui._set_status()
+    gui.set_status()
     assert gui.statusBar().currentMessage() == 'Move'
 
 
@@ -62,8 +66,19 @@ def test_toggle_brush(gui: MainWindow):
 
 def test_handle_user_input(gui: MainWindow):
     gui._ui.manualInput.setText('test input 123')
-    assert gui._handle_user_input() == 'test input 123'
+    gui._handle_user_input()
     assert gui._ui.manualInput.text() == ''
+    assert gui._controller.parsed == 'test input 123'
+
+    gui._ui.manualInput.setText('')
+    gui._handle_user_input()
+    assert gui._ui.manualInput.text() == ''
+    assert gui._controller.parsed == 'test input 123'
+
+    gui._ui.manualInput.setText('     \n     \t     ')
+    gui._handle_user_input()
+    assert gui._ui.manualInput.text() == ''
+    assert gui._controller.parsed == 'test input 123'
 
 
 def test_undo(gui: MainWindow):
@@ -86,11 +101,11 @@ def test_redo(gui: MainWindow):
     assert gui._ui.actionRedo.isEnabled() is False
 
 
-def test_print_newline_to_history(gui: MainWindow):
+def test_print_lines_to_history(gui: MainWindow):
     assert gui._ui.history.toPlainText() == ''
-    gui.print_newline_to_history('new line printed to the history \n actualy it\'s two lines')
+    gui.print_lines_to_history('new line printed to the history \n actualy it\'s two lines')
     assert gui._ui.history.toPlainText() == 'new line printed to the history \n actualy it\'s two lines'
-    gui.print_newline_to_history('yet another line')
+    gui.print_lines_to_history('yet another line')
     assert (
         gui._ui.history.toPlainText()
         ==
@@ -99,10 +114,10 @@ def test_print_newline_to_history(gui: MainWindow):
 
 
 def test_delete_from_history(gui: MainWindow):
-    gui.print_newline_to_history('line1')
-    gui.print_newline_to_history('line2')
-    gui.print_newline_to_history('line3')
-    gui.print_newline_to_history('line4')
+    gui.print_lines_to_history('line1')
+    gui.print_lines_to_history('line2')
+    gui.print_lines_to_history('line3')
+    gui.print_lines_to_history('line4')
 
     gui.delete_from_history(1)
     assert gui._ui.history.toPlainText() == 'line1\nline2\nline3'
@@ -115,10 +130,10 @@ def test_delete_from_history(gui: MainWindow):
 
 
 def test_clear_history(gui: MainWindow):
-    gui.print_newline_to_history('line1')
-    gui.print_newline_to_history('line2')
-    gui.print_newline_to_history('line3')
-    gui.print_newline_to_history('line4')
+    gui.print_lines_to_history('line1')
+    gui.print_lines_to_history('line2')
+    gui.print_lines_to_history('line3')
+    gui.print_lines_to_history('line4')
 
     gui.clear_history()
     assert gui._ui.history.toPlainText() == ''

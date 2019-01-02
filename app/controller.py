@@ -74,8 +74,8 @@ class Controller:
         for shape in self.shapes_at(point):
             self.print_to_history(str(shape))
 
-    def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
-        return self._shapes.print_all(printer or self._printer, point)
+    def print_all_shapes(self, printer: Printer = None) -> List[Shape]:
+        return self._shapes.print_all(printer or self._printer)
 
     def update(self):
         self._printer.update(self)

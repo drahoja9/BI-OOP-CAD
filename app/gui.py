@@ -125,8 +125,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def _handle_user_input(self):
         command_text = self._ui.manualInput.text()
+        self._ui.manualInput.setText('')
         if command_text != '' and not command_text.isspace():
-            self._ui.manualInput.setText('')
             self._controller.parse_command(command_text)
 
     def enable_undo(self):
