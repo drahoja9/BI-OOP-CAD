@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor, QTextCursor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
-from app.commands import ClearCommand, SaveCommand, LoadCommand
+from app.commands import ClearCommand, SaveCommand, LoadCommand, QuitCommand
 from app.ui.main_window import Ui_MainWindow
 from app.ui.clear_dialog import Ui_clearDialog
 from app.canvas import Canvas
@@ -58,6 +58,9 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         self._ui.actionRedo.triggered.connect(
             lambda: self._controller.redo()
+        )
+        self._ui.actionQuit.triggered.connect(
+            lambda: self._handle_action_quit()
         )
         self.disable_undo()
         self.disable_redo()
@@ -139,6 +142,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._ui.manualInput.setText('')
         if command_text != '' and not command_text.isspace():
             self._controller.parse_command(command_text)
+
+    def _handle_action_quit(self):
+        command = QuitCommand(self._controller)
+        self._controller.execute_command(command)
 
     # --------------------------------------------- Main window methods -----------------------------------------------
 
