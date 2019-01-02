@@ -194,8 +194,12 @@ class ClearCommand(Command):
         self.shapes = []
 
     def execute(self):
-        self.shapes = self.receiver.shapes_at(None)
-        self.receiver.restart()
+        if self.receiver.clear_dialog():
+            self.shapes = self.receiver.shapes_at(None)
+            self.receiver.restart()
+        else:
+            self.receiver.delete_from_history(1)
+            self.receiver.remove_last_command()
 
     def reverse(self):
         self.receiver.delete_from_history(1)

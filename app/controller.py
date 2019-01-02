@@ -1,10 +1,9 @@
-import io
 from typing import List, Dict
 
 from app.command_engine import CommandEngine
 from app.commands import Command
 from app.gui import MainWindow
-from app.printers import CanvasPrinter, Printer, StreamTextPrinter
+from app.printers import CanvasPrinter, Printer
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
 from app.utils import Point
@@ -131,6 +130,8 @@ class Controller:
         # Run the whole app
         self._gui.show()
 
+    def clear_dialog(self) -> bool:
+        return self._gui.clear_dialog()
+
     def restart(self):
         self._shapes.restart()
-        self._gui.clear_history()

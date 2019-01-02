@@ -6,9 +6,29 @@ from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
 from app.commands import ClearCommand
 from app.ui.main_window import Ui_MainWindow
+from app.ui.clear_dialog import Ui_clearDialog
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
     RemoveShapeBrush, Brush, MoveShapeBrush
+
+
+class ClearDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
+        self._ui = Ui_clearDialog()
+        self._ui.setupUi(self)
+
+        self.accepted = None
+        self._ui.clearButtonBox.accepted.connect(self._accepted)
+        self._ui.clearButtonBox.rejected.connect(self._rejected)
+
+        self.exec_()
+
+    def _accepted(self):
+        self.accepted = True
+
+    def _rejected(self):
+        self.accepted = False
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -79,6 +99,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._ui.canvasHolder.setWidget(self.canvas)
 
+    @staticmethod
+    def clear_dialog() -> bool:
+        res = ClearDialog()
+        return res.accepted
+
     def _handle_action_new(self):
         command = ClearCommand(self._controller)
         self._controller.execute_command(command)
@@ -115,7 +140,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if name:
             self._controller.save(name)
 
-    def handle_file_load(self,  path_to_file: str = None):
+    def handle_file_load(self, path_to_file: str = None):
         # Load file dialog will open and returns tuple (name of the loaded file, type)
         user = getpass.getuser()
         path = path_to_file or f'/home/{user}/untitled.txt'
