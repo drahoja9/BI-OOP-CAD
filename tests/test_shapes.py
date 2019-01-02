@@ -47,6 +47,10 @@ def test_abstract_shape():
     assert abstract_shape == Shape(Point(100, 100), Color(0, 1, 2))
     assert abstract_shape != Shape(Point(100, 101), Color(0, 1, 2))
 
+    new_shape = abstract_shape.move(Point(100, 100), Point(-32, 123))
+    assert abstract_shape.start == Point(100, 100)
+    assert new_shape == Shape(Point(-32, 123), abstract_shape.color)
+
 
 def test_dot(shapes: Dict[str, Shape]):
     dot = shapes['dot']
@@ -65,24 +69,46 @@ def test_dot(shapes: Dict[str, Shape]):
     assert dot.contains(Point(10, 200000000)) is True
     assert dot.contains(Point(11, 200000000)) is False
 
+    new_dot = dot.move(Point(10, 200000000), Point(0, 0))
+    assert dot.start == Point(10, 200000000)
+    assert new_dot == Dot(Point(0, 0), dot.color)
+
 
 def test_line(shapes: Dict[str, Shape]):
     line: Line = shapes['line']
 
     assert line.start == Point(1000, -1000)
-    assert line.end == Point(-123, 321)
+    assert line.end == Point(0, -1000)
     assert line.color == Color(0, 0, 0)
-    assert line.get_props() == (1000, -1000, -123, 321)
+    assert line.get_props() == (1000, -1000, 0, -1000)
 
     d = PrinterMockup()
     line.print_to(d)
     assert d.result == 'Drawed a ' + str(line)
     
-    assert str(line) == 'Line from [1000, -1000] to [-123, 321] with Color(0, 0, 0, alpha=255)'
-    assert line == Line(Point(1000, -1000), Point(-123, 321), Color(0, 0, 0))
-    assert line != Line(Point(1000, -1000), Point(123, 321), Color(0, 0, 0))
-    assert line.contains(Point(1000, -1000)) is True
-    assert line.contains(Point(1000, 1000)) is False
+    assert str(line) == 'Line from [1000, -1000] to [0, -1000] with Color(0, 0, 0, alpha=255)'
+    assert line == Line(Point(1000, -1000), Point(0, -1000), Color(0, 0, 0))
+    assert line != Line(Point(1000, -1000), Point(0, 1000), Color(0, 0, 0))
+    assert line.contains(Point(500, -1000)) is True
+    assert line.contains(Point(-1, -1000)) is False
+
+    # Vertical move
+    new_line = line.move(Point(500, -1000), Point(500, 0))
+    assert line.start == Point(1000, -1000)
+    assert line.end == Point(0, -1000)
+    assert new_line == Line(Point(1000, 0), Point(0, 0), line.color)
+
+    # Horizontal move
+    new_line = line.move(Point(1, -1000), Point(-999, -1000))
+    assert line.start == Point(1000, -1000)
+    assert line.end == Point(0, -1000)
+    assert new_line == Line(Point(0, -1000), Point(-1000, -1000), line.color)
+
+    # Diagonal move
+    new_line = line.move(Point(350, -1000), Point(500, -1200))
+    assert line.start == Point(1000, -1000)
+    assert line.end == Point(0, -1000)
+    assert new_line == Line(Point(1150, -1200), Point(150, -1200), line.color)
 
 
 def test_polyline(shapes: Dict[str, Shape]):
@@ -108,6 +134,30 @@ def test_polyline(shapes: Dict[str, Shape]):
     assert polyline.contains(Point(15, 16)) is False
     assert polyline.contains(Point(24, 15)) is False
 
+    # Vertical move
+    new_polyline = polyline.move(Point(20, 20), Point(20, 10))
+    assert polyline.start == Point(10, 10)
+    assert polyline.points[0] == Point(10, 10)
+    assert polyline.points[1] == Point(20, 20)
+    assert polyline.points[2] == Point(30, 10)
+    assert new_polyline == Polyline(Point(10, 0), Point(20, 10), Point(30, 0), color=polyline.color)
+
+    # Horizontal move
+    new_polyline = polyline.move(Point(28, 12), Point(40, 12))
+    assert polyline.start == Point(10, 10)
+    assert polyline.points[0] == Point(10, 10)
+    assert polyline.points[1] == Point(20, 20)
+    assert polyline.points[2] == Point(30, 10)
+    assert new_polyline == Polyline(Point(22, 10), Point(32, 20), Point(42, 10), color=polyline.color)
+
+    # Diagonal move
+    new_polyline = polyline.move(Point(15, 15), Point(10, 0))
+    assert polyline.start == Point(10, 10)
+    assert polyline.points[0] == Point(10, 10)
+    assert polyline.points[1] == Point(20, 20)
+    assert polyline.points[2] == Point(30, 10)
+    assert new_polyline == Polyline(Point(5, -5), Point(15, 5), Point(25, -5), color=polyline.color)
+
 
 def test_rectangle(shapes: Dict[str, Shape]):
     rect: Rectangle = shapes['rectangle']
@@ -131,6 +181,21 @@ def test_rectangle(shapes: Dict[str, Shape]):
     assert rect.contains(Point(2, 0)) is False
     assert rect.contains(Point(0, 50001)) is False
 
+    # Vertical move
+    new_rect = rect.move(Point(1, 3500), Point(1, 0))
+    assert rect.start == Point(0, 0)
+    assert new_rect == Rectangle(Point(0, -3500), rect.width, rect.height, rect.color)
+
+    # Horizontal move
+    new_rect = rect.move(Point(0, 20), Point(20, 20))
+    assert rect.start == Point(0, 0)
+    assert new_rect == Rectangle(Point(20, 0), rect.width, rect.height, rect.color)
+
+    # Diagonal move
+    new_rect = rect.move(Point(1, 100), Point(20, 50))
+    assert rect.start == Point(0, 0)
+    assert new_rect == Rectangle(Point(19, -50), rect.width, rect.height, rect.color)
+
 
 def test_circle(shapes: Dict[str, Shape]):
     circle: Circle = shapes['circle']
@@ -152,6 +217,21 @@ def test_circle(shapes: Dict[str, Shape]):
     assert circle.contains(Point(12345, 53322)) is True
     assert circle.contains(Point(12344, 53322)) is False
     assert circle.contains(Point(13344, 54322)) is False
+
+    # Vertical move
+    new_circle = circle.move(Point(13344, 54321), Point(13344, 0))
+    assert circle.start == Point(12345, 54321)
+    assert new_circle == Circle(Point(12345, 0), circle.radius, circle.color)
+
+    # Horizontal move
+    new_circle = circle.move(Point(12345, 53322), Point(0, 53322))
+    assert circle.start == Point(12345, 54321)
+    assert new_circle == Circle(Point(0, 54321), circle.radius, circle.color)
+
+    # Diagonal move
+    new_circle = circle.move(Point(13344, 54321), Point(0, 0))
+    assert circle.start == Point(12345, 54321)
+    assert new_circle == Circle(Point(-999, 0), circle.radius, circle.color)
 
 
 def test_shape_class_diff():
