@@ -362,7 +362,7 @@
           </size>
          </property>
          <property name="cursor" stdset="0">
-          <cursorShape>CrossCursor</cursorShape>
+          <cursorShape>ArrowCursor</cursorShape>
          </property>
          <property name="widgetResizable">
           <bool>true</bool>
@@ -417,12 +417,8 @@
     </property>
     <addaction name="actionNew"/>
     <addaction name="actionSave"/>
+    <addaction name="actionLoad"/>
     <addaction name="actionQuit"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -433,7 +429,6 @@
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionNew">
@@ -497,6 +492,14 @@
    </property>
    <property name="toolTip">
     <string>Manual Input</string>
+   </property>
+  </action>
+  <action name="actionLoad">
+   <property name="text">
+    <string>Load</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>

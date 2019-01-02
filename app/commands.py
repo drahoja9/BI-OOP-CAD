@@ -22,6 +22,9 @@ class Command:
         return self.__class__ == other.__class__ and self.receiver == other.receiver
 
 
+# -------------------------------------------------- Shape commands ---------------------------------------------------
+
+
 class ShapeCommand(Command):
     def __init__(self, receiver):
         super().__init__(receiver)
@@ -109,6 +112,9 @@ class PrintCircleCommand(ShapeCommand):
         return self.__str__()
 
 
+# -------------------------------------------------- Other commands ---------------------------------------------------
+
+
 class MoveShapeCommand(Command):
     def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int):
         super().__init__(receiver)
@@ -172,7 +178,7 @@ class ListShapeCommand(Command):
             self.point = None
 
     def execute(self):
-        self.listed = self.receiver.list_shapes(self.point)
+        self.listed = self.receiver.print_shapes_to_history(self.point)
 
     def reverse(self):
         if self.listed:
@@ -186,3 +192,41 @@ class ListShapeCommand(Command):
             return f'ls {self.point.x},{self.point.y}'
         else:
             return 'ls'
+
+
+class ClearCommand(Command):
+    def __init__(self, receiver):
+        super().__init__(receiver)
+        self.shapes = []
+
+    def execute(self):
+        if self.receiver.clear_dialog():
+            self.shapes = self.receiver.shapes_at(None)
+            self.receiver.restart()
+        else:
+            self.receiver.delete_from_history(1)
+            self.receiver.remove_last_command()
+
+    def reverse(self):
+        self.receiver.delete_from_history(1)
+        self.receiver.replace_shapes_store(self.shapes)
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.shapes == other.shapes
+
+    def __str__(self):
+        return 'clear'
+
+
+class InvalidCommand(Command):
+    def __init__(self, receiver):
+        super().__init__(receiver)
+
+    def execute(self):
+        self.receiver.print_to_history('Invalid command!')
+
+    def reverse(self):
+        self.receiver.delete_from_history(2)
+
+    def __str__(self):
+        return 'invalid command'

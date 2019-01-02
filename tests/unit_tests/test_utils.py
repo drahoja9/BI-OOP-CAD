@@ -82,14 +82,14 @@ def test_singleton():
     a = TestSingletonClass()
     b = TestSingletonClass()
     c = TestSingletonClass()
-    assert a == b == c
+    assert a is b is c
 
     a.a = 2
     assert a.a == b.a == c.a == 2
     b.b = 123
     assert a.b == b.b == c.b == 123
 
-    assert a == b == c
+    assert a is b is c
 
 
 def test_distance():

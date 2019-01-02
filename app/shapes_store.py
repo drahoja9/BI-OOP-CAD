@@ -18,13 +18,18 @@ class ShapesStore:
         self._shapes = shapes or []
         self._controller = controller
         self._preview = None
-        self._notify()
 
     def _notify(self):
-        self._controller.update_canvas()
+        self._controller.update()
 
     def is_empty(self) -> bool:
         return len(self._shapes) == 0
+
+    def shapes_at(self, point: Point = None) -> List[Shape]:
+        if point:
+            return [shape for shape in self._shapes if shape.contains(point)]
+        else:
+            return self._shapes
 
     def print_all(self, printer: Printer, point: Point = None) -> List[Shape]:
         printed = []
