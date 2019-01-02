@@ -19,8 +19,8 @@ class Controller:
     def __init__(self):
         self._gui = MainWindow(self)
         self._command_engine = CommandEngine(self)
-        self._shapes = ShapesStore(self)
         self._printer = CanvasPrinter(self._gui.canvas)
+        self._shapes = ShapesStore(self)
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
@@ -32,6 +32,7 @@ class Controller:
 
     def replace_shapes_store(self, shapes: List[Shape]):
         self._shapes = ShapesStore(self, shapes)
+        self.update()
 
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
@@ -69,19 +70,15 @@ class Controller:
     def shapes_at(self, point: Point = None) -> List[Shape]:
         return self._shapes.shapes_at(point)
 
-    def list_shapes(self, point: Point = None) -> List[Shape]:
-        stream = io.StringIO()
-        printed = self.print_all_shapes(StreamTextPrinter(stream), point)
-        # Ignoring the last newline `\n`
-        self._gui.print_lines_to_history(stream.getvalue()[:-1])
-        return printed
+    def print_shapes_to_history(self, point: Point):
+        for shape in self.shapes_at(point):
+            self.print_to_history(str(shape))
 
     def print_all_shapes(self, printer: Printer = None, point: Point = None) -> List[Shape]:
         return self._shapes.print_all(printer or self._printer, point)
 
-    def update_canvas(self):
-        # Emitting the QEvent.Paint event
-        self._gui.canvas.update()
+    def update(self):
+        self._printer.update(self)
 
     def undo(self):
         self._command_engine.undo()
@@ -136,3 +133,4 @@ class Controller:
 
     def restart(self):
         self._shapes.restart()
+        self._gui.clear_history()

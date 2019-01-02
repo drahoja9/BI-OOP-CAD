@@ -159,7 +159,7 @@ class Ui_MainWindow(object):
         self.canvasHolder.setSizePolicy(sizePolicy)
         self.canvasHolder.setMinimumSize(QtCore.QSize(0, 340))
         self.canvasHolder.setBaseSize(QtCore.QSize(0, 0))
-        self.canvasHolder.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.CrossCursor))
+        self.canvasHolder.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.canvasHolder.setWidgetResizable(True)
         self.canvasHolder.setObjectName("canvasHolder")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()

@@ -8,6 +8,9 @@ from app.utils import Singleton, Point
 
 
 class Brush(metaclass=Singleton):
+    def __init__(self):
+        self.cursor = Qt.ArrowCursor
+
     def mouse_move(self, controller, x: int, y: int, button):
         raise NotImplementedError
 
@@ -21,6 +24,7 @@ class ShapeBrush(Brush):
         self._start = None
         self._shape_command_class = None
         self.color = (0, 0, 0)
+        self.cursor = Qt.CrossCursor
 
     def mouse_move(self, controller, x: int, y: int, button):
         if self._shape_command_class is None:
@@ -31,7 +35,7 @@ class ShapeBrush(Brush):
                 receiver=controller,
                 start_x=self._start[0], start_y=self._start[1],
                 end_x=x, end_y=y,
-                color=(*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
+                color=(*self.color, 200)  # Adding alpha layer so the preview is semi-transparent
             )
             controller.preview_shape(shape_command.shape)
 
@@ -119,7 +123,7 @@ class PolylineShapeBrush(ShapeBrush):
                     *self._points,
                     (x, y)
                 ],
-                color=(*self.color, 200)      # Adding alpha layer so the preview is semi-transparent
+                color=(*self.color, 200)  # Adding alpha layer so the preview is semi-transparent
             )
             controller.preview_shape(shape_command.shape)
 
@@ -163,11 +167,17 @@ class MoveShapeBrush(Brush):
         self._start = None
 
     def mouse_move(self, controller, x: int, y: int, button):
-        pass
+        if self._start is None:
+            if controller.shapes_at(Point(x, y)):
+                self.cursor = Qt.OpenHandCursor
+            else:
+                self.cursor = Qt.ArrowCursor
 
     def mouse_press(self, controller, x: int, y: int, button):
         if self._start is None:
             self._start = (x, y)
+            if controller.shapes_at(Point(x, y)):
+                self.cursor = Qt.ClosedHandCursor
         else:
             command = MoveShapeCommand(
                 controller,
@@ -177,6 +187,7 @@ class MoveShapeBrush(Brush):
             controller.end_preview()
             controller.execute_command(command)
             self._start = None
+            self.cursor = Qt.OpenHandCursor
 
     def __str__(self):
         return 'Move'
@@ -184,7 +195,10 @@ class MoveShapeBrush(Brush):
 
 class RemoveShapeBrush(Brush):
     def mouse_move(self, controller, x: int, y: int, button):
-        pass
+        if controller.shapes_at(Point(x, y)):
+            self.cursor = Qt.PointingHandCursor
+        else:
+            self.cursor = Qt.ArrowCursor
 
     def mouse_press(self, controller, x: int, y: int, button):
         command = RemoveShapeCommand(controller, x, y)

@@ -39,8 +39,7 @@ class CommandEngine:
         command.execute()
 
     def remove_last_command(self):
-        if self._undos:
-            self._undos.pop()
+        self._pop_undo()
 
     def undo(self):
         command = self._pop_undo()

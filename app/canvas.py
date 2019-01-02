@@ -1,7 +1,7 @@
 from typing import Tuple
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QEvent, Qt
 
 from app.brushes import Brush, MoveShapeBrush, RemoveShapeBrush
 
@@ -15,12 +15,14 @@ class Canvas(QtWidgets.QWidget):
         super().__init__()
         self._controller = controller
         self.brush = MoveShapeBrush()
+        self.setCursor(self.brush.cursor)
+        self.setMouseTracking(True)
         self.color = (255, 255, 255)
 
     def set_brush(self, brush: Brush = MoveShapeBrush()):
         self.brush = brush
         self.brush.color = self.color
-        self.setMouseTracking(brush != RemoveShapeBrush())
+        self.setCursor(self.brush.cursor)
 
     def set_color(self, color: Tuple[int, int, int]):
         self.color = color
@@ -37,6 +39,8 @@ class Canvas(QtWidgets.QWidget):
     # By default this event is emitted only when some mouse button is pressed and the mouse moves
     def mouseMoveEvent(self, event: QEvent.MouseMove):
         self.brush.mouse_move(self._controller, event.x(), event.y(), event.buttons())
+        self.setCursor(self.brush.cursor)
 
     def mousePressEvent(self, event: QEvent.MouseButtonPress):
         self.brush.mouse_press(self._controller, event.x(), event.y(), event.buttons())
+        self.setCursor(self.brush.cursor)
