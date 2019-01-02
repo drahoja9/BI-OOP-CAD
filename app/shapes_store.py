@@ -26,6 +26,12 @@ class ShapesStore:
     def is_empty(self) -> bool:
         return len(self._shapes) == 0
 
+    def shapes_at(self, point: Point = None) -> List[Shape]:
+        if point:
+            return [shape for shape in self._shapes if shape.contains(point)]
+        else:
+            return self._shapes
+
     def print_all(self, printer: Printer, point: Point = None) -> List[Shape]:
         printed = []
         # Order is important - first we want to print all stored shapes and after that the shape preview
