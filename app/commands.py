@@ -188,6 +188,26 @@ class ListShapeCommand(Command):
             return 'ls'
 
 
+class ClearCommand(Command):
+    def __init__(self, receiver):
+        super().__init__(receiver)
+        self.shapes = []
+
+    def execute(self):
+        self.shapes = self.receiver.shapes_at(None)
+        self.receiver.restart()
+
+    def reverse(self):
+        self.receiver.delete_from_history(1)
+        self.receiver.replace_shapes_store(self.shapes)
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.shapes == other.shapes
+
+    def __str__(self):
+        return 'clear'
+
+
 class InvalidCommand(Command):
     def __init__(self, receiver):
         super().__init__(receiver)

@@ -66,6 +66,9 @@ class Controller:
     def delete_from_history(self, number_of_lines: int = 1):
         self._gui.delete_from_history(number_of_lines)
 
+    def shapes_at(self, point: Point = None) -> List[Shape]:
+        return self._shapes.shapes_at(point)
+
     def list_shapes(self, point: Point = None) -> List[Shape]:
         stream = io.StringIO()
         printed = self.print_all_shapes(StreamTextPrinter(stream), point)
@@ -98,6 +101,12 @@ class Controller:
     def disable_redo(self):
         self._gui.disable_redo()
 
+    def save_dialog(self, path_to_file: str):
+        self._gui.hadle_file_save(path_to_file)
+
+    def load_dialog(self, path_to_file: str):
+        self._gui.handle_file_load(path_to_file)
+
     def save(self, file: str):
         commands = self._command_engine.get_all_commands()
         with open(file, 'w+', encoding='utf-8') as f:
@@ -105,10 +114,25 @@ class Controller:
             [f.write(str(c) + '\n') for c in commands['undos']]
             [f.write(str(c) + '\n') for c in commands['redos']]
 
+        self._gui.set_status('File saved!')
+
+    def load(self, file: str):
+        with open(file, 'r', encoding='utf-8') as f:
+            # Getting rid of the newline `\n` at the end of every line
+            lines = [line[:-1] for line in f.readlines()]
+            undos = lines[0]
+            commands = lines[1:]
+            for command_text in commands:
+                # command = parser.parse(command_text)
+                # self.execute_command(command)
+                ...
+            [self.undo() for _ in range(int(undos))]
+
+        self._gui.set_status('File loaded!')
+
     def run_app(self):
         # Run the whole app
         self._gui.show()
 
     def restart(self):
-        self._command_engine.restart()
         self._shapes.restart()

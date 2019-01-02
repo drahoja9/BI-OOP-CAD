@@ -125,19 +125,3 @@ def test_get_all_commands(command_engine: CommandEngine):
     res = command_engine.get_all_commands()
     assert res['undos'] == [c1]
     assert res['redos'] == [c2]
-
-
-def test_restart(command_engine: CommandEngine):
-    c1 = CommandMockup('receiver')
-    c2 = CommandMockup(123)
-    command_engine.execute_command(c1)
-    command_engine.execute_command(c2)
-    command_engine.undo()
-    command_engine.undo()
-    command_engine.redo()
-
-    command_engine.restart()
-    assert command_engine._undos == []
-    assert command_engine._redos == []
-    assert command_engine._controller.undo is False
-    assert command_engine._controller.redo is False

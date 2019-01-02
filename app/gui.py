@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor, QTextCursor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
+from app.commands import ClearCommand
 from app.ui.main_window import Ui_MainWindow
 from app.canvas import Canvas
 from app.brushes import LineShapeBrush, RectShapeBrush, CircleShapeBrush, DotShapeBrush, PolylineShapeBrush, \
@@ -18,16 +19,19 @@ class MainWindow(QtWidgets.QMainWindow):
         # Initializing the whole UI
         self._ui = Ui_MainWindow()
         self._ui.setupUi(self)
-        self._set_status()
+        self.set_status()
 
         self.canvas = Canvas(controller)
 
         # Menu buttons
         self._ui.actionNew.triggered.connect(
-            lambda: self._controller.restart()
+            lambda: self._handle_action_new()
         )
         self._ui.actionSave.triggered.connect(
-            lambda: self._handle_file_save()
+            lambda: self.handle_file_save()
+        )
+        self._ui.actionLoad.triggered.connect(
+            lambda: self.handle_file_load()
         )
         self._ui.actionUndo.triggered.connect(
             lambda: self._controller.undo()
@@ -75,10 +79,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._ui.canvasHolder.setWidget(self.canvas)
 
-    def _handle_new_action(self):
-        self._controller.restart()
+    def _handle_action_new(self):
+        command = ClearCommand(self._controller)
+        self._controller.execute_command(command)
 
-    def _set_status(self, message: str = str(MoveShapeBrush())):
+    def set_status(self, message: str = str(MoveShapeBrush())):
         self.statusBar().showMessage(message)
 
     def _toggle_brush(self, brush: Brush):
@@ -87,10 +92,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.canvas.brush != brush:
             self.canvas.set_brush(brush)
-            self._set_status(str(brush))
+            self.set_status(str(brush))
         else:
             self.canvas.set_brush()
-            self._set_status()
+            self.set_status()
 
     def _handle_color_pick(self):
         # Color picker will popup and returns chosen color
@@ -100,11 +105,21 @@ class MainWindow(QtWidgets.QMainWindow):
             r, g, b, alpha = color.getRgb()
             self.canvas.set_color((r, g, b))
 
-    def _handle_file_save(self):
+    def handle_file_save(self, path_to_file: str = None):
         # Save file dialog will open and returns tuple (name of the saved file, type)
         user = getpass.getuser()
-        name = QFileDialog().getSaveFileName(self, 'Save File', f'/home/{user}/untitled.txt')
-        self._controller.save(name[0])
+        path = path_to_file or f'/home/{user}/untitled.txt'
+        name, _ = QFileDialog().getSaveFileName(self, 'Save File', path)
+        if name:
+            self._controller.save(name)
+
+    def handle_file_load(self,  path_to_file: str = None):
+        # Load file dialog will open and returns tuple (name of the loaded file, type)
+        user = getpass.getuser()
+        path = path_to_file or f'/home/{user}/untitled.txt'
+        name, _ = QFileDialog().getOpenFileName(self, 'Load File', path)
+        if name:
+            self._controller.load(name)
 
     def _handle_user_input(self):
         command_text = self._ui.manualInput.text()
