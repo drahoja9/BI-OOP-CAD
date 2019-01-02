@@ -130,3 +130,6 @@ class Controller:
 
     def restart(self):
         self._shapes.restart()
+
+    def quit(self):
+        self._gui.close()

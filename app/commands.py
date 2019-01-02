@@ -252,6 +252,20 @@ class ClearCommand(Command):
         return 'clear'
 
 
+class QuitCommand(Command):
+    def __init__(self, receiver):
+        super().__init__(receiver)
+
+    def execute(self):
+        self.receiver.quit()
+
+    def reverse(self):
+        pass
+
+    def __str__(self):
+        return 'quit'
+
+
 class InvalidCommand(Command):
     def __init__(self, receiver):
         super().__init__(receiver)

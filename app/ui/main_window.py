@@ -223,7 +223,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuEdit.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.actionQuit.triggered.connect(MainWindow.close)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -247,7 +246,7 @@ class Ui_MainWindow(object):
         self.actionSave.setShortcut(_translate("MainWindow", "Ctrl+S"))
         self.actionManualInput.setText(_translate("MainWindow", "ManualInput"))
         self.actionManualInput.setToolTip(_translate("MainWindow", "Manual Input"))
-        self.actionLoad.setText(_translate("MainWindow", "Load"))
+        self.actionLoad.setText(_translate("MainWindow", "&Load"))
         self.actionLoad.setShortcut(_translate("MainWindow", "Ctrl+L"))
 
 import app.ui.resources
