@@ -23,7 +23,7 @@ def controller() -> Controller:
 @pytest.fixture
 def cli_parser() -> CliParser:
     controller: Controller = "controller"
-    return CliParser(controller, RgbColorParser(NatParser()))
+    return CliParser(controller, RgbColorParser())
 
 # --------------- Low level parsers tests ---------------
 
@@ -123,7 +123,7 @@ def test_rgb_color_parser():
     """
     Test RgbColorParser's parsing of color in 'rgb([0,255],[0,255],[0,255])' format.
     """
-    parser = RgbColorParser(NatParser())
+    parser = RgbColorParser()
 
     # Test invalid inputs
     invalid_inputs = ["rgb( 0,1,2)", " rgb(0,1,2)", "rgb (0,1,2)", "r gb(0,1,2)", "rgb(0, 1,2)",
@@ -541,10 +541,10 @@ def test_list_shape_parser(controller: Controller, cli_parser: CliParser):
 
 def test_clear_parser(controller: Controller, cli_parser: CliParser):
     # Test valid input
-    assert cli_parser.parse_input(" clear") == InvalidCommand(controller)
+    assert cli_parser.parse_input("clear") == ClearCommand(controller)
 
     # Test invalid input
-    assert cli_parser.parse_input("clear") == ClearCommand(controller)
+    assert cli_parser.parse_input(" clear") == InvalidCommand(controller)
     assert cli_parser.parse_input("clear something") == InvalidCommand(controller)
     assert cli_parser.parse_input("clearsomething") == InvalidCommand(controller)
 

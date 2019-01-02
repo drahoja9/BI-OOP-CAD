@@ -20,8 +20,8 @@ class RgbColorParser(ColorParser):
     """
     Parser for color in "rgb([0,255],[0,255],[0,255])" (RGB) format.
     """
-    def __init__(self, nat_parser: NatParser):
-        self.nat_parser = nat_parser
+    def __init__(self):
+        self.nat_parser = NatParser()
 
     def parse_color(self, cli_input: str) -> ParseResult:
         failure = Failure("rgb([0,255],[0,255],[0,255])", cli_input)

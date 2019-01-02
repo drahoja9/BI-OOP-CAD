@@ -7,6 +7,7 @@ from app.printers import CanvasPrinter, Printer
 from app.shapes import Shape
 from app.shapes_store import ShapesStore
 from app.utils import Point
+from app.parsers.color_parser import RgbColorParser
 
 
 class Controller:
@@ -20,6 +21,10 @@ class Controller:
         self._command_engine = CommandEngine(self)
         self._printer = CanvasPrinter(self._gui.canvas)
         self._shapes = ShapesStore(self)
+
+        # import CliParser this late to avoid import loop
+        from app.parsers.cli_parser import CliParser
+        self._cli_parser = CliParser(self, RgbColorParser())
 
     def add_shapes(self, *shapes: Shape):
         for shape in shapes:
@@ -46,11 +51,8 @@ class Controller:
         self._shapes.set_preview(None)
 
     def parse_command(self, command_text: str):
-        # Something like:
-        # parser = Parser()
-        # command = parser.parse(command_text)
-        # self.execute_command(command, command_text=command_text)
-        ...
+        command = self._cli_parser.parse_input(command_text)
+        self.execute_command(command, command_text=command_text)
 
     def execute_command(self, command: Command, from_redo: bool = False, command_text: str = None):
         history_line = ' > ' + (command_text or str(command))
@@ -115,9 +117,8 @@ class Controller:
             # Getting rid of the newline `\n` at the end of every line
             commands = [line[:-1] for line in f.readlines()]
             for command_text in commands:
-                # command = parser.parse(command_text)
-                # self.execute_command(command)
-                ...
+                command = self._cli_parser.parse_input(command_text)
+                self.execute_command(command, command_text=command_text)
 
         self._gui.set_status('File loaded!')
 
