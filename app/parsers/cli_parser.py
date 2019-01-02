@@ -1,5 +1,5 @@
 from app.parsers.command_parsers import CommandParser, RemoveShapeParser, ListParser, QuitParser, \
-    RectParser, CircleParser, DotParser, LineParser, InvalidCommand
+    RectParser, CircleParser, DotParser, LineParser, InvalidCommand, MoveShapeParser
 from app.controller import Controller
 from app.parsers.color_parser import ColorParser
 from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
@@ -21,6 +21,7 @@ class CliParser:
         # Command Parsers
         self.command_parsers = [
             RemoveShapeParser(controller),
+            MoveShapeParser(controller),
             ListParser(controller),
             QuitParser(controller),
             RectParser(controller, self.nat_parser, self.int_parser, self.color_parser),
@@ -44,8 +45,9 @@ class CliParser:
                 if parser.has_parameters():
                     return self.parse_params(parser, command_result.get_remainder())
                 else:
-                    # TODO: kontrolovat, že command_result.get_remainder() == ''
-                    return command_result.get_match()
+                    # there must be no whitespace at the end of the input
+                    if command_result.get_remainder() == '':
+                        return command_result.get_match()
 
         return InvalidCommand(self.controller)
 
@@ -59,7 +61,7 @@ class CliParser:
         InvalidCommand otherwise
         """
         params_result = command_parser.parse_params(remainder)
-        if params_result.is_successful():
+        if params_result.is_successful() and params_result.get_remainder() == '':
             return params_result.get_match()
         else:
             return InvalidCommand(self.controller)

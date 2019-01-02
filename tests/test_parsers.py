@@ -10,7 +10,7 @@ from app.parsers.color_parser import RgbColorParser
 from app.parsers.command_parsers import InvalidCommand, CommandParser
 from app.controller import Controller
 from app.commands import PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, PrintPolylineCommand, \
-    RemoveShapeCommand, ListShapeCommand
+    RemoveShapeCommand, ListShapeCommand, MoveShapeCommand
 from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
 
 
@@ -474,15 +474,77 @@ def test_line_parser():
 
 
 def test_move_shape_parser():
-    ...
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
+
+    # Test invalid inputs, two points as parameters
+    invalid_inputs = ["move 10,-20 30,40", "move 10,20 30,+40", "move 10,20 30.40", "move 10 20 30,40",
+                      "move10,20 30,40", " move 10,20 30,40", "move 10,20  30,40", "move 10,20",
+                      "movee 10,20 30,40", "move 10,20 30 ,40", "move 10,20 30, 40", "move 10,20 30 , 40",
+                      "move something",
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs, two points as parameters
+    valid_inputs = [("move 10,20 30,40", MoveShapeCommand(controller, 10, 20, 30, 40)),
+                    ("move 10,20 -10,-20", MoveShapeCommand(controller, 10, 20, 0, 0)),
+                    ("move -5,-5 +5,+5", MoveShapeCommand(controller, -5, -5, 0, 0)),
+                    ("move -5,-5 10,20", MoveShapeCommand(controller, -5, -5, 10, 20))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
 
 
 def test_remove_shape_parser():
-    ...
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
+
+    # Test invalid inputs
+    invalid_inputs = ["remove 10,-20", "remove +10,20", "remove 10.20", "remove 10 20",
+                      "remove10,20", " remove 10,20", "remove 10,20   ", "remove 10,20 30,40",
+                      "removet 10,20", "remove 10 ,20", "remove 10, 20", "remove 10 , 20", "remove something",
+                      "remove 10,20 something"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs
+    valid_inputs = [("remove 10,20", RemoveShapeCommand(controller, 10, 20)),
+                    ("remove -10,+20", RemoveShapeCommand(controller, -10, +20)),
+                    ("remove -5,-5", RemoveShapeCommand(controller, -5, -5))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
 
 
 def test_list_shape_parser():
-    ...
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
+
+    # Test invalid inputs
+    invalid_inputs = ["ls 10,-20", "ls +10,20", "ls 10.20", "ls 10 20",
+                      "ls10,20", " ls 10,20", "ls 10,20   ", "ls 10,20 30,40",
+                      "lst 10,20", "ls 10 ,20", "ls 10, 20", "ls 10 , 20", "ls 10,20 something",
+                      "ls something", "ls  ", " ls",
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs
+    valid_inputs = [("ls 10,20", ListShapeCommand(controller, 10, 20)),
+                    ("ls -10,+20", ListShapeCommand(controller, -10, +20)),
+                    ("ls -5,-5", ListShapeCommand(controller, -5, -5)),
+                    ("ls", ListShapeCommand(controller))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
 
 
 def test_points_conversion():

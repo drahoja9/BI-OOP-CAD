@@ -6,7 +6,7 @@ from app.parsers.point_parsers import PointParser, AbsoluteParserPoint
 from app.parsers.color_parser import ColorParser
 from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
 from app.commands import Command, PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, \
-    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand
+    PrintPolylineCommand, MoveShapeCommand, RemoveShapeCommand, ListShapeCommand
 from app.utils import Color
 from app.controller import Controller
 
@@ -41,6 +41,18 @@ class CommandParser:
     @abc.abstractmethod
     def has_parameters(self) -> bool:
         raise NotImplementedError
+
+    def parse_two_points(self, cli_input: str) -> ParseResult:
+        """
+        Parse two Points from given input.
+        """
+        point_result1 = PointParser().parse_point(cli_input)
+        if point_result1.is_successful():
+            point_result2 = PointParser().parse_point(point_result1.get_remainder())
+            if point_result2.is_successful():
+                return Success([point_result1.get_match(), point_result2.get_match()], point_result2.get_remainder())
+
+        return Failure("<POINT> <POINT>", cli_input)
 
     def convert_points(self, points: list) -> list:
         """
@@ -84,7 +96,7 @@ class ShapeCommandParser(CommandParser):
 
     def parse_color(self, cli_input: str, color_parser: ColorParser) -> ParseResult:
         """
-        Parse a Color from given input
+        Parse a Color from given input.
         """
         default_color = Color(0, 0, 0)
         if cli_input == '':
@@ -92,11 +104,7 @@ class ShapeCommandParser(CommandParser):
 
         color_result = color_parser.parse_color(cli_input)
         if color_result.is_successful():
-            if not color_result.get_remainder() == '':
-                # TODO: lepší hlášku
-                return Failure("color is the last attribute!", color_result.get_remainder())
-            else:
-                return Success(color_result.get_match(), '')
+            return Success(color_result.get_match(), '')
 
         return Failure(color_result.get_expected(), cli_input)
 
@@ -104,10 +112,93 @@ class ShapeCommandParser(CommandParser):
 # ------------- Command Parsers ------------
 
 
+class MoveShapeParser(CommandParser):
+    """
+    Parser for "move" (Move) Command.
+    Definition: move <POINT> <POINT>
+    """
+    def parse_command(self, cli_input: str) -> ParseResult:
+        result = StringParser().parse_string("move", cli_input, ' ')
+        return result
+
+    def parse_params(self, cli_input: str) -> ParseResult:
+        result = self.parse_two_points(cli_input)
+        if result.is_successful():
+            abs_points = self.convert_points(result.get_match())
+
+            start_x = abs_points[0].x
+            start_y = abs_points[0].y
+            end_x = abs_points[1].x
+            end_y = abs_points[1].y
+            return Success(MoveShapeCommand(self.controller, start_x, start_y, end_x, end_y), result.get_remainder())
+        else:
+            return result
+
+    def has_parameters(self) -> bool:
+        return True
+
+
 class RemoveShapeParser(CommandParser):
+    """
+    Parser for "remove" (Remove) Command.
+    Definition: remove <POINT>
+    """
     def parse_command(self, cli_input: str) -> ParseResult:
         result = StringParser().parse_string("remove", cli_input, ' ')
         return result
+
+    def parse_params(self, cli_input: str) -> ParseResult:
+        result = PointParser().parse_point(cli_input)
+        if result.is_successful():
+            abs_point = self.convert_points([result.get_match()])
+
+            x = abs_point[0].x
+            y = abs_point[0].y
+            return Success(RemoveShapeCommand(self.controller, x, y), result.get_remainder())
+        else:
+            return result
+
+    def has_parameters(self) -> bool:
+        return True
+
+
+class ListParser(CommandParser):
+    """
+    Parser for "ls" (List) Command.
+    Definition: ls | ls <POINT>
+    """
+    def parse_command(self, cli_input: str):
+        # parse command 'ls' without parameter
+        result1 = StringParser().parse_string("ls", cli_input, '')
+        if result1.is_successful():
+            return result1
+
+        # parse command 'ls' with a parameter
+        result2 = StringParser().parse_string("ls", cli_input, ' ')
+        return result2
+
+    def parse_params(self, cli_input: str):
+        if cli_input == '':
+            # point parameter is absent, return ListShapeCommand with default values of parameters x and y
+            return Success(ListShapeCommand(self.controller), '')
+
+        result = PointParser.parse_point(cli_input)
+        if result.is_successful():
+            abs_point = self.convert_points([result.get_match()])
+
+            x = abs_point[0].x
+            y = abs_point[0].y
+            return Success(ListShapeCommand(self.controller, x, y), result.get_remainder())
+        else:
+            return result
+
+    def has_parameters(self):
+        return True
+
+
+class SaveParser(CommandParser):
+    def parse_command(self, cli_input: str) -> ParseResult:
+        pass
 
     def parse_params(self, cli_input: str) -> ParseResult:
         pass
@@ -116,19 +207,15 @@ class RemoveShapeParser(CommandParser):
         pass
 
 
-class ListParser(CommandParser):
-    """
-    Parser for "ls" (list) Command.
-    """
-    def parse_command(self, cli_input: str):
-        result = StringParser().parse_string("ls", cli_input, ' ')
-        return result
+class LoadParser(CommandParser):
+    def parse_command(self, cli_input: str) -> ParseResult:
+        pass
 
-    def parse_params(self, cli_input: str):
-        return Success("Temporary for debugging", "not implemented yet")
+    def parse_params(self, cli_input: str) -> ParseResult:
+        pass
 
-    def has_parameters(self):
-        return True
+    def has_parameters(self) -> bool:
+        pass
 
 
 class QuitParser(CommandParser):
@@ -163,7 +250,7 @@ class RectParser(ShapeCommandParser):
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        points_result = self.parse_points(cli_input)
+        points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():
             # TODO: parse Color a pak vytvořit Command pomocí CommandFactory
             abs_points = self.convert_points(points_result.get_match())
@@ -199,18 +286,6 @@ class RectParser(ShapeCommandParser):
 
         return Failure(points_result.get_expected() + ' | ' + point_and_nats_result.get_expected(), cli_input)
 
-    def parse_points(self, cli_input: str) -> ParseResult:
-        """
-        Parse two Points from given input.
-        """
-        point_result1 = PointParser().parse_point(cli_input)
-        if point_result1.is_successful():
-            point_result2 = PointParser().parse_point(point_result1.get_remainder())
-            if point_result2.is_successful():
-                return Success([point_result1.get_match(), point_result2.get_match()], point_result2.get_remainder())
-
-        return Failure("rect <POINT> <POINT>", cli_input)
-
     def parse_point_and_nats(self, cli_input: str) -> ParseResult:
         """
         Parse a Point and two Natural numbers from given input.
@@ -241,7 +316,7 @@ class CircleParser(ShapeCommandParser):
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        points_result = self.parse_points(cli_input)
+        points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():
             abs_points = self.convert_points(points_result.get_match())
             start_x = abs_points[0].x
@@ -275,18 +350,6 @@ class CircleParser(ShapeCommandParser):
                 return Failure(color_result.get_expected(), point_and_nat_result.get_remainder())
 
         return Failure(points_result.get_expected() + ' | ' + point_and_nat_result.get_expected(), cli_input)
-
-    def parse_points(self, cli_input: str) -> ParseResult:
-        """
-        Parse two Points from given input.
-        """
-        point_result1 = PointParser().parse_point(cli_input)
-        if point_result1.is_successful():
-            point_result2 = PointParser().parse_point(point_result1.get_remainder())
-            if point_result2.is_successful():
-                return Success([point_result1.get_match(), point_result2.get_match()], point_result2.get_remainder())
-
-        return Failure("circle <POINT> <POINT>", cli_input)
 
     def parse_point_and_nat(self, cli_input: str) -> ParseResult:
         """
@@ -349,7 +412,7 @@ class LineParser(ShapeCommandParser):
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        points_result = self.parse_points(cli_input)
+        points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():
             points = points_result.get_match()
 
@@ -388,18 +451,6 @@ class LineParser(ShapeCommandParser):
                             break
 
         return Failure("line <POINT> <POINTS>", cli_input)
-
-    def parse_points(self, cli_input: str) -> ParseResult:
-        """
-        Parse two Points from given input.
-        """
-        point_result1 = PointParser().parse_point(cli_input)
-        if point_result1.is_successful():
-            point_result2 = PointParser().parse_point(point_result1.get_remainder())
-            if point_result2.is_successful():
-                return Success([point_result1.get_match(), point_result2.get_match()], point_result2.get_remainder())
-
-        return Failure("line <POINT> <POINT>", cli_input)
 
     def has_parameters(self) -> bool:
         return True
