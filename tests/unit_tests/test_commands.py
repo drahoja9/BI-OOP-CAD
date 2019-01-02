@@ -79,6 +79,9 @@ class ReceiverMockup:
     def restart(self):
         self.restarted = True
 
+    def clear_dialog(self):
+        return True
+
 
 @pytest.fixture
 def receiver() -> ReceiverMockup:
