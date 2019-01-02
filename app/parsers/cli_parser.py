@@ -1,9 +1,10 @@
-from app.parsers.command_parsers import CommandParser, RemoveShapeParser, ListParser, QuitParser, \
-    RectParser, CircleParser, DotParser, LineParser, InvalidCommand, MoveShapeParser
+from app.parsers.command_parsers import CommandParser, RemoveShapeParser, ListParser, ClearParser, \
+    RectParser, CircleParser, DotParser, LineParser, MoveShapeParser, SaveParser, LoadParser, QuitParser
 from app.controller import Controller
 from app.parsers.color_parser import ColorParser
 from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
 from app.parsers.point_parsers import PointParser
+from app.commands import InvalidCommand
 
 
 class CliParser:
@@ -22,8 +23,11 @@ class CliParser:
         self.command_parsers = [
             RemoveShapeParser(controller),
             MoveShapeParser(controller),
-            ListParser(controller),
+            SaveParser(controller),
+            LoadParser(controller),
             QuitParser(controller),
+            ListParser(controller),
+            ClearParser(controller),
             RectParser(controller, self.nat_parser, self.int_parser, self.color_parser),
             CircleParser(controller, self.nat_parser, self.int_parser, self.color_parser),
             DotParser(controller, self.nat_parser, self.int_parser, self.color_parser),
@@ -45,7 +49,7 @@ class CliParser:
                 if parser.has_parameters():
                     return self.parse_params(parser, command_result.get_remainder())
                 else:
-                    # there must be no whitespace at the end of the input
+                    # there must not be any other characters remaining in the input string
                     if command_result.get_remainder() == '':
                         return command_result.get_match()
 

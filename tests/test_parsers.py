@@ -1,5 +1,4 @@
 import pytest
-import re
 
 from app.parsers.cli_parser import CliParser
 from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
@@ -7,12 +6,24 @@ from app.parsers.point_parsers import ParserPoint
 from app.parsers.parse_results import Success, Failure
 from app.parsers.point_parsers import PointParser, AbsoluteParserPoint, RelativeParserPoint
 from app.parsers.color_parser import RgbColorParser
-from app.parsers.command_parsers import InvalidCommand, CommandParser
+from app.parsers.command_parsers import CommandParser
 from app.controller import Controller
 from app.commands import PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, PrintPolylineCommand, \
-    RemoveShapeCommand, ListShapeCommand, MoveShapeCommand
+    RemoveShapeCommand, ListShapeCommand, MoveShapeCommand, ClearCommand, InvalidCommand, SaveCommand, LoadCommand,\
+    QuitCommand
 from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
 
+
+@pytest.fixture
+def controller() -> Controller:
+    controller: Controller = "controller"
+    return controller
+
+
+@pytest.fixture
+def cli_parser() -> CliParser:
+    controller: Controller = "controller"
+    return CliParser(controller, RgbColorParser(NatParser()))
 
 # --------------- Low level parsers tests ---------------
 
@@ -206,13 +217,10 @@ def test_absolute_parser_point_conversion():
         assert absolute_point.convert_to_absolute(predecessor_point) == result_point
 
 
-# --------------- CommandParsers tests ---------------
+# --------------- ShapeCommandParsers tests ---------------
 
 
-def test_circle_parser():
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
+def test_circle_parser(controller: Controller, cli_parser: CliParser):
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["circle 10,-20 30,40", "circle 10,20 30,+40", "circle 10,20 30.40", "circle 10 20 30,40",
                       "circle10,20 30,40", " circle 10,20 30,40", "circle 10,20  30,40", "circle 10,20",
@@ -273,14 +281,11 @@ def test_circle_parser():
         assert command == expected
 
 
-def test_rect_parser():
+def test_rect_parser(controller: Controller, cli_parser: CliParser):
     """
 
     :return:
     """
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["rect 10,-20 30,40", "rect 10,20 30,+40", "rect 10,20 30.40", "rect 10 20 30,40",
                       "rect10,20 30,40", " rect 10,20 30,40", "rect 10,20  30,40", "rect 10,20",
@@ -340,14 +345,11 @@ def test_rect_parser():
         assert command == expected
 
 
-def test_dot_parser():
+def test_dot_parser(controller: Controller, cli_parser: CliParser):
     """
 
     :return:
     """
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
     # Test invalid inputs
     invalid_inputs = ["dot 10,-20", "dot +10,20", "dot 10.20", "dot 10 20",
                       "dot10,20", " dot 10,20", "dot 10,20   ", "dot 10,20 30,40",
@@ -374,11 +376,7 @@ def test_dot_parser():
         assert command == expected
 
 
-def test_line_parser():
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
-    # Test invalid inputs, two points
+def test_line_parser(controller: Controller, cli_parser: CliParser):
     invalid_inputs = ["line 10,-20 30,40", "line 10,20 30,+40", "line 10,20 30.40", "line 10 20 30,40",
                       "line10,20 30,40", " line 10,20 30,40", "line 10,20  30,40", "line 10,20",
                       "linet 10,20 30,40", "line 10,20 30 ,40", "line 10,20 30, 40", "line 10,20 30 , 40",
@@ -473,10 +471,10 @@ def test_line_parser():
         assert command == expected
 
 
-def test_move_shape_parser():
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
+# --------------- Other CommandParsers tests ---------------
 
+
+def test_move_shape_parser(controller: Controller, cli_parser: CliParser):
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["move 10,-20 30,40", "move 10,20 30,+40", "move 10,20 30.40", "move 10 20 30,40",
                       "move10,20 30,40", " move 10,20 30,40", "move 10,20  30,40", "move 10,20",
@@ -498,10 +496,7 @@ def test_move_shape_parser():
         assert command == expected
 
 
-def test_remove_shape_parser():
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
+def test_remove_shape_parser(controller: Controller, cli_parser: CliParser):
     # Test invalid inputs
     invalid_inputs = ["remove 10,-20", "remove +10,20", "remove 10.20", "remove 10 20",
                       "remove10,20", " remove 10,20", "remove 10,20   ", "remove 10,20 30,40",
@@ -522,10 +517,7 @@ def test_remove_shape_parser():
         assert command == expected
 
 
-def test_list_shape_parser():
-    controller: Controller = "receiver"
-    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
-
+def test_list_shape_parser(controller: Controller, cli_parser: CliParser):
     # Test invalid inputs
     invalid_inputs = ["ls 10,-20", "ls +10,20", "ls 10.20", "ls 10 20",
                       "ls10,20", " ls 10,20", "ls 10,20   ", "ls 10,20 30,40",
@@ -547,11 +539,52 @@ def test_list_shape_parser():
         assert command == expected
 
 
-def test_points_conversion():
+def test_clear_parser(controller: Controller, cli_parser: CliParser):
+    # Test valid input
+    assert cli_parser.parse_input(" clear") == InvalidCommand(controller)
+
+    # Test invalid input
+    assert cli_parser.parse_input("clear") == ClearCommand(controller)
+    assert cli_parser.parse_input("clear something") == InvalidCommand(controller)
+    assert cli_parser.parse_input("clearsomething") == InvalidCommand(controller)
+
+
+def test_quit_parser(controller: Controller, cli_parser: CliParser):
+    # Test valid input
+    assert cli_parser.parse_input("quit") == QuitCommand(controller)
+
+    # Test invalid input
+    assert cli_parser.parse_input(" quit") == InvalidCommand(controller)
+    assert cli_parser.parse_input("quit something") == InvalidCommand(controller)
+    assert cli_parser.parse_input("quitsomething") == InvalidCommand(controller)
+
+
+def test_save_parser(controller: Controller, cli_parser: CliParser):
+    # Test valid input
+    assert cli_parser.parse_input("save") == SaveCommand(controller)
+    assert cli_parser.parse_input("save filename") == SaveCommand(controller, "filename")
+
+    # Test invalid input
+    assert cli_parser.parse_input(" save") == InvalidCommand(controller)
+    assert cli_parser.parse_input(" save something") == InvalidCommand(controller)
+    assert cli_parser.parse_input("savesomething") == InvalidCommand(controller)
+
+
+def test_load_parser(controller: Controller, cli_parser: CliParser):
+    # Test valid input
+    assert cli_parser.parse_input("load filename") == LoadCommand(controller, "filename")
+
+    # Test invalid input
+    assert cli_parser.parse_input("load") == InvalidCommand(controller)
+    assert cli_parser.parse_input(" load") == InvalidCommand(controller)
+    assert cli_parser.parse_input(" load something") == InvalidCommand(controller)
+    assert cli_parser.parse_input("loadsomething") == InvalidCommand(controller)
+
+
+def test_points_conversion(controller: Controller):
     """
     Test CommandParser's conversion of RelativeParserPoints to AbsoluteParserPoints.
     """
-    controller: Controller = "receiver"
     parser = CommandParser(controller)
 
     # Convert only RelativeParserPoints
@@ -584,7 +617,3 @@ def test_points_conversion():
         assert False
     except AttributeError:
         assert True
-
-
-class ControllerMock(Controller):
-    ...

@@ -5,14 +5,11 @@ from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
 from app.parsers.point_parsers import PointParser, AbsoluteParserPoint
 from app.parsers.color_parser import ColorParser
 from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
-from app.commands import Command, PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, \
-    PrintPolylineCommand, MoveShapeCommand, RemoveShapeCommand, ListShapeCommand
+from app.commands import PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, \
+    PrintPolylineCommand, MoveShapeCommand, RemoveShapeCommand, ListShapeCommand, LoadCommand, SaveCommand, \
+    ClearCommand, QuitCommand
 from app.utils import Color
 from app.controller import Controller
-
-
-class InvalidCommand(Command):
-    ...
 
 
 class CommandParser:
@@ -175,7 +172,10 @@ class ListParser(CommandParser):
 
         # parse command 'ls' with a parameter
         result2 = StringParser().parse_string("ls", cli_input, ' ')
-        return result2
+        if result2.is_successful():
+            return result2
+
+        return Failure("ls | ls <POINT>", cli_input)
 
     def parse_params(self, cli_input: str):
         if cli_input == '':
@@ -196,43 +196,82 @@ class ListParser(CommandParser):
         return True
 
 
-class SaveParser(CommandParser):
+class ClearParser(CommandParser):
+    """
+    Parser for 'clear' (Clear) command.
+    """
     def parse_command(self, cli_input: str) -> ParseResult:
-        pass
+        result = StringParser().parse_string("clear", cli_input, '')
+        if result.is_successful():
+            return Success(ClearCommand(self.controller), result.get_remainder())
+        else:
+            return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        pass
+        raise NotImplementedError
 
     def has_parameters(self) -> bool:
-        pass
+        return False
+
+
+class SaveParser(CommandParser):
+    """
+    Parser for 'save' (Save) command.
+    Definition: save | save <STRING>
+    """
+    def parse_command(self, cli_input: str) -> ParseResult:
+        result1 = StringParser().parse_string("save", cli_input, '')
+        if result1.is_successful():
+            return result1
+
+        result2 = StringParser().parse_string("save", cli_input, ' ')
+        if result2.is_successful():
+            return result2
+
+        return Failure("save | save <STRING>", cli_input)
+
+    def parse_params(self, cli_input: str) -> ParseResult:
+        if cli_input == '':
+            return Success(SaveCommand(self.controller, None), '')
+        else:
+            return Success(SaveCommand(self.controller, cli_input), '')
+
+    def has_parameters(self) -> bool:
+        return True
 
 
 class LoadParser(CommandParser):
+    """
+    Parser for 'load' (Load) command.
+    Definition: load <STRING>
+    """
     def parse_command(self, cli_input: str) -> ParseResult:
-        pass
+        result = StringParser().parse_string("load", cli_input, ' ')
+        return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        pass
+        return Success(LoadCommand(self.controller, cli_input), '')
 
     def has_parameters(self) -> bool:
-        pass
+        return True
 
 
 class QuitParser(CommandParser):
     """
-    Parser for "quit" Command.
+    Parser for 'quit' (Quit) command.
+    Definition: quit
     """
-    def parse_command(self, cli_input: str):
+    def parse_command(self, cli_input: str) -> ParseResult:
         result = StringParser().parse_string("quit", cli_input, '')
         if result.is_successful():
-            return Success(QuitCommand(), result.get_remainder())
-        else:
-            return result
+            return Success(QuitCommand(self.controller), '')
 
-    def parse_params(self, cli_input: str):
-        return NotImplementedError
+        return result
 
-    def has_parameters(self):
+    def parse_params(self, cli_input: str) -> ParseResult:
+        raise NotImplementedError
+
+    def has_parameters(self) -> bool:
         return False
 
 
