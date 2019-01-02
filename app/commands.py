@@ -194,6 +194,46 @@ class ListShapeCommand(Command):
             return 'ls'
 
 
+class SaveCommand(Command):
+    def __init__(self, receiver, file: str = None):
+        super().__init__(receiver)
+        self.file = file
+
+    def execute(self):
+        self.receiver.delete_from_history(1)
+        self.receiver.remove_last_command()
+        self.receiver.save_dialog(self.file)
+
+    def reverse(self):
+        pass
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.file == other.file
+
+    def __str__(self):
+        return f'save {self.file}'
+
+
+class LoadCommand(Command):
+    def __init__(self, receiver, file: str = None):
+        super().__init__(receiver)
+        self.file = file
+
+    def execute(self):
+        self.receiver.delete_from_history(1)
+        self.receiver.remove_last_command()
+        self.receiver.load_dialog(self.file)
+
+    def reverse(self):
+        pass
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.file == other.file
+
+    def __str__(self):
+        return f'load {self.file}'
+
+
 class ClearCommand(Command):
     def __init__(self, receiver):
         super().__init__(receiver)

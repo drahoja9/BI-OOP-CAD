@@ -4,7 +4,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtGui import QColor, QTextCursor
 from PyQt5.QtWidgets import QColorDialog, QFileDialog
 
-from app.commands import ClearCommand
+from app.commands import ClearCommand, SaveCommand, LoadCommand
 from app.ui.main_window import Ui_MainWindow
 from app.ui.clear_dialog import Ui_clearDialog
 from app.canvas import Canvas
@@ -48,10 +48,10 @@ class MainWindow(QtWidgets.QMainWindow):
             lambda: self._handle_action_new()
         )
         self._ui.actionSave.triggered.connect(
-            lambda: self.handle_file_save()
+            lambda: self.save_dialog()
         )
         self._ui.actionLoad.triggered.connect(
-            lambda: self.handle_file_load()
+            lambda: self.load_dialog()
         )
         self._ui.actionUndo.triggered.connect(
             lambda: self._controller.undo()
@@ -99,17 +99,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self._ui.canvasHolder.setWidget(self.canvas)
 
-    @staticmethod
-    def clear_dialog() -> bool:
-        res = ClearDialog()
-        return res.accepted
+    # ------------------------------------------------ Handlers -------------------------------------------------------
 
     def _handle_action_new(self):
         command = ClearCommand(self._controller)
         self._controller.execute_command(command)
 
-    def set_status(self, message: str = str(MoveShapeBrush())):
-        self.statusBar().showMessage(message)
+    def _handle_save_file(self):
+        command = SaveCommand(self._controller)
+        self._controller.execute_command(command)
+
+    def _handle_load_file(self):
+        command = LoadCommand(self._controller)
+        self._controller.execute_command(command)
 
     def _toggle_brush(self, brush: Brush):
         if self.canvas.brush != MoveShapeBrush():
@@ -132,7 +134,23 @@ class MainWindow(QtWidgets.QMainWindow):
             r, g, b, alpha = color.getRgb()
             self.canvas.set_color((r, g, b))
 
-    def handle_file_save(self, path_to_file: str = None):
+    def _handle_user_input(self):
+        command_text = self._ui.manualInput.text()
+        self._ui.manualInput.setText('')
+        if command_text != '' and not command_text.isspace():
+            self._controller.parse_command(command_text)
+
+    # --------------------------------------------- Main window methods -----------------------------------------------
+
+    @staticmethod
+    def clear_dialog() -> bool:
+        res = ClearDialog()
+        return res.accepted
+
+    def set_status(self, message: str = str(MoveShapeBrush())):
+        self.statusBar().showMessage(message)
+
+    def save_dialog(self, path_to_file: str = None):
         # Save file dialog will open and returns tuple (name of the saved file, type)
         user = getpass.getuser()
         path = path_to_file or f'/home/{user}/untitled.txt'
@@ -140,19 +158,13 @@ class MainWindow(QtWidgets.QMainWindow):
         if name:
             self._controller.save(name)
 
-    def handle_file_load(self, path_to_file: str = None):
+    def load_dialog(self, path_to_file: str = None):
         # Load file dialog will open and returns tuple (name of the loaded file, type)
         user = getpass.getuser()
         path = path_to_file or f'/home/{user}/untitled.txt'
         name, _ = QFileDialog().getOpenFileName(self, 'Load File', path)
         if name:
             self._controller.load(name)
-
-    def _handle_user_input(self):
-        command_text = self._ui.manualInput.text()
-        self._ui.manualInput.setText('')
-        if command_text != '' and not command_text.isspace():
-            self._controller.parse_command(command_text)
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)
