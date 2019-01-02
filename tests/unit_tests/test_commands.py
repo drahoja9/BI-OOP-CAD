@@ -4,7 +4,7 @@ from typing import List, Dict
 import pytest
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
-    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand
+    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand, InvalidCommand, ClearCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -19,7 +19,9 @@ class ReceiverMockup:
         self.removed = []
         self.listed_shapes = None
         self.last_command_removed = None
+        self.printed = ''
         self.deleted_lines = 0
+        self.restarted = False
 
     def add_shapes(self, *shapes: Shape):
         if len(shapes) == 1:
@@ -65,8 +67,17 @@ class ReceiverMockup:
         self.removed = res['removed']
         return res
 
+    def print_to_history(self, lines: str):
+        self.printed += lines
+
     def delete_from_history(self, number_of_lines: int = 1):
         self.deleted_lines = number_of_lines
+
+    def shapes_at(self, point: Point = None) -> List[Shape]:
+        return [Line(Point(10, 10), Point(20, 20), Color(1, 2, 3)), Dot(Point(10, 10), Color(1, 2, 3))]
+
+    def restart(self):
+        self.restarted = True
 
 
 @pytest.fixture
@@ -422,3 +433,29 @@ def test_list_shape_command(receiver: ReceiverMockup):
     ]
     command.reverse()
     assert receiver.deleted_lines == len(command.listed) + 1
+
+
+def test_clear_command(receiver: ReceiverMockup):
+    command = ClearCommand(receiver)
+    assert str(command) == 'clear'
+    assert command == ClearCommand(receiver)
+
+    command.execute()
+    assert receiver.restarted is True
+    assert command.shapes == [Line(Point(10, 10), Point(20, 20), Color(1, 2, 3)), Dot(Point(10, 10), Color(1, 2, 3))]
+
+    command.reverse()
+    assert receiver.deleted_lines == 1
+    assert receiver.received == [Line(Point(10, 10), Point(20, 20), Color(1, 2, 3)), Dot(Point(10, 10), Color(1, 2, 3))]
+
+
+def test_invalid_command(receiver: ReceiverMockup):
+    command = InvalidCommand(receiver)
+    assert str(command) == 'invalid command'
+    assert command == InvalidCommand(receiver)
+
+    command.execute()
+    assert receiver.printed == 'Invalid command!'
+
+    command.reverse()
+    assert receiver.deleted_lines == 2

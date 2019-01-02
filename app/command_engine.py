@@ -52,9 +52,3 @@ class CommandEngine:
 
     def get_all_commands(self) -> Dict[str, List[Command]]:
         return {'undos': self._undos, 'redos': self._redos}
-
-    def restart(self):
-        self._undos = []
-        self._redos = []
-        self._controller.disable_undo()
-        self._controller.disable_redo()
