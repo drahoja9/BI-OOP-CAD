@@ -336,12 +336,70 @@ class DotParser(ShapeCommandParser):
 
 
 class LineParser(ShapeCommandParser):
+    """
+    Parser for "line" (Line) Command.
+    If More than two points are parsed as parameters, the result command
+    is PolylineCommand instead of LineCommand.
+    Definition: line <POINT> <POINTS> <COLOR>
+    POINTS ::= <POINT> | <POINT> <POINTS>
+    COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
+    """
     def parse_command(self, cli_input: str) -> ParseResult:
         result = StringParser().parse_string("line", cli_input, ' ')
         return result
 
     def parse_params(self, cli_input: str) -> ParseResult:
-        pass
+        points_result = self.parse_points(cli_input)
+        if points_result.is_successful():
+            points = points_result.get_match()
+
+            # two points parsed successfully, try to parse a color
+            remainder = points_result.get_remainder()
+            color_result = self.parse_color(remainder, self.color_parser)
+            if color_result.is_successful():
+                # color parsed successfully, no more points will be parsed
+                color = color_result.get_match()
+
+                abs_points = self.convert_points(points_result.get_match())
+                start_x = abs_points[0].x
+                start_y = abs_points[0].y
+                end_x = abs_points[1].x
+                end_y = abs_points[1].y
+                return Success(PrintLineCommand(self.controller, start_x, start_y, end_x, end_y, color), '')
+            else:
+                # try to parse a point or a color
+                while True:
+                    point_result = PointParser().parse_point(remainder)
+                    if point_result.is_successful():
+                        points.append(point_result.get_match())
+                        remainder = point_result.get_remainder()
+                    else:
+                        color_result = self.parse_color(remainder, self.color_parser)
+                        if color_result.is_successful():
+                            # color parsed successfully, no more points will be parsed
+                            color = color_result.get_match()
+
+                            abs_points = self.convert_points(points)
+                            return Success(PrintPolylineCommand(self.controller,
+                                                                [(p.x, p.y) for p in abs_points], color),
+                                           color_result.get_remainder()
+                                           )
+                        else:
+                            break
+
+        return Failure("line <POINT> <POINTS>", cli_input)
+
+    def parse_points(self, cli_input: str) -> ParseResult:
+        """
+        Parse two Points from given input.
+        """
+        point_result1 = PointParser().parse_point(cli_input)
+        if point_result1.is_successful():
+            point_result2 = PointParser().parse_point(point_result1.get_remainder())
+            if point_result2.is_successful():
+                return Success([point_result1.get_match(), point_result2.get_match()], point_result2.get_remainder())
+
+        return Failure("line <POINT> <POINT>", cli_input)
 
     def has_parameters(self) -> bool:
-        pass
+        return True

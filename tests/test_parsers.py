@@ -216,7 +216,8 @@ def test_circle_parser():
     # Test invalid inputs, two points as parameters
     invalid_inputs = ["circle 10,-20 30,40", "circle 10,20 30,+40", "circle 10,20 30.40", "circle 10 20 30,40",
                       "circle10,20 30,40", " circle 10,20 30,40", "circle 10,20  30,40", "circle 10,20",
-                      "circlee 10,20 30,40", "circle something",
+                      "circlee 10,20 30,40", "line 10,20 30 ,40", "line 10,20 30, 40", "line 10,20 30 , 40",
+                      "circle something",
                       "circle 10,20 30,40 rgb(0,0,-1)", "circle 10,20 30,40 rgb(0,0,0", "circle 10,20 30,40 rgb 0,0,0",
                       "circle 10,20 30,40 rgb(0,1)", "circle 10,20 30,40rgb(0,1,2)", "circle 10,20 30,40   rgb(0,0,0)",
                       "circle 10,20 30,40 rgb(1a,2,3)", "circle 10,20 30,40,rgb(0,2,3)",
@@ -311,6 +312,7 @@ def test_rect_parser():
     invalid_inputs = ["rect 10,-20 30 40", "rect 10,20 30 +40", "rect 10,20 -30 40", "rect 10 20 30 40",
                       "rect10,20 30 40", " rect 10,20 30 40", "rect 10,20  30 40", "rect 10,20", "rect 10,20 30",
                       "rectt 10,20 30 40", "rect 10,20 something", "rect 10,20 30 something",
+                      "rect 10,20 30 ,40", "rect 10,20 30, 40", "rect 10,20 30 , 40",
                       "rect 10,20 30 40 rgb(0,0,-1)", "rect 10,20 30 40 rgb(0,0,0", "rect 10,20 30 40 rgb 0,0,0",
                       "rect 10,20 30 40 rgb(0,1)", "rect 10,20 30 40rgb(0,1,2)", "rect 10,20 30 40   rgb(0,0,0)",
                       "rect 10,20 30 40 rgb(1a,2,3)", "rect 10,20 30 40,rgb(0,2,3)",
@@ -348,8 +350,8 @@ def test_dot_parser():
 
     # Test invalid inputs
     invalid_inputs = ["dot 10,-20", "dot +10,20", "dot 10.20", "dot 10 20",
-                      "dott10,20", " dot 10,20", "dot 10,20   ", "dot 10,20 30,40",
-                      "dott 10,20", "dot something",
+                      "dot10,20", " dot 10,20", "dot 10,20   ", "dot 10,20 30,40",
+                      "dott 10,20", "dot 10 ,20", "dot 10, 20", "dot 10 , 20", "dot something",
                       "dot 10,20 rgb(0,0,-1)", "dot 10,20 30,40 rgb(0,0,0", "dot 10,20 rgb 0,0,0",
                       "dot 10,20 rgb(0,1)", "dot 10,20rgb(0,1,2)", "dot 10,20  rgb(0,0,0)",
                       "dot 10,20 rgb(1a,2,3)", "dot  10,20,rgb(0,2,3)",
@@ -370,6 +372,117 @@ def test_dot_parser():
     for cli_input, expected in valid_inputs:
         command = cli_parser.parse_input(cli_input)
         assert command == expected
+
+
+def test_line_parser():
+    controller: Controller = "receiver"
+    cli_parser = CliParser(controller, RgbColorParser(NatParser()))
+
+    # Test invalid inputs, two points
+    invalid_inputs = ["line 10,-20 30,40", "line 10,20 30,+40", "line 10,20 30.40", "line 10 20 30,40",
+                      "line10,20 30,40", " line 10,20 30,40", "line 10,20  30,40", "line 10,20",
+                      "linet 10,20 30,40", "line 10,20 30 ,40", "line 10,20 30, 40", "line 10,20 30 , 40",
+                      "line something",
+                      "line 10,20 30,40 rgb(0,0,-1)", "line 10,20 30,40 rgb(0,0,0", "line 10,20 30,40 rgb 0,0,0",
+                      "line 10,20 30,40 rgb(0,1)", "line 10,20 30,40rgb(0,1,2)", "line 10,20 30,40   rgb(0,0,0)",
+                      "line 10,20 30,40 rgb(1a,2,3)", "line 10,20 30,40,rgb(0,2,3)",
+                      "line 10,20 30,40 rgb(256,0,1)", "line 10,20 30,40 rgb(2, 0,1)",
+                      "line 10,20 30,40 rgb(2.0.1)", "line 10,20 30,40 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs, two points
+    valid_inputs = [("line 10,20 30,40", PrintLineCommand(controller, 10, 20, 30, 40, (0, 0, 0))),
+                    ("line 10,20 -10,-20", PrintLineCommand(controller, 10, 20, 0, 0, (0, 0, 0))),
+                    ("line -5,-5 +5,+5", PrintLineCommand(controller, -5, -5, 0, 0, (0, 0, 0))),
+                    ("line -5,-5 10,20", PrintLineCommand(controller, -5, -5, 10, 20, (0, 0, 0))),
+                    ("line 10,20 30,40 rgb(10,20,30)", PrintLineCommand(controller, 10, 20, 30, 40, (10, 20, 30))),
+                    ("line 10,20 -10,-20 rgb(0,0,0)", PrintLineCommand(controller, 10, 20, 0, 0, (0, 0, 0)))
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
+
+    # Test invalid inputs, three points
+    invalid_inputs = ["line 10,20 30,40 50,-60", "line 10,20 30,40 50,+60", "line 10,20 30,40 50.60",
+                      "line 10,20 30,40 50 60", "line 10,20 30,40  50,60", "line 10,20 30,40 something",
+                      "line 10,20, 30,40 50, 60", "line 10,20, 30,40 50 ,60",
+                      "line 10,20 30,40 50,60 rgb(0,0,-1)", "line 10,20 30,40 50,60 rgb(0,0,0",
+                      "line 10,20 30,40 rgb 0,0,0", "line 10,20 30,40 50,60 rgb(0,1)",
+                      "line 10,20 30,40 50,60  rgb(0,0,0)", "line 10,20 30,40 50,60 rgb(1a,2,3)",
+                      "line 10,20 30,40,50,60 rgb(0,2,3)", "line 10,20 30,40 50,60 rgb(256,0,1)",
+                      "line 10,20 30,40 50,60 rgb(2, 0,1)", "line 10,20 30,40 50,60 rgb(2.0.1)",
+                      "line 10,20 30,40 50,60rgb(0,1,2)", "line 10,20 30,40 50,60 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs, three points
+    valid_inputs = [("line 10,20 30,40 50,60",
+                     PrintPolylineCommand(controller, [(10, 20), (30, 40), (50, 60)], (0, 0, 0))),
+                    ("line 10,20 -10,-20 10,20",
+                     PrintPolylineCommand(controller, [(10, 20), (0, 0), (10, 20)], (0, 0, 0))),
+                    ("line -5,-5 +5,+5 5,5",
+                     PrintPolylineCommand(controller, [(-5, -5), (0, 0), (5, 5)], (0, 0, 0))),
+                    ("line -5,-5 10,20 -10,-20",
+                     PrintPolylineCommand(controller, [(-5, -5), (10, 20), (0, 0)], (0, 0, 0))),
+                    ("line 10,20 30,40 50,60 rgb(10,20,30)",
+                     PrintPolylineCommand(controller, [(10, 20), (30, 40), (50, 60)], (10, 20, 30))),
+                    ("line 10,20 -10,-20 +30,+40 rgb(0,0,0)",
+                     PrintPolylineCommand(controller, [(10, 20), (0, 0), (30, 40)], (0, 0, 0))),
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
+
+    # Test invalid inputs, four points
+    invalid_inputs = ["line 10,20 30,40 50,60 70,-80", "line 10,20 30,40 50,60 70,+80",
+                      "line 10,20 30,40 50,60 70.80", "line 10,20 30,40 50,60 70 80", "line 10,20 30,40 50,60  70,80",
+                      "line 10,20 30,40 50,60 something",
+                      "line 10,20, 30,40 50,60 70, 80", "line 10,20, 30,40 50,60 70, 80",
+                      "line 10,20 30,40 50,60 70,80 rgb(0,0,-1)", "line 10,20 30,40 50,60 70,80 rgb(0,0,0",
+                      "line 10,20 30,40 50,60 70,80 rgb 0,0,0", "line 10,20 30,40 50,60 70,80 rgb(0,1)",
+                      "line 10,20 30,40 50,60 70,80  rgb(0,0,0)", "line 10,20 30,40 50,60 70,80 rgb(1a,2,3)",
+                      "line 10,20 30,40,50,60 70,80 rgb(0,2,3)", "line 10,20 30,40 50,60 70,80 rgb(256,0,1)",
+                      "line 10,20 30,40 50,60 70,80 rgb(2, 0,1)", "line 10,20 30,40 50,60 70,80 rgb(2.0.1)",
+                      "line 10,20 30,40 50,60 70,80rgb(0,1,2)", "line 10,20 30,40 50,60 70,80 rgb(123)"
+                      ]
+    for cli_input in invalid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == InvalidCommand(controller)
+
+    # Test valid inputs, four points
+    valid_inputs = [("line 10,20 30,40 50,60 70,80",
+                     PrintPolylineCommand(controller, [(10, 20), (30, 40), (50, 60), (70, 80)], (0, 0, 0))),
+                    ("line 10,20 -10,-20 10,20 -10,-20",
+                     PrintPolylineCommand(controller, [(10, 20), (0, 0), (10, 20), (0, 0)], (0, 0, 0))),
+                    ("line -5,-5 +5,+5 5,5 -5,-5",
+                     PrintPolylineCommand(controller, [(-5, -5), (0, 0), (5, 5), (0, 0)], (0, 0, 0))),
+                    ("line -5,-5 10,20 -10,-20 10,20",
+                     PrintPolylineCommand(controller, [(-5, -5), (10, 20), (0, 0), (10, 20)], (0, 0, 0))),
+                    ("line 10,20 30,40 50,60 70,80 rgb(10,20,30)",
+                     PrintPolylineCommand(controller, [(10, 20), (30, 40), (50, 60), (70, 80)], (10, 20, 30))),
+                    ("line 10,20 -10,-20 +30,+40 -30,-40 rgb(0,0,0)",
+                     PrintPolylineCommand(controller, [(10, 20), (0, 0), (30, 40), (0, 0)], (0, 0, 0))),
+                    ]
+    for cli_input, expected in valid_inputs:
+        command = cli_parser.parse_input(cli_input)
+        assert command == expected
+
+
+def test_move_shape_parser():
+    ...
+
+
+def test_remove_shape_parser():
+    ...
+
+
+def test_list_shape_parser():
+    ...
 
 
 def test_points_conversion():
