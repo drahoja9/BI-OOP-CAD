@@ -107,9 +107,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self._controller.save(name[0])
 
     def _handle_user_input(self):
-        command = self._ui.manualInput.text()
-        self._ui.manualInput.setText('')
-        print(command)
+        command_text = self._ui.manualInput.text()
+        if command_text != '' and not command_text.isspace():
+            self._ui.manualInput.setText('')
+            self._controller.parse_command(command_text)
 
     def enable_undo(self):
         self._ui.actionUndo.setEnabled(True)
@@ -123,8 +124,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def disable_redo(self):
         self._ui.actionRedo.setEnabled(False)
 
-    def print_newline_to_history(self, line: str):
-        self._ui.history.append(line)
+    def print_lines_to_history(self, lines: str):
+        self._ui.history.append(lines)
 
     def delete_from_history(self, number_of_lines: int = 1):
         history = self._ui.history.toPlainText()

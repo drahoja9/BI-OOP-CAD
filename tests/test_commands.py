@@ -4,7 +4,7 @@ from typing import List, Dict
 import pytest
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
-    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand
+    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand, InvalidCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -19,6 +19,7 @@ class ReceiverMockup:
         self.removed = []
         self.listed_shapes = None
         self.last_command_removed = None
+        self.printed = ''
         self.deleted_lines = 0
 
     def add_shapes(self, *shapes: Shape):
@@ -37,7 +38,7 @@ class ReceiverMockup:
         self.moved = res['moved']
         return res
 
-    def list_shapes(self, point: Point = None):
+    def print_shapes_to_history(self, point: Point = None):
         to_list = []
         for shape in self.shapes:
             if point and shape.contains(point):
@@ -64,6 +65,9 @@ class ReceiverMockup:
                 res['removed'].append(shape)
         self.removed = res['removed']
         return res
+
+    def print_to_history(self, lines: str):
+        self.printed += lines
 
     def delete_from_history(self, number_of_lines: int = 1):
         self.deleted_lines = number_of_lines
@@ -422,3 +426,15 @@ def test_list_shape_command(receiver: ReceiverMockup):
     ]
     command.reverse()
     assert receiver.deleted_lines == len(command.listed) + 1
+
+
+def test_invalid_command(receiver: ReceiverMockup):
+    command = InvalidCommand(receiver)
+    assert str(command) == 'invalid command'
+    assert command == InvalidCommand(receiver)
+
+    command.execute()
+    assert receiver.printed == 'Invalid command!'
+
+    command.reverse()
+    assert receiver.deleted_lines == 2
