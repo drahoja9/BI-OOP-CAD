@@ -1,5 +1,3 @@
-import math
-
 from PyQt5.QtCore import Qt
 
 from app.commands import PrintLineCommand, PrintRectCommand, PrintCircleCommand, PrintDotCommand, PrintPolylineCommand, \
@@ -62,18 +60,6 @@ class DotShapeBrush(ShapeBrush):
         super().__init__()
         self._shape_command_class = PrintDotCommand
 
-    # def _point_distance(self, p1, p2):
-    #     return math.floor(
-    #         math.sqrt((p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2)
-    #     )
-    #
-    # def _lerp(self, v0, v1, i):
-    #     return v0 + i * (v1 - v0)
-    #
-    # def _get_equidistant_points(self, p1, p2):
-    #     n = self._point_distance(p1, p2)
-    #     return [(self._lerp(p1[0], p2[0], 1./n*i), self._lerp(p1[1], p2[1], 1./n*i)) for i in range(n+1)]
-
     def _dot_command(self, controller, x: int, y: int):
         shape_command = self._shape_command_class(controller, x, y, self.color)
         controller.execute_command(shape_command)
@@ -84,17 +70,6 @@ class DotShapeBrush(ShapeBrush):
 
     def mouse_press(self, controller, x: int, y: int, button):
         self._dot_command(controller, x, y)
-
-    # def mouse_move(self, controller, x: int, y: int):
-    #     if self._start:
-    #         for point in self._get_equidistant_points(self._start, (x, y)):
-    #             self._dot_command(controller, point[0], point[1])
-    #     self._dot_command(controller, x, y)
-    #     self._start = (x, y)
-    #
-    # def mouse_press(self, controller, x: int, y: int):
-    #     self._dot_command(controller, x, y)
-    #     self._start = None
 
     def __str__(self):
         return 'Dot'
