@@ -1,14 +1,14 @@
 from typing import Tuple
 
 from PyQt5 import QtWidgets
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import QEvent
 
-from app.brushes import Brush, MoveShapeBrush, RemoveShapeBrush
+from app.brushes import Brush, MoveShapeBrush
 
 
 class Canvas(QtWidgets.QWidget):
     """
-    A (GUI) drawing place for all the shapes. It represents an observer in the observer design pattern.
+    A (GUI) drawing place for all the shapes.
     """
 
     def __init__(self, controller):

@@ -9,8 +9,7 @@ from app.utils import Point
 class ShapesStore:
     """
     Holds together all the shapes and actions provided on them.
-    When anything changes, notifies the main controller (so in a way,
-    this is a subject and the controller is its observer, right?).
+    When anything changes, notifies the main controller (so this is a subject and the controller is it's observer).
     """
 
     def __init__(self, controller, shapes: List[Shape] = None):

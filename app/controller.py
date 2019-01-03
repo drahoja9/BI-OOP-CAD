@@ -12,7 +12,7 @@ from app.utils import Point
 class Controller:
     """
     Main class of this application. Holds all crucial pieces together.
-    It represents a subject in the observer design pattern.
+    It represents an observer in the observer design pattern.
     """
 
     def __init__(self):
