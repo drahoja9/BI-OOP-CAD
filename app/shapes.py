@@ -4,6 +4,10 @@ from typing import Tuple
 from app.utils import Point, distance, Color
 
 
+DISTANCE_CONST = 0.025
+DISTANCE_CONST_DOT = DISTANCE_CONST*100
+
+
 class Shape:
     """
     Represents an object that is visited by a visitor in the visitor design pattern.
@@ -19,7 +23,7 @@ class Shape:
     def get_props(self):
         raise NotImplementedError
 
-    def contains(self, point: Point) -> bool:
+    def contains(self, point: Point, divergence: bool = False) -> bool:
         raise NotImplementedError
 
     def move(self, move_from: Point, move_to: Point):
@@ -49,8 +53,12 @@ class Dot(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y
 
-    def contains(self, point: Point) -> bool:
-        return self.start == point
+    def contains(self, point: Point, divergence: bool = False) -> bool:
+        if divergence:
+            # Allowing a small divergence to enable grabbing in the GUI
+            return distance(self.start, point) < DISTANCE_CONST_DOT
+        else:
+            return self.start == point
 
     def move(self, move_from: Point, move_to: Point):
         return Dot(move_to, self.color)
@@ -70,11 +78,19 @@ class Line(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.end.x, self.end.y
 
-    def contains(self, point: Point) -> bool:
-        return math.isclose(
-            distance(self.start, point) + distance(self.end, point),
-            distance(self.start, self.end)
-        )
+    def contains(self, point: Point, divergence: bool = False) -> bool:
+        if divergence:
+            # Allowing a small divergence to enable grabbing in the GUI
+            return abs(
+                distance(self.start, point) +
+                distance(self.end, point) -
+                distance(self.start, self.end)
+            ) < DISTANCE_CONST
+        else:
+            return math.isclose(
+                distance(self.start, point) + distance(self.end, point),
+                distance(self.start, self.end)
+            )
 
     def move(self, move_from: Point, move_to: Point):
         new_start = super().move(move_from, move_to).start
@@ -104,14 +120,25 @@ class Polyline(Shape):
     def get_props(self) -> Tuple[Point]:
         return self.points
 
-    def contains(self, point: Point) -> bool:
-        for i in range(len(self.points) - 1):
-            if math.isclose(
-                distance(self.points[i], point) + distance(self.points[i + 1], point),
-                distance(self.points[i], self.points[i + 1])
-            ):
-                return True
-        return False
+    def contains(self, point: Point, divergence: bool = False) -> bool:
+        if divergence:
+            # Allowing a small divergence to enable grabbing in the GUI
+            for i in range(len(self.points) - 1):
+                if abs(
+                    distance(self.points[i], point) +
+                    distance(self.points[i + 1], point) -
+                    distance(self.points[i], self.points[i + 1])
+                ) < DISTANCE_CONST:
+                    return True
+            return False
+        else:
+            for i in range(len(self.points) - 1):
+                if math.isclose(
+                    distance(self.points[i], point) + distance(self.points[i + 1], point),
+                    distance(self.points[i], self.points[i + 1])
+                ):
+                    return True
+            return False
 
     def move(self, move_from: Point, move_to: Point):
         new_start = super().move(move_from, move_to).start
@@ -142,7 +169,7 @@ class Rectangle(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.width, self.height
 
-    def contains(self, point: Point) -> bool:
+    def contains(self, point: Point, divergence: bool = False) -> bool:
         return (
             self.start.x <= point.x <= self.start.x + self.width
             and
@@ -175,7 +202,7 @@ class Circle(Shape):
     def get_props(self) -> tuple:
         return self.start.x, self.start.y, self.radius
 
-    def contains(self, point: Point) -> bool:
+    def contains(self, point: Point, divergence: bool = False) -> bool:
         return distance(self.start, point) <= self.radius
 
     def move(self, move_from: Point, move_to: Point):

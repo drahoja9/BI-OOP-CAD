@@ -26,8 +26,8 @@ class Controller:
             self.print_to_history(str(shape))
         self._shapes.add_shapes(*shapes)
 
-    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
-        return self._shapes.move_shapes(move_from, move_to)
+    def move_shapes(self, move_from: Point, move_to: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
+        return self._shapes.move_shapes(move_from, move_to, divergence)
 
     def replace_shapes_store(self, shapes: List[Shape]):
         self._shapes = ShapesStore(self, shapes)
@@ -36,8 +36,8 @@ class Controller:
     def remove_last_shape(self):
         self._shapes.remove_last_shape()
 
-    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
-        return self._shapes.remove_shapes_at(point)
+    def remove_shapes_at(self, point: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
+        return self._shapes.remove_shapes_at(point, divergence)
 
     def preview_shape(self, shape: Shape):
         self._shapes.set_preview(shape)
@@ -66,8 +66,8 @@ class Controller:
     def delete_from_history(self, number_of_lines: int = 1):
         self._gui.delete_from_history(number_of_lines)
 
-    def shapes_at(self, point: Point = None) -> List[Shape]:
-        return self._shapes.shapes_at(point)
+    def shapes_at(self, point: Point = None, divergence: bool = False) -> List[Shape]:
+        return self._shapes.shapes_at(point, divergence)
 
     def print_shapes_to_history(self, point: Point):
         for shape in self.shapes_at(point):

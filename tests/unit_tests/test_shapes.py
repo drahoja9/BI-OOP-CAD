@@ -67,7 +67,9 @@ def test_dot(shapes: Dict[str, Shape]):
     assert dot == Dot(Point(10, 200000000), Color(1, 2, 3))
     assert dot != Dot(Point(10, 200000000), Color(1, 2, 4))
     assert dot.contains(Point(10, 200000000)) is True
+    assert dot.contains(Point(11, 200000000), divergence=True) is True
     assert dot.contains(Point(11, 200000000)) is False
+    assert dot.contains(Point(13, 200000000), divergence=True) is False
 
     new_dot = dot.move(Point(10, 200000000), Point(0, 0))
     assert dot.start == Point(10, 200000000)
@@ -90,7 +92,9 @@ def test_line(shapes: Dict[str, Shape]):
     assert line == Line(Point(1000, -1000), Point(0, -1000), Color(0, 0, 0))
     assert line != Line(Point(1000, -1000), Point(0, 1000), Color(0, 0, 0))
     assert line.contains(Point(500, -1000)) is True
+    assert line.contains(Point(502, -1000), divergence=True) is True
     assert line.contains(Point(-1, -1000)) is False
+    assert line.contains(Point(-3, -1000), divergence=False) is False
 
     # Vertical move
     new_line = line.move(Point(500, -1000), Point(500, 0))
@@ -131,8 +135,10 @@ def test_polyline(shapes: Dict[str, Shape]):
     assert polyline.contains(Point(10, 10)) is True
     assert polyline.contains(Point(15, 15)) is True
     assert polyline.contains(Point(25, 15)) is True
+    assert polyline.contains(Point(24.5, 15), divergence=True) is True
     assert polyline.contains(Point(15, 16)) is False
     assert polyline.contains(Point(24, 15)) is False
+    assert polyline.contains(Point(24, 15), divergence=True) is False
 
     # Vertical move
     new_polyline = polyline.move(Point(20, 20), Point(20, 10))

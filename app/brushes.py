@@ -143,21 +143,22 @@ class MoveShapeBrush(Brush):
 
     def mouse_move(self, controller, x: int, y: int, button):
         if self._start is None:
-            if controller.shapes_at(Point(x, y)):
+            if controller.shapes_at(Point(x, y), divergence=True):
                 self.cursor = Qt.OpenHandCursor
             else:
                 self.cursor = Qt.ArrowCursor
 
     def mouse_press(self, controller, x: int, y: int, button):
         if self._start is None:
-            self._start = (x, y)
-            if controller.shapes_at(Point(x, y)):
+            if controller.shapes_at(Point(x, y), divergence=True):
                 self.cursor = Qt.ClosedHandCursor
+                self._start = (x, y)
         else:
             command = MoveShapeCommand(
                 controller,
                 start_x=self._start[0], start_y=self._start[1],
-                end_x=x, end_y=y
+                end_x=x, end_y=y,
+                divergence=True
             )
             controller.end_preview()
             controller.execute_command(command)
@@ -170,13 +171,13 @@ class MoveShapeBrush(Brush):
 
 class RemoveShapeBrush(Brush):
     def mouse_move(self, controller, x: int, y: int, button):
-        if controller.shapes_at(Point(x, y)):
+        if controller.shapes_at(Point(x, y), divergence=True):
             self.cursor = Qt.PointingHandCursor
         else:
             self.cursor = Qt.ArrowCursor
 
     def mouse_press(self, controller, x: int, y: int, button):
-        command = RemoveShapeCommand(controller, x, y)
+        command = RemoveShapeCommand(controller, x, y, divergence=True)
         controller.execute_command(command)
 
     def __str__(self):
