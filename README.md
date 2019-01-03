@@ -17,6 +17,7 @@ It provides GUI with following features:
 * Saving and loading
 * Output list of objects on some point (or on the whole canvas)
 
+![screenoshot](screenshot.png)
 
 A user can interact with the application in two different ways - via command line 
 interface (takes commands described below) or graphical user interface.
