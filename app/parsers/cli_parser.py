@@ -14,24 +14,23 @@ class CliParser:
     def __init__(self, controller: Controller, color_parser: ColorParser):
         self.controller = controller
         self.color_parser = color_parser
-        self.string_parser = StringParser()
         self.point_parser = PointParser()
         self.int_parser = IntParser()
         self.nat_parser = NatParser()
 
         # Command Parsers
         self.command_parsers = [
-            RemoveShapeParser(controller),
-            MoveShapeParser(controller),
-            SaveParser(controller),
-            LoadParser(controller),
-            QuitParser(controller),
-            ListParser(controller),
-            ClearParser(controller),
-            RectParser(controller, self.nat_parser, self.int_parser, self.color_parser),
-            CircleParser(controller, self.nat_parser, self.int_parser, self.color_parser),
-            DotParser(controller, self.nat_parser, self.int_parser, self.color_parser),
-            LineParser(controller, self.nat_parser, self.int_parser, self.color_parser)
+            RemoveShapeParser(controller, "remove"),
+            MoveShapeParser(controller, "move"),
+            SaveParser(controller, "save"),
+            LoadParser(controller, "load"),
+            QuitParser(controller, "quit"),
+            ListParser(controller, "ls"),
+            ClearParser(controller, "clear"),
+            RectParser(controller, "rect", self.nat_parser, self.int_parser, self.color_parser),
+            CircleParser(controller, "circle", self.nat_parser, self.int_parser, self.color_parser),
+            DotParser(controller, "dot", self.nat_parser, self.int_parser, self.color_parser),
+            LineParser(controller, "line", self.nat_parser, self.int_parser, self.color_parser)
         ]
 
     def parse_input(self, cli_input: str):

@@ -14,17 +14,19 @@ class PointParser:
         :return Success(AbsoluteParserPoint or RelativeParserPoint, remainder) if input contains either valid
         absolute point or relative point, Failure(expected format, the given cli_input) otherwise
         """
-        nat_parser = NatParser()
-        int_parser = IntParser()
+        first_nat_parser = NatParser(',')
+        second_nat_parser = NatParser()
+        first_int_parser = IntParser(',')
+        second_int_parser = IntParser()
 
         # Parse absolute point from given input
-        abs_point_parse = PointParser().parse_input(nat_parser, cli_input)
+        abs_point_parse = PointParser().parse_input(first_nat_parser, second_nat_parser, cli_input)
         if abs_point_parse.is_successful():
             abs_point = AbsoluteParserPoint(abs_point_parse.get_match()[0], abs_point_parse.get_match()[1])
             return Success(abs_point, abs_point_parse.get_remainder())
 
         # Parse relative point from given input
-        rel_point_parse = PointParser().parse_input(int_parser, cli_input)
+        rel_point_parse = PointParser().parse_input(first_int_parser, second_int_parser, cli_input)
         if rel_point_parse.is_successful():
             rel_point = RelativeParserPoint(rel_point_parse.get_match()[0], rel_point_parse.get_match()[1])
             return Success(rel_point, rel_point_parse.get_remainder())
@@ -33,20 +35,25 @@ class PointParser:
         return rel_point_parse
 
     @staticmethod
-    def parse_input(parser: NumberParser, cli_input: str) -> ParseResult:
+    def parse_input(first_parser: NumberParser, second_parser: NumberParser, cli_input: str) -> ParseResult:
         """ 
-        Parse point from input using given NumberParser.
-        :param parser: NumberParser
+        Parse point from input using given NumberParsers. Both NumberParser must be of the same type!
+        :param first_parser: NumberParser
+        :param second_parser: NumberParser
         :param cli_input: string
         :return: Success([X coordinate, Y coordinate], string) if input contains a number within
         range, Failure(string, string) otherwise
         """
 
+        # Both given NumberParsers must be of the same type
+        if first_parser.__class__ != second_parser.__class__:
+            raise ValueError("first_pasrser and second_parser must be of the same type!")
+
         # Parse a number using comma and only comma as a delimiter"
-        result1 = parser.parse_number(cli_input, ',', ',')
+        result1 = first_parser.parse_input(cli_input)
         if result1.is_successful():
             # Parse a number using space or end of string as a delimiter"
-            result2 = parser.parse_number(result1.get_remainder(), ' ', '')
+            result2 = second_parser.parse_input(result1.get_remainder())
             if result2.is_successful():
                 x = result1.get_match()
                 y = result2.get_match()

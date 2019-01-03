@@ -1,106 +1,71 @@
 import re
-import abc
 
 from app.parsers.parse_results import ParseResult, Success, Failure
 
 
-class StringParser:
-    @staticmethod
-    def parse_string(expected: str, cli_input: str, delimiter: str) -> ParseResult:
+class LowLevelParser:
+    def __init__(self, expected: str, delimiter: str = ''):
         """
-        Parse a word from the beginning of given input with given delimiter.
-        If delimiter is empty, the given input needs to be equal to expected input.
-        :param expected: expected word
-        :param cli_input: string
-        :param delimiter: string
-        :return: Success(matched string, remainder) if input contains expected word,
-        Failure(expected string, actual string) otherwise
+        :param expected: string, should be escaped unless it's a regular expression
+        :param delimiter: string, is matched after the expected expression
         """
-        if delimiter == '':
-            match = re.match(r'^(' + re.escape(expected) + r')$', cli_input)
+        self._expected = expected
+        self._delimiter = delimiter
+
+    def parse_input(self, cli_input: str) -> ParseResult:
+        if self._delimiter == '':
+            match = re.match(r'^(\s*)(' + self._expected + ')(\s+|$)', cli_input)
         else:
-            match = re.match(r'^(' + re.escape(expected) + r')' + re.escape(delimiter), cli_input)
+            match = re.match(r'^(\s*)(' + self._expected + ')' +
+                             r'(\s*)' + re.escape(self._delimiter) + r'(\s*|$)', cli_input)
 
         if match:
-            string = match.group(1)
             remainder = cli_input[match.end():]
-            return Success(string, remainder)
+            return Success(match.group(2), remainder)
         else:
-            return Failure(expected, cli_input)
+            return Failure(self._expected, cli_input)
 
 
-class NumberParser:
-    def parse_number(self, cli_input: str, delimiter1: str, delimiter2: str) -> ParseResult:
-        """
-        Parse a number with each of both given delimiters from the given CLI input.
-        :param cli_input: string
-        :param delimiter1: string First delimiter
-        :param delimiter2: string Second delimiter
-        :return: Success(integer or natural number, remainder) if input contains either valid integer or
-        natural number within range, Failure(expected format, the given cli_input) otherwise
-        """
+class StringParser(LowLevelParser):
+    """
+    Parser used for parsing expected strings from the beginning of the input.
+    """
+    def __init__(self, expected: str, delimiter: str = ''):
+        super().__init__(re.escape(expected), delimiter)
 
-        # Parse a number from the given input using the first given delimiter
-        result1 = self.parse_input(cli_input, delimiter1)
-        if result1.is_successful():
-            return result1
+    def parse_input(self, cli_input: str):
+        return super().parse_input(cli_input)
 
-        if delimiter1 != delimiter2:
-            # Parse a number from the given input using the second given delimiter
-            result2 = self.parse_input(cli_input, delimiter2)
-            if result2.is_successful():
-                return result2
 
-        # Parsing a number has failed for both delimiters (or for the first one if both delimiters are the same),
-        # return Failure result from the first parser
-        return result1
+class NumberParser(LowLevelParser):
+    """
+    Parser used for parsing numbers from the beginning of the input.
+    """
+    def __init__(self, expected: str, delimiter: str = ''):
+        super().__init__(expected, delimiter)
 
-    @abc.abstractmethod
-    def parse_input(self, cli_input: str, delimiter: str) -> ParseResult:
-        raise NotImplementedError
+    def parse_input(self, cli_input: str):
+        result = super().parse_input(cli_input)
+        if result.is_successful():
+            integer = int(result.get_match())
+            return Success(integer, result.get_remainder())
+
+        return result
 
 
 class NatParser(NumberParser):
-    def parse_input(self, cli_input: str, delimiter: str) -> ParseResult:
-        """
-        Parse natural number from the beginning of given input.
-        Natural number is just a number without a sign.
-        :param cli_input: string
-        :param delimiter: string Delimits the matched natural number and the remainder
-        :return: Success(matched nat. number, remainder) if input contains valid natural number within range,
-        Failure(expected format, the given cli_input) otherwise
-        """
-        if delimiter == '':
-            match = re.match(r'^(\d+)$', cli_input)
-        else:
-            match = re.match(r'^(\d+)' + re.escape(delimiter), cli_input)
-
-        if match:
-            nat = int(match.group(1))
-            remainder = cli_input[match.end():]
-            return Success(nat, remainder)
-        else:
-            return Failure("a natural number", cli_input)
+    """
+    Parser used for parsing natural numbers from the beginning of given input.
+    Natural number is just a number without a sign.
+    """
+    def __init__(self, delimiter: str = ''):
+        super().__init__(r'\d+', delimiter)
 
 
 class IntParser(NumberParser):
-    def parse_input(self, cli_input: str, delimiter: str) -> ParseResult:
-        """
-        Parse integer from the beginning of given input.
-        Integer is a number with a positive or negative sign (+-)
-        :param cli_input: string
-        :param delimiter: string Delimits the matched integer and the remainder
-        :return: Success(matched integer, remainder) if input contains valid integer within range,
-        Failure(expected format, the given cli_input) otherwise
-        """
-        if delimiter == '':
-            match = re.match(r'^([+-]\d+)$', cli_input)
-        else:
-            match = re.match(r'^([+-]\d+)' + re.escape(delimiter), cli_input)
-
-        if match:
-            nat = int(match.group(1))
-            remainder = cli_input[match.end():]
-            return Success(nat, remainder)
-        else:
-            return Failure("an integer", cli_input)
+    """
+    Parser used for parsing integers from the beginning of given input.
+    Integer is a number with a positive or negative sign (+-).
+    """
+    def __init__(self, delimiter: str = ''):
+        super().__init__(r'[+-]\d+', delimiter)

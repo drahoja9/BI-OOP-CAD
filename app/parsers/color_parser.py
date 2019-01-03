@@ -21,32 +21,34 @@ class RgbColorParser(ColorParser):
     Parser for color in "rgb([0,255],[0,255],[0,255])" (RGB) format.
     """
     def __init__(self):
-        self.nat_parser = NatParser()
+        self.first_nat_parser = NatParser(",")
+        self.second_nat_parser = NatParser(")")
+        self.string_parser = StringParser("rgb", '(')
 
     def parse_color(self, cli_input: str) -> ParseResult:
         failure = Failure("rgb([0,255],[0,255],[0,255])", cli_input)
 
         # Parse prefix \"rgb(\"
-        prefix_parse_result = StringParser().parse_string("rgb", cli_input, "(")
+        prefix_parse_result = self.string_parser.parse_input(cli_input)
         if not prefix_parse_result.is_successful():
             return failure
 
         # Parse red (first number)
-        red_parse_result = self.nat_parser.parse_input(prefix_parse_result.get_remainder(), ",")
+        red_parse_result = self.first_nat_parser.parse_input(prefix_parse_result.get_remainder())
         if not red_parse_result.is_successful():
             return failure
 
         red = red_parse_result.get_match()
 
         # Parse green (second number)
-        green_parse_result = self.nat_parser.parse_input(red_parse_result.get_remainder(), ",")
+        green_parse_result = self.first_nat_parser.parse_input(red_parse_result.get_remainder())
         if not green_parse_result.is_successful():
             return failure
 
         green = green_parse_result.get_match()
 
         # Parse blue (third number)
-        blue_parse_result = self.nat_parser.parse_input(green_parse_result.get_remainder(), ")")
+        blue_parse_result = self.second_nat_parser.parse_input(green_parse_result.get_remainder())
         if not blue_parse_result.is_successful():
             return failure
 
