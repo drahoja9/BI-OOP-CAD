@@ -101,6 +101,7 @@ class MainWindow(QtWidgets.QMainWindow):
         )
 
         self._ui.canvasHolder.setWidget(self.canvas)
+        self._ui.canvasHolder.setStyleSheet('background-color: white')
 
     # ------------------------------------------------ Handlers -------------------------------------------------------
 

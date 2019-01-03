@@ -383,14 +383,14 @@
           <item>
            <widget class="QTextBrowser" name="history">
             <property name="styleSheet">
-             <string notr="true">border: 1px solid black;</string>
+             <string notr="true">border: 1px solid silver;</string>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLineEdit" name="manualInput">
             <property name="styleSheet">
-             <string notr="true">border: 1px solid black;</string>
+             <string notr="true">border: 1px solid silver;</string>
             </property>
            </widget>
           </item>

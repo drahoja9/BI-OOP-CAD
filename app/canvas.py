@@ -13,6 +13,7 @@ class Canvas(QtWidgets.QWidget):
 
     def __init__(self, controller):
         super().__init__()
+        self.setStyleSheet('background-color: red')
         self._controller = controller
         self.brush = MoveShapeBrush()
         self.setCursor(self.brush.cursor)
