@@ -41,7 +41,7 @@ class ShapeCommand(Command):
         return super().__eq__(other) and self.shape == other.shape
 
     def __str__(self):
-        return f' ({self.shape.color.r},{self.shape.color.g},{self.shape.color.b})'
+        return f' rgb({self.shape.color.r},{self.shape.color.g},{self.shape.color.b})'
 
 
 class PrintDotCommand(ShapeCommand):
