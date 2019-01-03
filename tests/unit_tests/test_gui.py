@@ -2,7 +2,7 @@ import pytest
 from pytestqt.qtbot import QtBot
 
 from app.brushes import LineShapeBrush, CircleShapeBrush, MoveShapeBrush
-from app.commands import Command, ClearCommand
+from app.commands import Command, ClearCommand, SaveCommand, LoadCommand, QuitCommand
 from app.gui import MainWindow
 
 
@@ -29,6 +29,21 @@ def gui(qtbot: QtBot) -> MainWindow:
 def test_handle_action_new(gui: MainWindow):
     gui._handle_action_new()
     assert gui._controller.command == ClearCommand(gui._controller)
+
+
+def test_handle_save_file(gui: MainWindow):
+    gui._handle_save_file()
+    assert gui._controller.command == SaveCommand(gui._controller)
+
+
+def test_handle_load_file(gui: MainWindow):
+    gui._handle_load_file()
+    assert gui._controller.command == LoadCommand(gui._controller)
+
+
+def test_handle_action_quit(gui: MainWindow):
+    gui._handle_action_quit()
+    assert gui._controller.command == QuitCommand(gui._controller)
 
 
 def test_set_status(gui: MainWindow):

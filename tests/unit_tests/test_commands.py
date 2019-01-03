@@ -4,7 +4,8 @@ from typing import List, Dict
 import pytest
 
 from app.commands import Command, PrintDotCommand, PrintLineCommand, PrintRectCommand, PrintCircleCommand, \
-    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand, InvalidCommand, ClearCommand
+    PrintPolylineCommand, RemoveShapeCommand, ListShapeCommand, MoveShapeCommand, InvalidCommand, ClearCommand, \
+    SaveCommand, LoadCommand, QuitCommand
 from app.shapes import Shape, Dot, Line, Rectangle, Circle, Polyline
 from app.utils import Point, Color
 
@@ -22,6 +23,9 @@ class ReceiverMockup:
         self.printed = ''
         self.deleted_lines = 0
         self.restarted = False
+        self.saved = None
+        self.loaded = None
+        self.quited = False
 
     def add_shapes(self, *shapes: Shape):
         if len(shapes) == 1:
@@ -79,8 +83,21 @@ class ReceiverMockup:
     def restart(self):
         self.restarted = True
 
+    def save_dialog(self, path_to_file: str = None):
+        self.deleted_lines = 1
+        self.last_command_removed = True
+        self.saved = path_to_file
+
+    def load_dialog(self, path_to_file: str = None):
+        self.deleted_lines = 1
+        self.last_command_removed = True
+        self.loaded = path_to_file
+
     def clear_dialog(self):
         return True
+
+    def quit(self):
+        self.quited = True
 
 
 @pytest.fixture
@@ -438,6 +455,28 @@ def test_list_shape_command(receiver: ReceiverMockup):
     assert receiver.deleted_lines == len(command.listed) + 1
 
 
+def test_save_command(receiver: ReceiverMockup):
+    command = SaveCommand(receiver, '/test/example/path_to_some_file.txt')
+    assert str(command) == 'save /test/example/path_to_some_file.txt'
+    assert command == SaveCommand(receiver, '/test/example/path_to_some_file.txt')
+
+    command.execute()
+    assert receiver.deleted_lines == 1
+    assert receiver.last_command_removed is True
+    assert receiver.saved == '/test/example/path_to_some_file.txt'
+
+
+def test_load_command(receiver: ReceiverMockup):
+    command = LoadCommand(receiver, '/test/example/path_to_some_file.txt')
+    assert str(command) == 'load /test/example/path_to_some_file.txt'
+    assert command == LoadCommand(receiver, '/test/example/path_to_some_file.txt')
+
+    command.execute()
+    assert receiver.deleted_lines == 1
+    assert receiver.last_command_removed is True
+    assert receiver.loaded == '/test/example/path_to_some_file.txt'
+
+
 def test_clear_command(receiver: ReceiverMockup):
     command = ClearCommand(receiver)
     assert str(command) == 'clear'
@@ -450,6 +489,15 @@ def test_clear_command(receiver: ReceiverMockup):
     command.reverse()
     assert receiver.deleted_lines == 1
     assert receiver.received == [Line(Point(10, 10), Point(20, 20), Color(1, 2, 3)), Dot(Point(10, 10), Color(1, 2, 3))]
+
+
+def test_quit_command(receiver: ReceiverMockup):
+    command = QuitCommand(receiver)
+    assert str(command) == 'quit'
+    assert command == QuitCommand(receiver)
+
+    command.execute()
+    assert receiver.quited is True
 
 
 def test_invalid_command(receiver: ReceiverMockup):
