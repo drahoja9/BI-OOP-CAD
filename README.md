@@ -8,11 +8,59 @@ programming course (BI-OOP) at FIT CTU.
 The subject of this project is a simple version of Computer Aided Design (CAD). 
 It provides GUI with following features:
 * Command line interface
-* History of command line commands
-* Drawing basic shapes (e.g., lines, polylines, rectangles, circles)
+* History of all commands
+* Drawing basic shapes (dots, lines, polylines, rectangles and circles)
+* Shape preview while drawing
+* Color choosing
+* Moving and deleting shapes
+* Undo and redo
 * Saving and loading
-* Changing colors of new objects or all current lines on some position
-* Output list of objects on some points
+* Output list of objects on some point (or on the whole canvas)
+
+
+A user can interact with the application in two different ways - via command line 
+interface (takes commands described below) or graphical user interface.
+
+Above CLI is a history of all commands that have been executed (no matter whether
+they were created via CLI or GUI) and messages that these commands can produce.
+There's also a status bar in the left bottom corner indicating which action is
+currently selected and if the file is saved/loaded, a message will appear there
+as well.
+
+The user can select an action via their icons. After choosing one, the action 
+button will be highlighted, as well as there will be a name of the action in the 
+status bar (bottom left corner). The default action is the move action (it means 
+that if there's no action button pressed, the move action is active).
+Also, the color of the shape to be drawn can be changed after clicking on the color 
+button (the last one in the left toolbar).
+
+The mouse cursor is changing according to the action you're about to do:
+* Crosshair if you are drawing a shape
+* Pointing hand if you are deleting a shape or choosing a brush
+* Open hand if you are choosing a shape to move
+* Closed hand if you have already chosen a shape and you are choosing where to
+place it
+
+Common key-shortcuts are also available (ctrl+s, ctrl+l, ctrl+n, ctrl+w, ctrl+z, 
+ctrl+shift+z).
+
+## Architecture
+Model-View-Presenter architecture
+
+
+## Design patterns
+
+We've used following design patters:
+* Polymorphism - shapes, shape factories, printers, commands, brushes
+* Double-dispatch - we call `shape.print_to(printer)` on given shape (first 
+dispatch) and then call respective method for printing concrete shape on given 
+printer (second dispatch)
+* Visitor pattern - printers (visitor) and shapes (object)
+* Factory pattern - shape factories (rectangle and circle)
+* Observer pattern - controller observes shapes store
+* Parser combinators???
+* Strategy pattern - canvas brushes
+* Singleton - canvas brushes
 
 
 ## How to run
