@@ -29,11 +29,11 @@ class ReceiverMockup:
         else:
             self.received = shapes
 
-    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
+    def move_shapes(self, move_from: Point, move_to: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
         self.received = (move_from, move_to)
         res = {'before_move': copy.deepcopy(self.shapes), 'moved': []}
         for shape in self.shapes:
-            if shape.contains(move_from):
+            if shape.contains(move_from, divergence):
                 new_shape = shape.move(move_from, move_to)
                 res['moved'].append(new_shape)
         self.moved = res['moved']
@@ -58,11 +58,11 @@ class ReceiverMockup:
     def remove_last_command(self):
         self.last_command_removed = True
 
-    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
+    def remove_shapes_at(self, point: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
         self.received = point
         res = {'before_remove': copy.deepcopy(self.shapes), 'removed': []}
         for shape in self.shapes:
-            if shape.contains(point):
+            if shape.contains(point, divergence):
                 res['removed'].append(shape)
         self.removed = res['removed']
         return res

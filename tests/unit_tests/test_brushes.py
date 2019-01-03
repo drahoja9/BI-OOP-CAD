@@ -26,7 +26,7 @@ class ControllerMockup:
     def end_preview(self):
         self.preview = None
 
-    def shapes_at(self, point: Point) -> List[Shape]:
+    def shapes_at(self, point: Point, divergence: bool = False) -> List[Shape]:
         shapes = [Line(Point(0, 0), Point(0, 10), Color(10, 20, 30)), Rectangle(Point(0, 5), 10, 10, Color(0, 0, 0))]
         return [shape for shape in shapes if shape.contains(point)]
 

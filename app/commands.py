@@ -110,14 +110,15 @@ class PrintCircleCommand(ShapeCommand):
 
 
 class MoveShapeCommand(Command):
-    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int):
+    def __init__(self, receiver, start_x: int, start_y: int, end_x: int, end_y: int, divergence: bool = False):
         super().__init__(receiver)
         self.start = Point(start_x, start_y)
         self.end = Point(end_x, end_y)
         self._before_move = []
+        self._divergence = divergence
 
     def execute(self):
-        res = self.receiver.move_shapes(self.start, self.end)
+        res = self.receiver.move_shapes(self.start, self.end, self._divergence)
         self._before_move = res['before_move']
         # If nothing was moved, there's no need to keep empty move command in command engine
         if not res['moved']:
@@ -137,13 +138,14 @@ class MoveShapeCommand(Command):
 
 
 class RemoveShapeCommand(Command):
-    def __init__(self, receiver, x: int, y: int):
+    def __init__(self, receiver, x: int, y: int, divergence: bool = False):
         super().__init__(receiver)
         self.point = Point(x, y)
         self._before_remove = []
+        self._divergence = divergence
 
     def execute(self):
-        res = self.receiver.remove_shapes_at(self.point)
+        res = self.receiver.remove_shapes_at(self.point, self._divergence)
         self._before_remove = res['before_remove']
         # If nothing was removed, there's no need to keep empty remove command in command engine
         if not res['removed']:

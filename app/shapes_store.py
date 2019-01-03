@@ -25,9 +25,9 @@ class ShapesStore:
     def is_empty(self) -> bool:
         return len(self._shapes) == 0
 
-    def shapes_at(self, point: Point = None) -> List[Shape]:
+    def shapes_at(self, point: Point = None, divergence: bool = False) -> List[Shape]:
         if point:
-            return [shape for shape in self._shapes if shape.contains(point)]
+            return [shape for shape in self._shapes if shape.contains(point, divergence)]
         else:
             return self._shapes
 
@@ -55,12 +55,12 @@ class ShapesStore:
             self._shapes.append(copy.deepcopy(shape))
         self._notify()
 
-    def move_shapes(self, move_from: Point, move_to: Point) -> Dict[str, List[Shape]]:
+    def move_shapes(self, move_from: Point, move_to: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
         before_move = copy.deepcopy(self._shapes)
         moved = []
         to_remove = []
         for shape in self._shapes:
-            if shape.contains(move_from):
+            if shape.contains(move_from, divergence):
                 new_shape = shape.move(move_from, move_to)
                 moved.append(new_shape)
                 to_remove.append(shape)
@@ -83,11 +83,11 @@ class ShapesStore:
         except ValueError:
             pass
 
-    def remove_shapes_at(self, point: Point) -> Dict[str, List[Shape]]:
+    def remove_shapes_at(self, point: Point, divergence: bool = False) -> Dict[str, List[Shape]]:
         before_remove = copy.deepcopy(self._shapes)
         to_remove = []
         for shape in self._shapes:
-            if shape.contains(point):
+            if shape.contains(point, divergence):
                 to_remove.append(shape)
         self._remove_shapes(*to_remove)
         return {'removed': to_remove, 'before_remove': before_remove}
