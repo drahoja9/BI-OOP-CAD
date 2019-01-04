@@ -44,11 +44,6 @@ class PointParser:
         :return: Success([X coordinate, Y coordinate], string) if input contains a number within
         range, Failure(string, string) otherwise
         """
-
-        # Both given NumberParsers must be of the same type
-        if first_parser.__class__ != second_parser.__class__:
-            raise ValueError("first_pasrser and second_parser must be of the same type!")
-
         # Parse a number using comma and only comma as a delimiter"
         result1 = first_parser.parse_input(cli_input)
         if result1.is_successful():

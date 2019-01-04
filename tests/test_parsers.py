@@ -230,24 +230,6 @@ def test_point_parser_relative_points():
         assert result == Success(expected, remainder)
 
 
-def test_point_parser_parse_input():
-    # Exception must be thrown if both NumberParsers are of the same type
-    nat_parser = NatParser(',')
-    int_parser = IntParser()
-    try:
-        PointParser().parse_input(nat_parser, int_parser, "10,-20")
-        assert False
-    except ValueError:
-        assert True
-
-    # Exception must NOT be thrown if both NumberParsers are NOT of the same type
-    second_nat_parser = NatParser()
-    try:
-        PointParser().parse_input(nat_parser, second_nat_parser, "10,-20")
-        assert True
-    except ValueError:
-        assert False
-
 # --------------- RelativeParserPoint to AbsoluteParserPoint conversion tests ---------------
 
 
@@ -636,7 +618,7 @@ def test_points_conversion(controller: Controller):
     """
     Test CommandParser's conversion of RelativeParserPoints to AbsoluteParserPoints.
     """
-    parser = CommandParser(controller, "command")
+    parser = CommandParser(controller)
 
     # Convert only RelativeParserPoints
     points_before_conversion = [RelativeParserPoint(-10, 20), RelativeParserPoint(10, -20), RelativeParserPoint(-5, -5)]

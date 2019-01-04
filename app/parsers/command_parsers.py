@@ -18,9 +18,9 @@ class CommandParser:
     If Command (and it's parameters, if there are any required) is successfully parsed,
     Success(Command, string) is returned.
     """
-    def __init__(self, controller: Controller, command: str):
+    def __init__(self, controller: Controller):
         self._controller = controller
-        self._command = command
+        self._command = None
 
     def parse_command(self, cli_input: str) -> ParseResult:
         """
@@ -89,12 +89,15 @@ class CommandParser:
 
 
 class ShapeCommandParser(CommandParser):
-    def __init__(self, controller: Controller, command: str, nat_parser: NatParser,
-                 int_parser: IntParser, color_parser: ColorParser):
-        super().__init__(controller, command)
-        self.nat_parser = nat_parser
-        self.int_parser = int_parser
+    def __init__(self, controller: Controller, color_parser: ColorParser):
+        super().__init__(controller)
         self.color_parser = color_parser
+
+    def parse_params(self, cli_input: str) -> ParseResult:
+        pass
+
+    def has_parameters(self) -> bool:
+        pass
 
     def parse_color(self, cli_input: str, color_parser: ColorParser) -> ParseResult:
         """
@@ -119,6 +122,10 @@ class MoveShapeParser(CommandParser):
     Parser for "move" (Move) Command.
     Definition: move <POINT> <POINT>
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'move'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         result = self.parse_two_points(cli_input)
         if result.is_successful():
@@ -141,6 +148,10 @@ class RemoveShapeParser(CommandParser):
     Parser for "remove" (Remove) Command.
     Definition: remove <POINT>
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'remove'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         result = PointParser().parse_point(cli_input)
         if result.is_successful():
@@ -161,6 +172,17 @@ class ListParser(CommandParser):
     Parser for "ls" (List) Command.
     Definition: ls | ls <POINT>
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'ls'
+
+    def parse_command(self, cli_input: str):
+        result = super().parse_command(cli_input)
+        if result.is_successful():
+            return Success(ListShapeCommand(self._controller), result.get_remainder())
+        else:
+            return result
+
     def parse_params(self, cli_input: str):
         if cli_input == '':
             # point parameter is absent, return ListShapeCommand with default values of parameters x and y
@@ -184,6 +206,10 @@ class ClearParser(CommandParser):
     """
     Parser for 'clear' (Clear) command.
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'clear'
+
     def parse_command(self, cli_input: str) -> ParseResult:
         result = super().parse_command(cli_input)
         if result.is_successful():
@@ -203,6 +229,10 @@ class SaveParser(CommandParser):
     Parser for 'save' (Save) command.
     Definition: save | save <STRING>
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'save'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         if cli_input == '':
             return Success(SaveCommand(self._controller, None), '')
@@ -218,6 +248,10 @@ class LoadParser(CommandParser):
     Parser for 'load' (Load) command.
     Definition: load <STRING>
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'load'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         if cli_input == '':
             return Success(LoadCommand(self._controller, None), '')
@@ -233,6 +267,10 @@ class QuitParser(CommandParser):
     Parser for 'quit' (Quit) command.
     Definition: quit
     """
+    def __init__(self, controller):
+        super().__init__(controller)
+        self._command = 'quit'
+
     def parse_command(self, cli_input: str) -> ParseResult:
         result = super().parse_command(cli_input)
         if result.is_successful():
@@ -256,10 +294,16 @@ class RectParser(ShapeCommandParser):
     Definition: ( rect <POINT> <POINT> | rect <POINT> <NAT> <NAT>) ) <COLOR>
     COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
     """
+    def __init__(self, controller, width_parser: NatParser,
+                 height_parser: NatParser, color_parser: ColorParser):
+        super().__init__(controller, color_parser)
+        self._command = 'rect'
+        self.width_parser = width_parser
+        self.height_parser = height_parser
+
     def parse_params(self, cli_input: str) -> ParseResult:
         points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():
-            # TODO: parse Color a pak vytvořit Command pomocí CommandFactory
             abs_points = self.convert_points(points_result.get_match())
 
             # Parse color
@@ -297,17 +341,14 @@ class RectParser(ShapeCommandParser):
         """
         Parse a Point and two Natural numbers from given input.
         """
-        first_nat_parser = NatParser(' ')
-        second_nat_parser = NatParser()
-
         point_result = PointParser().parse_point(cli_input)
         if point_result.is_successful():
-            nat_result1 = first_nat_parser.parse_input(point_result.get_remainder())
-            if nat_result1.is_successful():
-                nat_result2 = second_nat_parser.parse_input(nat_result1.get_remainder())
-                if nat_result2.is_successful():
-                    return Success([point_result.get_match(), nat_result1.get_match(), nat_result2.get_match()],
-                                   nat_result2.get_remainder())
+            width_result = self.width_parser.parse_input(point_result.get_remainder())
+            if width_result.is_successful():
+                height_result = self.height_parser.parse_input(width_result.get_remainder())
+                if height_result.is_successful():
+                    return Success([point_result.get_match(), width_result.get_match(), height_result.get_match()],
+                                   height_result.get_remainder())
 
         return Failure("rect <POINT> <NAT> <NAT>", cli_input)
 
@@ -321,6 +362,11 @@ class CircleParser(ShapeCommandParser):
     Definition: ( circle <POINT> <POINT> | circle <POINT> <NAT>) ) <COLOR>
     COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
     """
+    def __init__(self, controller, radius_parser: NatParser, color_parser: ColorParser):
+        super().__init__(controller, color_parser)
+        self._command = 'circle'
+        self.radius_parser = radius_parser
+
     def parse_params(self, cli_input: str) -> ParseResult:
         points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():
@@ -330,7 +376,7 @@ class CircleParser(ShapeCommandParser):
             end_x = abs_points[1].x
             end_y = abs_points[1].y
 
-            "Parse color"
+            # Parse color
             color_result = self.parse_color(points_result.get_remainder(), self.color_parser)
             if color_result.is_successful():
                 color = color_result.get_match()
@@ -361,13 +407,11 @@ class CircleParser(ShapeCommandParser):
         """
         Parse a Point and a Natural number from given input.
         """
-        nat_parser = NatParser()
-
         point_result = PointParser().parse_point(cli_input)
         if point_result.is_successful():
-            nat_result = nat_parser.parse_input(point_result.get_remainder())
-            if nat_result.is_successful():
-                return Success([point_result.get_match(), nat_result.get_match()], nat_result.get_remainder())
+            radius_result = self.radius_parser.parse_input(point_result.get_remainder())
+            if radius_result.is_successful():
+                return Success([point_result.get_match(), radius_result.get_match()], radius_result.get_remainder())
 
         return Failure("circle <POINT> <NAT>", cli_input)
 
@@ -381,6 +425,10 @@ class DotParser(ShapeCommandParser):
     Definition: dot <POINT> <COLOR>
     COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
     """
+    def __init__(self, controller, color_parser: ColorParser):
+        super().__init__(controller, color_parser)
+        self._command = 'dot'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         point_result = PointParser().parse_point(cli_input)
         if point_result.is_successful():
@@ -411,6 +459,10 @@ class LineParser(ShapeCommandParser):
     POINTS ::= <POINT> | <POINT> <POINTS>
     COLOR := rgb([0,255],[0,255],[0,255]) | <empty string>
     """
+    def __init__(self, controller, color_parser: ColorParser):
+        super().__init__(controller, color_parser)
+        self._command = 'line'
+
     def parse_params(self, cli_input: str) -> ParseResult:
         points_result = self.parse_two_points(cli_input)
         if points_result.is_successful():

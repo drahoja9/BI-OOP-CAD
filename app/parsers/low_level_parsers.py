@@ -26,15 +26,17 @@ class LowLevelParser:
             return Failure(self._expected, cli_input)
 
 
+class WordParser(LowLevelParser):
+    def __init__(self):
+        super().__init__('\w+')
+
+
 class StringParser(LowLevelParser):
     """
     Parser used for parsing expected strings from the beginning of the input.
     """
     def __init__(self, expected: str, delimiter: str = ''):
         super().__init__(re.escape(expected), delimiter)
-
-    def parse_input(self, cli_input: str):
-        return super().parse_input(cli_input)
 
 
 class NumberParser(LowLevelParser):
