@@ -92,6 +92,9 @@ class ShapeCommandParser(CommandParser):
         super().__init__(controller)
         self.color_parser = color_parser
 
+    def get_command(self) -> ParseResult:
+        raise NotImplementedError
+
     def parse_params(self, cli_input: str) -> ParseResult:
         pass
 
@@ -141,6 +144,9 @@ class MoveShapeParser(CommandParser):
     def has_parameters(self) -> bool:
         return True
 
+    def get_command(self):
+        pass
+
 
 class RemoveShapeParser(CommandParser):
     """
@@ -164,6 +170,9 @@ class RemoveShapeParser(CommandParser):
 
     def has_parameters(self) -> bool:
         return True
+
+    def get_command(self):
+        pass
 
 
 class ListParser(CommandParser):
@@ -192,6 +201,9 @@ class ListParser(CommandParser):
 
     def has_parameters(self):
         return True
+
+    def get_command(self):
+        pass
 
 
 class ClearParser(CommandParser):
@@ -223,12 +235,15 @@ class SaveParser(CommandParser):
 
     def parse_params(self, cli_input: str) -> ParseResult:
         if cli_input == '':
-            return Success(SaveCommand(self._controller, None), '')
+            return Success(SaveCommand(self._controller), '')
         else:
             return Success(SaveCommand(self._controller, cli_input), '')
 
     def has_parameters(self) -> bool:
         return True
+
+    def get_command(self) -> Command:
+        return SaveCommand(self._controller)
 
 
 class LoadParser(CommandParser):
@@ -242,12 +257,15 @@ class LoadParser(CommandParser):
 
     def parse_params(self, cli_input: str) -> ParseResult:
         if cli_input == '':
-            return Success(LoadCommand(self._controller, None), '')
+            return Success(LoadCommand(self._controller), '')
         else:
             return Success(LoadCommand(self._controller, cli_input), '')
 
     def has_parameters(self) -> bool:
         return True
+
+    def get_command(self) -> Command:
+        return LoadCommand(self._controller)
 
 
 class QuitParser(CommandParser):
@@ -339,6 +357,9 @@ class RectParser(ShapeCommandParser):
     def has_parameters(self):
         return True
 
+    def get_command(self):
+        pass
+
 
 class CircleParser(ShapeCommandParser):
     """
@@ -402,6 +423,9 @@ class CircleParser(ShapeCommandParser):
     def has_parameters(self) -> bool:
         return True
 
+    def get_command(self):
+        pass
+
 
 class DotParser(ShapeCommandParser):
     """
@@ -432,6 +456,9 @@ class DotParser(ShapeCommandParser):
 
     def has_parameters(self) -> bool:
         return True
+
+    def get_command(self):
+        pass
 
 
 class LineParser(ShapeCommandParser):
@@ -489,3 +516,6 @@ class LineParser(ShapeCommandParser):
 
     def has_parameters(self) -> bool:
         return True
+
+    def get_command(self):
+        pass

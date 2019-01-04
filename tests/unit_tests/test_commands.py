@@ -123,7 +123,7 @@ def test_dot_command(receiver: ReceiverMockup):
         x=0, y=-12,
         color=(1, 2, 3)
     )
-    assert str(command) == 'dot 0,-12 (1,2,3)'
+    assert str(command) == 'dot 0,-12 rgb(1,2,3)'
     assert command == PrintDotCommand(
         receiver=receiver,
         x=0, y=-12,
@@ -145,7 +145,7 @@ def test_line_command(receiver: ReceiverMockup):
         end_x=20, end_y=20,
         color=(100, 200, 100)
     )
-    assert str(command) == 'line 10,10 20,20 (100,200,100)'
+    assert str(command) == 'line 10,10 20,20 rgb(100,200,100)'
     assert (
         command
         ==
@@ -171,7 +171,7 @@ def test_polyline_command(receiver: ReceiverMockup):
         points=[(10, 10), (20, 20), (30, 30), (40, 20), (50, 10)],
         color=(100, 200, 255)
     )
-    assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10 (100,200,255)'
+    assert str(command) == 'line 10,10 20,20 30,30 40,20 50,10 rgb(100,200,255)'
     assert (
         command
         ==
@@ -200,7 +200,7 @@ def test_rect_command_with_points(receiver: ReceiverMockup):
         rect_factory=PointsRectFactory,
         end_x=100, end_y=100
     )
-    assert str(command) == 'rect 50,50 50 50 (255,255,255)'
+    assert str(command) == 'rect 50,50 50 50 rgb(255,255,255)'
     assert (
         command
         ==
@@ -229,7 +229,7 @@ def test_rect_command_with_dimensions(receiver: ReceiverMockup):
         rect_factory=DimensionsRectFactory,
         width=50, height=50
     )
-    assert str(command) == 'rect 50,50 50 50 (255,255,255)'
+    assert str(command) == 'rect 50,50 50 50 rgb(255,255,255)'
     assert (
         command
         ==
@@ -259,7 +259,7 @@ def test_circle_command_with_points(receiver: ReceiverMockup):
         end_x=100, end_y=100
     )
 
-    assert str(command) == 'circle 0,0 141 (0,0,0)'
+    assert str(command) == 'circle 0,0 141 rgb(0,0,0)'
     assert (
         command
         ==
@@ -288,7 +288,7 @@ def test_circle_command_with_dimensions(receiver: ReceiverMockup):
         circle_factory=DimensionsCircleFactory,
         radius=141
     )
-    assert str(command) == 'circle 0,0 141 (0,0,0)'
+    assert str(command) == 'circle 0,0 141 rgb(0,0,0)'
     assert (
         command
         ==
