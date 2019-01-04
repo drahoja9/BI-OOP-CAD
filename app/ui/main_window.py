@@ -127,7 +127,7 @@ class Ui_MainWindow(object):
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         self.brushes.addItem(spacerItem)
         self.colorButton = QtWidgets.QPushButton(self.mainArea)
-        self.colorButton.setStyleSheet("background-color: rgb(0, 0, 0);")
+        self.colorButton.setStyleSheet("background-color: rgb(255,255,255);")
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap(":/assets/color.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.colorButton.setIcon(icon6)
