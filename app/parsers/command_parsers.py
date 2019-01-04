@@ -1,13 +1,14 @@
 import abc
+from builtins import NotImplementedError
 
 from app.parsers.parse_results import ParseResult, Success, Failure
-from app.parsers.low_level_parsers import StringParser, NatParser, IntParser
+from app.parsers.low_level_parsers import NatParser
 from app.parsers.point_parsers import PointParser, AbsoluteParserPoint
 from app.parsers.color_parser import ColorParser
 from app.shape_factory import DimensionsRectFactory, DimensionsCircleFactory
 from app.commands import PrintDotCommand, PrintRectCommand, PrintCircleCommand, PrintLineCommand, \
     PrintPolylineCommand, MoveShapeCommand, RemoveShapeCommand, ListShapeCommand, LoadCommand, SaveCommand, \
-    ClearCommand, QuitCommand
+    ClearCommand, QuitCommand, Command
 from app.utils import Color
 from app.controller import Controller
 
@@ -22,13 +23,11 @@ class CommandParser:
         self._controller = controller
         self._command = None
 
-    def parse_command(self, cli_input: str) -> ParseResult:
+    def get_command(self) -> ParseResult:
         """
-        Parse a command from given input.
+        Return a Command instance if it does not require parameters.
         """
-        string_parser = StringParser(self._command)
-        result = string_parser.parse_input(cli_input)
-        return result
+        raise NotImplementedError
 
     @abc.abstractmethod
     def parse_params(self, cli_input: str) -> ParseResult:
@@ -176,13 +175,6 @@ class ListParser(CommandParser):
         super().__init__(controller)
         self._command = 'ls'
 
-    def parse_command(self, cli_input: str):
-        result = super().parse_command(cli_input)
-        if result.is_successful():
-            return Success(ListShapeCommand(self._controller), result.get_remainder())
-        else:
-            return result
-
     def parse_params(self, cli_input: str):
         if cli_input == '':
             # point parameter is absent, return ListShapeCommand with default values of parameters x and y
@@ -210,12 +202,8 @@ class ClearParser(CommandParser):
         super().__init__(controller)
         self._command = 'clear'
 
-    def parse_command(self, cli_input: str) -> ParseResult:
-        result = super().parse_command(cli_input)
-        if result.is_successful():
-            return Success(ClearCommand(self._controller), result.get_remainder())
-        else:
-            return result
+    def get_command(self) -> Command:
+        return ClearCommand(self._controller)
 
     def parse_params(self, cli_input: str) -> ParseResult:
         raise NotImplementedError
@@ -271,12 +259,8 @@ class QuitParser(CommandParser):
         super().__init__(controller)
         self._command = 'quit'
 
-    def parse_command(self, cli_input: str) -> ParseResult:
-        result = super().parse_command(cli_input)
-        if result.is_successful():
-            return Success(QuitCommand(self._controller), result.get_remainder())
-        else:
-            return result
+    def get_command(self) -> Command:
+        return QuitCommand(self._controller)
 
     def parse_params(self, cli_input: str) -> ParseResult:
         raise NotImplementedError
