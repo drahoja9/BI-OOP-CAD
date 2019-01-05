@@ -81,6 +81,8 @@ As a view we use e.g. `Canvas` (`app/canvas.py`) and `Printer` (`app/printers.py
 
 The GUI of the app looks like this – on top there is the graphical user interface, on the bottom there is the command line interface.
 
+On the left its located the command palete, which can be used by user to draw shapes on canvas.
+
 ![screenoshot](screenshot.png)
 
 ### Desicions
@@ -110,7 +112,7 @@ The mouse cursor is changing according to the action you're about to do:
 * Open hand if you are choosing a shape to move
 * Closed hand if you have already chosen a shape and you are choosing where to place it
 
-Common key-shortcuts are also available (ctrl+s, ctrl+l, ctrl+n, ctrl+w, ctrl+z, ctrl+shift+z).
+Common key-shortcuts are also available (`ctrl+s`, `ctrl+l`, `ctrl+n`, `ctrl+w`, `ctrl+z`, `ctrl+shift+z`).
 
 ### Design patterns
 
