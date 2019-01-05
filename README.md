@@ -79,9 +79,9 @@ As a view we use e.g. `Canvas` (`app/canvas.py`) and `Printer` (`app/printers.py
 
 ### Examples
 
-The GUI of the app looks like this – on top there is the graphical user interface, on the bottom there is the command line interface.
+The GUI of the app looks like this – on top there is the canvas, on the bottom is the command line interface.
 
-On the left its located the command palete, which can be used by user to draw shapes on canvas.
+On the left is located the command palete, which can be used by user to draw/remove shapes on canvas or to change the color.
 
 ![screenoshot](screenshot.png)
 
@@ -91,7 +91,7 @@ The app provides GUI with following features:
 
 * Command line interface
 * History of all commands
-* Drawing basic shapes (dots, lines, polylines, rectangles and circles)
+* Drawing basic shapes (i.e. dots, lines, polylines, rectangles and circles)
 * Shape preview while drawing
 * Color choosing
 * Moving and deleting shapes
@@ -124,15 +124,15 @@ To be able to not repeat our code, or create meaningless switches, we have used 
 
 #### Double-dispatch
 
-We call `shape.print_to(printer)` on given shape (first dispatch) and then call respective method for printing concrete shape on given printer (second dispatch), e.g. `app/shapes.py:53` and more.
+We call `shape.print_to(printer)` on given shape (first dispatch) and then call respective method for printing concrete shape on given printer (second dispatch), e.g. `app/shapes.py:53`.
 
 #### Visitor pattern
 
-We use this pattern for e.g. printers (`app/printers.py`), those are our visitors, and shapes (`app/shapes.py`), those are our objects.
+We use this pattern for printers (`app/printers.py`), those are our visitors, and shapes (`app/shapes.py`) are objects being visited.
 
 #### Factory pattern
 
-To keep our code flexible and reusable, we use factory pattern for shapes (`app/shapes.py`) via shape factories (`app/shape_factory.py`).
+To keep our code flexible and reusable, we use factory pattern (`app/shape_factory.py`) for shapes (`app/shapes.py`).
 
 #### Observer pattern
 
@@ -140,12 +140,12 @@ Controller (`app/controller.py`) observes shapes store (`app/shape_store.py`).
 
 #### Parser combinators
 
-We use cli parser (`app/parsers/cli_parser.py`) which has other parsers (e.g. `app/parsers/color_parser.py`) as input and properly parses the input data.
+We use CLI parser (`app/parsers/cli_parser.py`) which is built from other, smaller parsers (e.g. `app/parsers/color_parser.py`) as input and properly parses the input data.
 
 #### Strategy pattern
 
-We use canvas brushes (`app/brushes.py`) in our strategy pattern.
+We use canvas brushes (`app/brushes.py`) as a strategy pattern.
 
 #### Sigleton
 
-We also use canvas brushes (`app/brushes.py`) as singleton.
+Canvas brushes (`app/brushes.py`) are also singletons.
