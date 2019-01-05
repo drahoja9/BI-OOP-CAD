@@ -146,6 +146,6 @@ We use cli parser (`app/parsers/cli_parser.py`) which has other parsers (e.g. `a
 
 We use canvas brushes (`app/brushes.py`) in our strategy pattern.
 
-#### Signeton
+#### Sigleton
 
 We also use canvas brushes (`app/brushes.py`) as singleton.
