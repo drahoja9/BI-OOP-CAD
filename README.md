@@ -85,7 +85,7 @@ On the left is located the command palete, which can be used by user to draw/rem
 
 ![screenoshot](screenshot.png)
 
-### Desicions
+### Assignment
 
 The app provides GUI with following features:
 
