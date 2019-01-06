@@ -126,6 +126,8 @@ POINT ::= <ABSOLUTE_POINT> | <RELATIVE_POINT>
 POINTS ::= <POINT> | <POINT> <POINTS> 
 ABSOLUTE_POINT ::= <NAT>,<NAT>
 RELATIVE_POINT ::= <INT>,<INT>
+RGB_NAT ::= [0-9] | [1-9][0-9] | 1[0-9][0-9] | 2[0-4][0-9] | 25[0-5]
+RGB_COLOR ::= rgb\(<RGB_NAT>,<RGB_NAT>,<RGB_NAT>\)
 
 COMMAND ::= <SAVE> 
   | <LOAD> 
@@ -142,15 +144,13 @@ SHAPE_COMMAND ::= <LINE>
   | <CIRCLE> 
   | <DOT>
 
-RGB_COLOR ::= rgb(<NAT>,<NAT>,<NAT>)
-
 LINE ::= line <POINT> <POINTS>
 
 RECT ::= rect <POINT> <POINT>
   | rect <POINT> <NAT> <NAT>
 
-CIRCLE ::= circle <POINT> <NAT>
-  | circle <POINT> <POINT> 
+CIRCLE ::= circle <POINT> <POINT>
+  | circle <POINT> <NAT>
 
 DOT ::= dot <POINT>
 
