@@ -114,6 +114,65 @@ The mouse cursor is changing according to the action you're about to do:
 
 Common key-shortcuts are also available (`ctrl+s`, `ctrl+l`, `ctrl+n`, `ctrl+w`, `ctrl+z`, `ctrl+shift+z`).
 
+#### CLI commands
+
+The following is the grammar of the command language in BNF format with regex definition for `STRING`, `NAT` and `INT`:
+
+```
+STRING ::= "\w+"
+NAT ::= \d+
+INT ::= [+-]\d+ 
+POINT ::= <ABSOLUTE_POINT> | <RELATIVE_POINT>
+POINTS ::= <POINT> | <POINT> <POINTS> 
+ABSOLUTE_POINT ::= <NAT>,<NAT>
+RELATIVE_POINT ::= <INT>,<INT>
+
+COMMAND ::= <SAVE> 
+  | <LOAD> 
+  | <REMOVE> 
+  | <MOVE> 
+  | <CLEAR> 
+  | <LS> 
+  | <QUIT>
+  | <SHAPE_COMMAND> 
+  | <SHAPE_COMMAND> <RGB_COLOR>
+
+SHAPE_COMMAND ::= <LINE> 
+  | <RECT>
+  | <CIRCLE> 
+  | <DOT>
+
+RGB_COLOR ::= rgb(<NAT>,<NAT>,<NAT>)
+
+LINE ::= line <POINT> <POINTS>
+
+RECT ::= rect <POINT> <POINT>
+  | rect <POINT> <NAT> <NAT>
+
+CIRCLE ::= circle <POINT> <NAT>
+  | circle <POINT> <POINT> 
+
+DOT ::= dot <POINT>
+
+SAVE ::= save
+  | save <STRING>
+
+LOAD ::= load 
+  | load <STRING>
+
+REMOVE ::= remove <POINT>
+
+MOVE ::= move <POINT> <POINT>
+
+CLEAR ::= clear
+
+LS ::= ls
+  | ls <POINT>
+
+QUIT ::= quit
+```
+
+
 ### Design patterns
 
 In this section, we will describe some design patterns we have decided to use.
