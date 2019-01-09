@@ -44,7 +44,7 @@ pip install -r requirements.txt
 Run the app:
 
 ```shell
-./run.py
+python3 ./run.py
 ```
 
 ### Generating UI and/or resources
